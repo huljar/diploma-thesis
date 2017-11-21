@@ -1,0 +1,164 @@
+% !TeX program = lualatex
+% !TeX spellcheck = en_US
+\documentclass[
+	paper=a4,
+	%open=right, % Chapters start on right pages
+	%twoside=true,
+	fontsize=11pt,
+	parskip=full % Space between paragraphs
+]{scrreprt}
+
+% % % Polyglossia % % %
+\usepackage{polyglossia}
+\setmainlanguage{german}
+
+\usepackage{csquotes}
+
+% % % BibLaTeX % % %
+\usepackage[
+	%abbreviate=false, % Don't abbreviate standard bibliography terms
+	backend=biber, % Bibliography engine
+	citestyle=numeric-comp, % Style for citations
+	bibstyle=numeric, % Style for bibliography
+	date=terse, % Shorter dates
+	ibidtracker=false, idemtracker=false, opcittracker=false, citetracker=false, % Don't abbreviate when same citation twice in a row
+	doi=false, % Don't print the following fields in the bibliography, unless required by the entry type
+	isbn=false,
+	url=false,
+	giveninits=true, % Render first and middle names as initials
+	uniquename=init, % Prevent using initials for authors
+	maxcitenames=2, % Maximum number of authors to use in citations
+	maxbibnames=99 % Print all authors in bibliography
+]{biblatex}
+
+\bibliography{quellen}
+
+\setlength{\bibitemsep}{.7\baselineskip} % Empty lines between literature sources
+
+\renewcommand{\labelnamepunct}{\addcolon\addspace}
+
+% % % VarioRef % % %
+\usepackage{varioref}
+
+% % % GraphicX % % %
+\usepackage{graphicx}
+\graphicspath{{bilder/}}
+
+% % % EnumItem % % %
+\usepackage{enumitem}
+\setitemize{itemsep=-.5\parskip, topsep=-.5\baselineskip}
+\setenumerate{itemsep=-.5\parskip, topsep=-.5\baselineskip}
+
+% % % Titling % % %
+\usepackage{titling}
+
+% % % Caption % % %
+\usepackage[font={small,it}]{caption}
+
+% % % amssymb % % %
+\usepackage{amssymb}
+
+% % % MathTools % % %
+\usepackage{mathtools}
+
+% % % ChangeCounter % % %
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter} % Global footnote indices
+
+% % % EPStoPDF % % %
+%\usepackage{epstopdf}
+
+% % % Color % % %
+\usepackage{color}
+
+% % % SIunitX % % %
+%\usepackage[group-separator={,}]{siunitx}
+
+% % % Rahmendaten % % %
+\author{Julian Harttung}
+\title{Sichere und effiziente Datenübertragung für Network-on-Chip unter Nutzung multipler Pfade}
+\newcommand{\thesubtitle}{Diplomarbeit}
+\newcommand{\theuniversity}{Technische Universität Dresden}
+\newcommand{\thefaculty}{Fakultät Informatik}
+\newcommand{\theinstitute}{Institut für Systemarchitektur}
+\newcommand{\thechair}{Professur für Datenschutz und Datensicherheit}
+% % % Rahmendaten Ende % % %
+
+\begin{document}
+    \frenchspacing % Disable double spaces between sentences
+	\begin{titlepage}
+		\includegraphics[width=0.28\textwidth]{header_logo_tud}
+		\hfill
+		\includegraphics[width=0.28\textwidth]{header_logo_haec} % TODO: find HD HAEC logo
+		\vspace{2\baselineskip}
+		
+		\begin{center}
+			\textsc{\theuniversity \\
+					\thefaculty \\
+					\theinstitute \\
+					\thechair}
+			\vspace{4\baselineskip}
+		
+			\Huge{\thetitle}
+			\vspace{.5\baselineskip}
+			
+			\LARGE{\thesubtitle}
+		\end{center}
+		
+		\vfill
+		
+		\begin{tabular}{ll}
+			Autor:           & \theauthor \\
+			Studiengang:     & Diplom-Informatik \\
+			Matrikelnummer:  & 3753196 \\
+			Betreuer:        & Dr.-Ing. Elke Franz und Dipl.-Inf. Paul Walther \\
+			Hochschullehrer: & Prof. Dr. Thorsten Strufe \\
+			\multicolumn{2}{l}{ } \\
+			\multicolumn{2}{l}{ } \\
+			\multicolumn{2}{l}{ } \\
+			\multicolumn{2}{l}{Dresden, 11.\ April 2018} % TODO: adjust date
+		\end{tabular}
+	\end{titlepage}
+	
+	
+	\pagenumbering{roman}
+	
+	\chapter*{Aufgabenstellung}
+    Lorem ipsum
+	
+	\chapter*{Selbstständigkeitserklärung}
+	Hiermit erkläre ich, dass ich die von mir am heutigen Tag dem Prüfungsausschuss der Fakultät Informatik eingereichte Arbeit zum Thema:
+	\begin{center}
+		\textit{\thetitle} 
+	\end{center}
+	
+	vollkommen selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.
+	
+	Dresden, 11.\ April 2018 \\ % TODO: adjust date
+	\theauthor
+	
+	
+	\chapter*{Abstract}
+    Lorem ipsum
+	
+	\tableofcontents
+	
+	\addtocontents{lot}{\protect\vspace{-1.4\baselineskip}}
+	\addtocontents{lof}{\protect\vspace{-1.4\baselineskip}}
+	
+	\listoftables
+	\vspace{-2.6\baselineskip}
+	\begingroup
+	\let\clearpage\relax
+	\listoffigures
+	\endgroup
+	
+	
+	\chapter{Einleitung}\label{ch:einleitung}
+	\pagenumbering{arabic}
+    Lorem ipsum
+	
+	% % % Bibliography % % %
+	\nocite{*} % Put all entries in the bibliography, not only those cited in the document
+	\printbibliography
+\end{document}

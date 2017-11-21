@@ -1,0 +1,18 @@
+.*.swp
+
+# TeX auxiliary files
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+
+# Compiled document
+*.pdf
+
+# BibLaTeX auxiliary files
+*.bbl
+*.bcf
+*.blg
+*.run.xml
