@@ -157,6 +157,15 @@
 	\chapter{Einleitung}\label{ch:einleitung}
 	\pagenumbering{arabic}
     Lorem ipsum
+
+    \chapter{Notizen}
+    \section{NoC-Design}
+    \begin{itemize}
+        \item Router: in+out buffer vs. only input buffer (2 cycles vs. 1 cycle routing)
+        \item GenTraffic: injection rate of 0.2 was considered in Sadia's calculations and is a good starting point
+        \item Network Interface: sender and receiver share the crypto units → we need to keep track of where the flit has to go after leaving the crypto unit → flag at crypto unit itself?
+        \item Speed: NoC usually runs at ~500 MHz or a bit lower, but definitely runs a lot faster than the maximum frequency of the lightweight encryption algorithms. Using multiple clock domains is hard and requires expertise
+        \item Crypto algorithms: 18 units for mCrypton was planned; also possible to use multiple (but less) PRINCE units, but then the clock domain problem arises again
 	
 	% % % Bibliography % % %
 	\nocite{*} % Put all entries in the bibliography, not only those cited in the document
