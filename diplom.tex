@@ -158,6 +158,53 @@
 	\pagenumbering{arabic}
     Lorem ipsum
 
+    \chapter{Implementierung}
+    \section{Ablauf}
+    \begin{itemize}
+        \item lalala
+    \end{itemize}
+
+    \section{Annahmen}
+    \begin{itemize}
+        \item only input buffers are used (for app, NI, router), no output buffers
+        \item network coding module stores flits until enough flits with the same
+            destination are available (in our case: 2)
+        \item network coding (creating all 3 combinations) takes one cycle, but
+            because we can only send one flit out per cycle, it takes 3 cycles until
+            all combinations are sent (so in the end it's one combination per cycle)
+        \item we have a variable number of authentication units and the amount of
+            cycles the encryption algorithm takes can be set by a parameter
+        \item if all crypto units are busy, the encoded flit combinations are held
+            back in a dedicated buffer
+        \item if e.g. authentication method 1 is used (1 MAC flit per data flit),
+            the data flit is sent out one cycle before the MAC finished computing,
+            so the MAC can be sent immediately when it's ready
+        \item the encoding/authentication and decoding/verification pipelines in the
+            network interface share the same crypto units (but this is not
+            implemented yet)
+        \item when a flit arrives at the NI from the router, the first thing that is
+            done is checking if this is an ARQ. If yes, it is delivered directly to
+            the retransmission buffer. Otherwise, it goes through the normal network
+            decoding pipeline
+        \item when an ARQ arrives at a NI, it takes one cycle to look up the correct
+            flit and it will be sent out in the same cycle (not sure about this, two
+            cycles might be more realistic)
+        \item size of the retransmission buffer is configurable
+        \item retransmission buffers use a FIFO caching strategy
+        \item if an ARQ and a new data flit arrive a the retransmission buffer
+            during the same clock cycle, the ARQ answer (retransmission) has
+            priority to be sent out first
+        \item in a router, several flits can be routed simultaneously, provided that
+            they do not share an input or output port
+        \item also in router: flits are held back in the input queues if the
+            receiving router's input queue is full (this was discussed in an earlier
+            email)
+        \item in uncoded flits, the GID header contains a flit ID instead of
+            generation ID, and MAC and data flit have the same ID
+        \item the different values for the mode header are: normal data flit, mac
+            flit, data/mac combined, ARQ
+    \end{itemize}
+
     \chapter{Notizen}
     \section{NoC-Design}
     \begin{itemize}
@@ -166,6 +213,7 @@
         \item Network Interface: sender and receiver share the crypto units → we need to keep track of where the flit has to go after leaving the crypto unit → flag at crypto unit itself?
         \item Speed: NoC usually runs at ~500 MHz or a bit lower, but definitely runs a lot faster than the maximum frequency of the lightweight encryption algorithms. Using multiple clock domains is hard and requires expertise
         \item Crypto algorithms: 18 units for mCrypton was planned; also possible to use multiple (but less) PRINCE units, but then the clock domain problem arises again
+    \end{itemize}
 	
 	% % % Bibliography % % %
 	\nocite{*} % Put all entries in the bibliography, not only those cited in the document
