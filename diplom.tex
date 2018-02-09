@@ -158,6 +158,14 @@
 	\pagenumbering{arabic}
     Lorem ipsum
 
+    \chapter{Ansprechen}
+    \begin{itemize}
+        \item Encrypt-then-MAC vs. Encrypt-and-MAC
+        \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
+        \item Welche Komponenten brauchen wie viele Takte
+        \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
+    \end{itemize}
+
     \chapter{Implementierung}
     \section{Ablauf}
     \begin{itemize}
@@ -203,6 +211,10 @@
             generation ID, and MAC and data flit have the same ID
         \item the different values for the mode header are: normal data flit, mac
             flit, data/mac combined, ARQ
+        \item entry guard can distribute a departing and an arriving flit at the same
+            time, as long as units are free
+        \item it does not matter whether data or mac flit is sent out first (order),
+            because they can arrive out-of-order at the destination node anyway
     \end{itemize}
 
     \chapter{Notizen}
