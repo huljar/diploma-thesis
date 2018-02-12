@@ -1,5 +1,5 @@
 % !TeX program = lualatex
-% !TeX spellcheck = en_US
+% !TeX spellcheck = de_DE
 \documentclass[
 	paper=a4,
 	%open=right, % Chapters start on right pages
@@ -158,18 +158,38 @@
 	\pagenumbering{arabic}
     Lorem ipsum
 
-    \chapter{Ansprechen}
+    \chapter{Verwandte Arbeiten}
     \begin{itemize}
-        \item Encrypt-then-MAC vs. Encrypt-and-MAC
-        \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
-        \item Welche Komponenten brauchen wie viele Takte
-        \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
+        \item \textbf{Guest Editors’ Introduction: The Network-on-Chip Paradigm in Practice and Research}
+            \begin{itemize}
+                \item Aus dem Jahr 2005, als SoC-Kommunikationsschwierigkeiten wichtiger wurden
+            \end{itemize}
     \end{itemize}
+
+    \chapter{Das HAEC-Projekt}
+
+    \section{NoC-Design}
+
+    \chapter{Kommunikations-Protokoll}
 
     \chapter{Implementierung}
     \section{Ablauf}
     \begin{itemize}
         \item lalala
+    \end{itemize}
+
+    \chapter{Ansprechen}
+    \begin{itemize}
+        \item Encrypt-then-MAC vs. Encrypt-and-MAC (bei Encrypt-then-MAC encrypt+authenticate sequentiell, aber decrypt+verify parallel.
+            Bei Encrypt-and-MAC encrypt+authenticate parallel, aber decrypt+verify sequentiell). Bei Encrypt-and-MAC: decrypt kann schon
+            beginnen, wenn MAC noch nicht da ist, verringert die Latenz in manchen Fällen.
+        \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
+        \item Welche Komponenten brauchen wie viele Takte
+        \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
+        \item GALS design pattern - wir sind aber auf jeden Fall synchron innerhalb einer Node, d.h. wenn GALS vs GS diskutiert wird,
+            ändert sich nur die Zeit der Übertragung zwischen den Routern
+        \item Leichtgewichtige Krypto: FPGA vs. ASIC, speedup von Faktor 3-4 wahrscheinlich möglich (→ critical path delay) \cite{kuon07fpgavsasic}
+            → AES und AES\_INV zum Vergleich, da ähnlicher Aufbau von Logik + FlipFlops (Rundenfunktionen etc.)
     \end{itemize}
 
     \section{Annahmen}
@@ -215,6 +235,7 @@
             time, as long as units are free
         \item it does not matter whether data or mac flit is sent out first (order),
             because they can arrive out-of-order at the destination node anyway
+        \item encryption units can also be used for decryption
     \end{itemize}
 
     \chapter{Notizen}
