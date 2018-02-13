@@ -1,3 +1,4 @@
+# Vim lockfile
 .*.swp
 
 # TeX auxiliary files
@@ -7,6 +8,8 @@
 *.lof
 *.lot
 *.synctex.gz
+*.fls
+*.fdb_latexmk
 
 # Compiled document
 *.pdf

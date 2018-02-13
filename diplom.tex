@@ -187,9 +187,11 @@
         \item Welche Komponenten brauchen wie viele Takte
         \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
         \item GALS design pattern - wir sind aber auf jeden Fall synchron innerhalb einer Node, d.h. wenn GALS vs GS diskutiert wird,
-            ändert sich nur die Zeit der Übertragung zwischen den Routern
+            ändert sich nur die Zeit der Übertragung zwischen den Routern → zur Vereinfachung wird GS angenommen
         \item Leichtgewichtige Krypto: FPGA vs. ASIC, speedup von Faktor 3-4 wahrscheinlich möglich (→ critical path delay) \cite{kuon07fpgavsasic}
-            → AES und AES\_INV zum Vergleich, da ähnlicher Aufbau von Logik + FlipFlops (Rundenfunktionen etc.)
+            → AES und AES\_INV zum Vergleich, da ähnlicher Aufbau von kombinatorischer Logik + FlipFlops (Rundenfunktionen etc.)
+        \item Statistiken: Wie viele Crypto Units für Auth+Enc sind gleichzeitig besetzt (→ Auslastung)
+        \item Threat model, protection goals
     \end{itemize}
 
     \section{Annahmen}
