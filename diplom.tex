@@ -233,6 +233,12 @@
                 \item retransmission buffer: ARQs have priority
                 \item crypto units (→ entry guard): arriving flits have priority
             \end{itemize}
+        \item Lane widths
+            \begin{itemize}
+                \item lanes have as many wires as flits have bits
+                \item one flit can be transmitted per clock cycle per lane
+                \item flit size is fixed (standard header fields + 64 bit payload)
+            \end{itemize}
     \end{itemize}
 
     \chapter{Kommunikations-Protokoll}
