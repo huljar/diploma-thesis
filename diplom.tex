@@ -197,7 +197,43 @@
 
     \chapter{Das HAEC-Projekt}
 
-    \section{NoC-Design}
+    \chapter{NoC-Design}
+    \begin{itemize}
+        \item Encryption/authentication ordering
+            \begin{itemize}
+                \item Encrypt-then-MAC: best practice. Sequential encrypt/authenticate on sender side, but parallel decrypt/verify
+                    on receiver side. Advantage: MAC can be computed on sender side immediately when ciphertext arrives, even when
+                    MAC flit has not arrived yet (if ARQ is necessary, it can be issued right away)
+                \item MAC-then-encrypt: bad. Sequential authenticate/encrypt on sender side and sequential decrypt/verify on receiver
+                    side.
+                \item Encrypt-and-MAC: okay. Parallel encrypt/authenticate on sender side, but sequential decrypt/verify on receiver
+                    side (overall same latency as Encrypt-then-MAC, but without advantage of fast ARQs)
+            \end{itemize}
+        \item GALS (Globally Asynchronous, Locally Synchronous)
+            \begin{itemize}
+                \item not relevant for simulations, just for actual hardware (e.g. power spikes on active clock edges, low-power PEs etc.)
+                \item simulation is only inaccurate at the link between routers
+                \item we just do Globally Synchronous because it's easier
+            \end{itemize}
+        \item 24 bit FIDs/GIDs
+            \begin{itemize}
+                \item integer overflow after $2^{24}-1$
+                \item this is the latest time when session keys should be changed, otherwise packet injection (repeat attacks) become
+                    possible
+            \end{itemize}
+        \item Retransmission Buffer structure and lookup times
+            \begin{itemize}
+                \item corresponding flits are stored consecutively (e.g. data/MAC of same FID, flits of same generation etc.)
+                \item lookup time (in clock cycles) is a parameter in the simulation
+                \item UC case: one cycle lookup is fine (just need to find FID, mode field determines offset in the buffer)
+                \item NC case: two cycles for lookup (one to find GID, one to compare GEVs of the generation in parallel, mode determines offset)
+            \end{itemize}
+        \item Priorities
+            \begin{itemize}
+                \item retransmission buffer: ARQs have priority
+                \item crypto units (→ entry guard): arriving flits have priority
+            \end{itemize}
+    \end{itemize}
 
     \chapter{Kommunikations-Protokoll}
 
