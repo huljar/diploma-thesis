@@ -239,6 +239,19 @@
                 \item one flit can be transmitted per clock cycle per lane
                 \item flit size is fixed (standard header fields + 64 bit payload)
             \end{itemize}
+        \item Routing Strategies
+            \begin{itemize}
+                \item XY/YX
+                    \begin{itemize}
+                        \item Deterministic path
+                        \item Attacker controlling a single router can reliably disrupt communication between certain nodes
+                        \item does not distribute flits of a generation across different paths
+                    \end{itemize}
+                \item Valiant
+                    \begin{itemize}
+                        \item Deterministic path only if fixed valiant
+                    \end{itemize}
+            \end{itemize}
     \end{itemize}
 
     \chapter{Kommunikations-Protokoll}
@@ -248,6 +261,9 @@
     \begin{itemize}
         \item lalala
     \end{itemize}
+
+    \section{Components}
+    \subsection{Network Interface}
 
     \chapter{Ansprechen}
     \begin{itemize}
