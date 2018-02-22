@@ -276,6 +276,8 @@
                 \item Timeout of x (e.g. 8) cycles until first ARQ is sent
                 \item If limit >1: start larger timeout (→ round-trip of ARQ) until things start arriving again
                 \item Many different cases, insert some flow diagrams here
+                \item The higher the ARQ timeout/limit, the less likely the flit is still in retransmission buffer
+                \item → ARQ timeout/limit and retransmission buffer size have to correlate
             \end{itemize}
     \end{itemize}
 
