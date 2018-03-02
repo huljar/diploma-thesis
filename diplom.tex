@@ -199,6 +199,17 @@
 
     \chapter{The HAEC Project}
 
+    \chapter{Simulation Setup}
+    \section{Node Layout}
+
+    \section{Attacker Model}
+    \begin{itemize}
+        \item Variable number of compromised routers (e.g. 8 for an 8x8 grid)
+        \item Compromised routers randomly drop or modify packets (no intelligent modifications/drops)
+        \item Future work: If attacker model changes, i.e. attackers start to drop specific/whole generations,
+            how does that influence the Routing/ARQ design?
+    \end{itemize}
+
     \chapter{NoC Design}
     \begin{itemize}
         \item Encryption/authentication ordering
