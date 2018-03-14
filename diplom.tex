@@ -160,16 +160,29 @@
     Multi-core chips are/were often based on bus communication, which quickly becomes impractical for many-core chips.
     To confront this scaling problem, new ways of communication were developed, and thus the Network-on-Chip principle was devised.
 
+    Security is an essential component to NoC design. \citeauthor{ancajas14fortnocs} have shown that it is feasible to compromise a NoC with a very
+    minimal area and performance overhead, and that attack vectors are accessible e.g. in cloud computing setups. \cite{ancajas14fortnocs}
+
     \chapter{Related Work} % TODO: filter papers by number of citations and conferences
     \begin{itemize}
-        \item \textbf{Guest Editors’ Introduction: The Network-on-Chip Paradigm in Practice and Research}
+        \item \textbf{\citetitle{ivanov05nocintroduction}}
             \begin{itemize}
                 \item Aus dem Jahr 2005, als SoC-Kommunikationsschwierigkeiten wichtiger wurden
                 \item Wird als langfristiger Einstiegspunkt in NoC-Forschung gesehen von den Autoren
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{ancajas14fortnocs}}
             \begin{itemize}
-                \item
+                \item MPSoCs with 3rd party IP NoCs (i.e. the interconnect system is 3rd party)
+                \item Software accomplices (malicious/infected processing elements)
+                \item Attack types: eavesdropping (information leak), voluntary data corruption, denial of service
+                \item Fort-NoCs: 3-layer security mechanism (hardware level protection)
+                    \begin{itemize}
+                        \item Lower layer data scrambling
+                        \item Middle layer packet certification
+                        \item Top layer node obfuscation
+                    \end{itemize}
+                \item Malicious PE must secretly communicate with hardware trojan to send commands (C\&C node)
+                \item Easy to run malicious software on a PE e.g. in cloud computing setups
             \end{itemize}
         \item \textbf{}
             \begin{itemize}
