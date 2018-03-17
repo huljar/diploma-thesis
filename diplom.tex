@@ -177,16 +177,29 @@
                 \item Attack types: eavesdropping (information leak), voluntary data corruption, denial of service
                 \item Fort-NoCs: 3-layer security mechanism (hardware level protection)
                     \begin{itemize}
-                        \item Lower layer data scrambling
-                        \item Middle layer packet certification
-                        \item Top layer node obfuscation
+                        \item Lower layer data scrambling (hardware encryption to prevent covert activation sequences from AcTh to Trojan)
+                        \item Middle layer packet certification (authentication tag, detect unintended destination after flit copy)
+                        \item Top layer node obfuscation (migrate running applications from one node to another)
                     \end{itemize}
                 \item Malicious PE must secretly communicate with hardware trojan to send commands (C\&C node)
                 \item Easy to run malicious software on a PE e.g. in cloud computing setups
+                \item Small area and power overhead, mostly small runtime overhead
+                \item Not all layers need to be used (in lower security domains)
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{frey17hardenednoc}}
             \begin{itemize}
-                \item
+                \item Router level hardware trojans (HTs)
+                \item Focuses on DoS attacks (bandwidth depletion) originating in a router (not a NI because router has more connections → more
+                    feasible)
+                \item Implement DoS mitigation directly in the routers, rather than NI, to prevent bandwidth depletion as quickly as possible
+                \item Physically Unclonable Function (PUF): random vector generation in each router
+                \item Apply random dynamic permutation (data scrambling) to flits arriving at a router input (makes modifying flits into something
+                    meaningful significantly harder) before flit reaches the input queue (where the HT has access); de-permutate at output port (→
+                    PUF random vectors)
+                \item Apply ECC (error control code) encoding before input port; decode before output port (only critical flit bits: header, tail,
+                    dest. address)
+                \item Check flit integrity after leaving input queue and right before departing through the computed output port
+                \item Cites lots of useful other related work
             \end{itemize}
         \item \textbf{}
             \begin{itemize}
@@ -209,6 +222,13 @@
                 \item
             \end{itemize}
     \end{itemize}
+
+    Differentiate between methods to detect HTs (on software level, firmware level, w/ static analysis, side-channel analysis), and methods to harden
+    the NoC against potential HT infections.
+
+    NI is usually assumed to be trusted, and routers are potentially compromised because of 3rd party IP or 3rd party manufacturing/integration partners.
+
+    This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
 
     \chapter{The HAEC Project}
 
@@ -344,6 +364,12 @@
 
     \section{Components}
     \subsection{Network Interface}
+
+    \chapter{Future Work}
+    \begin{itemize}
+        \item Local network coding, local encoding vectors
+        \item Burst mode
+    \end{itemize}
 
     \chapter{Talk About}
     \begin{itemize}
