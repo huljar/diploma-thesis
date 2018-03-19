@@ -201,13 +201,24 @@
                 \item Check flit integrity after leaving input queue and right before departing through the computed output port
                 \item Cites lots of useful other related work
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{fernandes16nocrouting}}
             \begin{itemize}
-                \item
+                \item "Attacks at MPSoC aim to extract sensitive data, modify the system behavior or denial the system operation (Denial-of-Service,
+                    DoS)"
+                \item Build security zones in the NoC using routing algorithm ("wrap IPs and protect sensitive information from attacker")
+                \item Firewalls also possible, but may be costly (→ they implement a security policy in the NI)
+                \item Aims to protect against software-based attacks (NoC is assumed to be secure)
+                \item Threat model: timing and DoS attacks
+                \item Security zone is e.g. the set of IP blocks that an application was mapped on
+                \item Routing algorithm tries to keep the sensitive path completely inside the same security zone, if possible
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{boraten16packetsecurity}}
             \begin{itemize}
-                \item
+                \item Packet-Security (P-Sec)
+                \item Threat model: compromised NoC does fault injection (side channel attack)
+                \item It is possible to eventually obtain encryption keys by observing how how encoders and decoders react to the side channel attacks
+                \item → ensure integrity of packets (AMD, CRC)
+                \item AMD for sensitive communications (together with encryption), otherwise CRC to provide minimal fault tolerance
             \end{itemize}
         \item \textbf{}
             \begin{itemize}
@@ -226,7 +237,8 @@
     Differentiate between methods to detect HTs (on software level, firmware level, w/ static analysis, side-channel analysis), and methods to harden
     the NoC against potential HT infections.
 
-    NI is usually assumed to be trusted, and routers are potentially compromised because of 3rd party IP or 3rd party manufacturing/integration partners.
+    NI is usually assumed to be trusted, and routers are potentially compromised because of 3rd party IP or 3rd party manufacturing/integration
+    partners. Other threat model: software attacks (NoC itself is secure).
 
     This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
 
