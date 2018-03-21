@@ -170,6 +170,17 @@
                 \item Aus dem Jahr 2005, als SoC-Kommunikationsschwierigkeiten wichtiger wurden
                 \item Wird als langfristiger Einstiegspunkt in NoC-Forschung gesehen von den Autoren
             \end{itemize}
+        \item \textbf{\citetitle{sethumadhavan15trustworthyhardware}}
+            \begin{itemize}
+                \item Introduction into hardware design process and compromisation vectors
+                \item Explains how the hardware design and fabrication chain is vulnerable to exploits/attacks
+                \item Three security systems operating "in series" (next one is only coming into play if previous one has failed)
+                    \begin{enumerate}
+                        \item Static check that the design being used is backdoor-free
+                        \item Runtime altering of inputs (→ obfuscation) to ensure backdoors are not triggered/turned on
+                        \item Runtime on-chip monitoring (of instruction counts, opcode types, ...) to detect enabled backdoors
+                    \end{enumerate}
+            \end{itemize}
         \item \textbf{\citetitle{ancajas14fortnocs}}
             \begin{itemize}
                 \item MPSoCs with 3rd party IP NoCs (i.e. the interconnect system is 3rd party)
@@ -186,8 +197,16 @@
                 \item Small area and power overhead, mostly small runtime overhead
                 \item Not all layers need to be used (in lower security domains)
             \end{itemize}
+        \item \textbf{\citetitle{frey15stateobfuscation}}
+            \begin{itemize}
+                \item Attacker model: HT is the FSM control unit of NIs (very specific HT location)
+                \item Countermeasure: obfuscate the states and state transistions that the FSMs do
+                \item HT modifying state transitions causes FSM to enter illegal/invalid state → HT warning
+                \item High HT detection rate (for this specific type of HT)
+            \end{itemize}
         \item \textbf{\citetitle{frey17hardenednoc}}
             \begin{itemize}
+                \item Published two years after state obfuscation paper above
                 \item Router level hardware trojans (HTs)
                 \item Focuses on DoS attacks (bandwidth depletion) originating in a router (not a NI because router has more connections → more
                     feasible)
@@ -216,23 +235,43 @@
             \begin{itemize}
                 \item Packet-Security (P-Sec)
                 \item Threat model: compromised NoC does fault injection (side channel attack)
-                \item It is possible to eventually obtain encryption keys by observing how how encoders and decoders react to the side channel attacks
-                \item → ensure integrity of packets (AMD, CRC)
+                \item It is possible to eventually obtain encryption keys by observing how encoders and decoders react to the side channel attacks
+                \item → ensure integrity of packets using error correction codes (ECCs) (→ AMD, CRC)
                 \item AMD for sensitive communications (together with encryption), otherwise CRC to provide minimal fault tolerance
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{boraten18mitigationdos}}
             \begin{itemize}
-                \item
+                \item Published 2 year after Packet Security paper above (builds upon previous research)
+                \item HT does DoS attack: inspect packets, inject fault, trigger ECC response (ECC cannot correct error) → repeated transmissions,
+                    deadlocks
+                \item HT resides in links between nodes
+                \item Prevention: Heuristic fault classification → discover HTs
+                \item Continue using compromised links instead of rerouting → obfuscation to prevent HT triggering, optimized AMDs to detect fault
+                    injections
+                \item Little overhead: 2\% area, 6\% power
+                \item "[...] we can classify security threats for NoCs as a subset of preexisting challenges originating from but not limited to,
+                    on-chip fault tolerance, functional correctness, path diversity, isolation, and quality of service"
+                \item Security measures should not be compromised themselves
             \end{itemize}
-        \item \textbf{}
+        \item \textbf{\citetitle{biswas2015routerattack}}
             \begin{itemize}
-                \item
-            \end{itemize}
-        \item \textbf{}
-            \begin{itemize}
-                \item
+                \item Survey of MPSoC attack types
+                \item New attack type for routing table-based routers (i.e. reconfigurable routers as opposed to routers with fixed routing logic)
+                \item Mentions survey of hardware trojan detection techniques
+                \item Not about detecting HTs, but about protection from malicious users
+                \item → TEEs and REEs (Trusted/Rich Execution Environments), similar to security zones
+                \item It is desirable to use routing tables instead of fixed routing logic (flexibility, more complex routing algorithms)
+                \item Attack scenario: routing table is loaded onto NoC at boot or runtime (by host processor or NoC controller), which is modified by
+                    the attacker → unauthorized access and misrouting (routing to other environment)
             \end{itemize}
     \end{itemize}
+
+    Different attacker/threat models in literature. Depending on the attacker model, different approaches are used to protect the system against it.
+    E.g. when the underlying network architecture (the NoC itself) is assumed to be compromised, protection is implemented in the network interfaces
+    of the nodes. If the attacker only has access to specific parts of the routers or specific zones of the NoC, protection can be implemented through
+    the routing algorithm. → The power of the HTs differs. The more complex the HT is, the stronger it influences chip area/power consumption/runtime
+    overhead and may be easier detectable → that's why HTs are often assumed to use "small" attacks like fault injection, or have access to only very
+    specific components of the NoC to stay undetected/not require much chip area.
 
     Differentiate between methods to detect HTs (on software level, firmware level, w/ static analysis, side-channel analysis), and methods to harden
     the NoC against potential HT infections.
@@ -240,7 +279,10 @@
     NI is usually assumed to be trusted, and routers are potentially compromised because of 3rd party IP or 3rd party manufacturing/integration
     partners. Other threat model: software attacks (NoC itself is secure).
 
+    How to get HT into hardware: rogue employee, 3rd party IP, 3rd party manufacturing/integration partners, ...
+
     This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
+    Deterministic vs. static routing?
 
     \chapter{The HAEC Project}
 
