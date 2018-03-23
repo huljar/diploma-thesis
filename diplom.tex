@@ -37,6 +37,9 @@
 
 \renewcommand{\labelnamepunct}{\addcolon\addspace}
 
+% % % Bookmark % % %
+\usepackage[open,openlevel=1]{bookmark}
+
 % % % VarioRef % % %
 \usepackage{varioref}
 
@@ -264,6 +267,34 @@
                 \item Attack scenario: routing table is loaded onto NoC at boot or runtime (by host processor or NoC controller), which is modified by
                     the attacker → unauthorized access and misrouting (routing to other environment)
             \end{itemize}
+        \item \textbf{\citetitle{gebotys03securityframework}}
+            \begin{itemize}
+                \item Framework: protection both at network and application layer
+                \item Network layer
+                    \begin{itemize}
+                        \item Key-keeper core: protects/distributes encryption keys to other secure cores
+                        \item Each secure core has a security wrapper
+                        \item Focus on key distribution and key management
+                    \end{itemize}
+                \item Application layer
+                    \begin{itemize}
+                        \item Software modifications for resistance against power (side-channel) attacks
+                    \end{itemize}
+                \item Higher level approach than most other papers (more protocol layer than hardware layer)
+                \item Strong assumptions on trusted software and hardware
+                \item No clear attacker model, paper seems more like a "framework suggestion"
+            \end{itemize}
+        \item \textbf{\citetitle{kapoor2013nocauthenc}}
+            \begin{itemize}
+                \item 2 NoC zones: secure and non-secure IP cores
+                \item Authenticated Encryption implemented in NIs of secure cores
+                \item Secure cores can communicate with each other using permanent keys
+                \item Non-secure cores can communicate with each other using plain text
+                \item Hardware (NIs + routers) are assumed to be secure
+                \item Secure and non-secure cores communicate with session keys and an intermediate link IP core (link can be secure or non-secure)
+                \item Memory IP cores have access rights table in NI to prevent unauthorized memory accesses
+                \item DoS attacks prevented by having a max number of packets allowed to be sent implemented in NI
+            \end{itemize}
     \end{itemize}
 
     Different attacker/threat models in literature. Depending on the attacker model, different approaches are used to protect the system against it.
@@ -282,7 +313,7 @@
     How to get HT into hardware: rogue employee, 3rd party IP, 3rd party manufacturing/integration partners, ...
 
     This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
-    Deterministic vs. static routing?
+    Deterministic vs. static routing? No security zones or division into secure/non-secure zones/cores.
 
     \chapter{The HAEC Project}
 
