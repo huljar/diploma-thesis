@@ -295,6 +295,30 @@
                 \item Memory IP cores have access rights table in NI to prevent unauthorized memory accesses
                 \item DoS attacks prevented by having a max number of packets allowed to be sent implemented in NI
             \end{itemize}
+        \item \textbf{\citetitle{evain05nocsecurityanalysis}}
+            \begin{itemize}
+                \item In their context: CCM (central configuration module) is added (unique IP block → initialize and (re)configure NoC). Also CCM:
+                    add supervising and defending reactions for security
+                \item FPGA vs. ASIC: reconfigurability of FPGA is another potential attack vector
+                \item Mixed FPGA/ASIC implementation possible: ASIC for secure zone, FPGA for insecure zone (CCM must be in secure zone)
+                \item Many possible attack types → different protection strategies
+                    \begin{itemize}
+                        \item Bandwidth denial: virtual channels in the secure area (unsecure packets can't obstruct secure packets)
+                        \item Unauthorized access: packet/path filters at zone boundaries and/or at NIs
+                        \item Only encrypted/authenticated communication with the CCM
+                    \end{itemize}
+            \end{itemize}
+        \item \textbf{\citetitle{stefan11enhancingnocs}}
+            \begin{itemize}
+                \item Introduce non-determinism through multipath routing
+                \item Proposal is implemented on top of Aethereal framework
+                \item Time-division multiplexing (TDM) for router channels
+                \item Alternative path selection
+                    \begin{itemize}
+                        \item … based on position in the slot table at the moment of sending (static schedule)
+                        \item … based on hardware RNG (dynamic at runtime)
+                    \end{itemize}
+            \end{itemize}
     \end{itemize}
 
     Different attacker/threat models in literature. Depending on the attacker model, different approaches are used to protect the system against it.
@@ -314,6 +338,8 @@
 
     This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
     Deterministic vs. static routing? No security zones or division into secure/non-secure zones/cores.
+    
+    The concept of security zones can be implemented in different ways. Bla et al. propose to do X, while bla enforce them through the routing protocol.
 
     \chapter{The HAEC Project}
 
@@ -473,6 +499,7 @@
         \item node-unique FIDs/GIDs have advantage that 24 bits are not full nearly as fast as with globally unique IDs
 		\item large flits (128 bits) need 2 crypto units (w/ block size 64 bit)
         \item Lack of error correcting code (ECC) in simulation
+        \item Deadlock/Livelock possibilities? D yes, L not
     \end{itemize}
 
     \section{Assumptions}
@@ -532,6 +559,6 @@
     \end{itemize}
 	
 	% % % Bibliography % % %
-	\nocite{*} % Put all entries in the bibliography, not only those cited in the document
+	%\nocite{*} % Put all entries in the bibliography, not only those cited in the document
 	\printbibliography
 \end{document}
