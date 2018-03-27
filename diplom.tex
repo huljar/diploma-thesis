@@ -47,6 +47,11 @@
 \usepackage{graphicx}
 \graphicspath{{bilder/}}
 
+% % % Glossaries % % %
+\usepackage[toc,nonumberlist]{glossaries}
+\include{glossar}
+\makeglossaries
+
 % % % EnumItem % % %
 \usepackage{enumitem}
 \setitemize{itemsep=-.5\parskip, topsep=-.5\baselineskip}
@@ -159,12 +164,18 @@
 	
 	\chapter{Introduction}\label{ch:introduction}
 	\pagenumbering{arabic}
-    Since the dawn of multiprocessor system, the way/design of communicating/communication has been an integral part of processor design.
+    Since the dawn of multiprocessor systems, the way/design of communicating/communication has been an integral part of processor design.
     Multi-core chips are/were often based on bus communication, which quickly becomes impractical for many-core chips.
     To confront this scaling problem, new ways of communication were developed, and thus the Network-on-Chip principle was devised.
 
+    With the emergence of network-on-chip as a scalable solution for inter-core or inter-processor communication, ...
+
     Security is an essential component to NoC design. \citeauthor{ancajas14fortnocs} have shown that it is feasible to compromise a NoC with a very
     minimal area and performance overhead, and that attack vectors are accessible e.g. in cloud computing setups. \cite{ancajas14fortnocs}
+
+    In this thesis, a novel approach to secure a NoC against adversaries in the hardware is explored.
+
+    The rest/remainder of this thesis is organized as follows.
 
     \chapter{Related Work} % TODO: filter papers by number of citations and conferences
     \begin{itemize}
@@ -256,7 +267,7 @@
                     on-chip fault tolerance, functional correctness, path diversity, isolation, and quality of service"
                 \item Security measures should not be compromised themselves
             \end{itemize}
-        \item \textbf{\citetitle{biswas2015routerattack}}
+        \item \textbf{\citetitle{biswas15routerattack}}
             \begin{itemize}
                 \item Survey of MPSoC attack types
                 \item New attack type for routing table-based routers (i.e. reconfigurable routers as opposed to routers with fixed routing logic)
@@ -284,7 +295,7 @@
                 \item Strong assumptions on trusted software and hardware
                 \item No clear attacker model, paper seems more like a "framework suggestion"
             \end{itemize}
-        \item \textbf{\citetitle{kapoor2013nocauthenc}}
+        \item \textbf{\citetitle{kapoor13nocauthenc}}
             \begin{itemize}
                 \item 2 NoC zones: secure and non-secure IP cores
                 \item Authenticated Encryption implemented in NIs of secure cores
@@ -336,7 +347,9 @@
 
     How to get HT into hardware: rogue employee, 3rd party IP, 3rd party manufacturing/integration partners, ...
 
-    This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks.
+    This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks. Our
+    model assumes that the NoC routers and links may be compromised and thus relies on the NIs for the security measures → no effective protection
+    against bandwidth depletion, but this is not the goal.
     Deterministic vs. static routing? No security zones or division into secure/non-secure zones/cores.
     
     The concept of security zones can be implemented in different ways. Bla et al. propose to do X, while bla enforce them through the routing protocol.
@@ -355,6 +368,7 @@
     \end{itemize}
 
     \chapter{NoC Design}
+    2D mesh as NoC topology is very common in research (insert many cites here).
     \begin{itemize}
         \item Encryption/authentication ordering
             \begin{itemize}
@@ -554,11 +568,15 @@
         \item Router: in+out buffer vs. only input buffer (2 cycles vs. 1 cycle routing)
         \item GenTraffic: injection rate of 0.2 was considered in Sadia's calculations and is a good starting point
         \item Network Interface: sender and receiver share the crypto units → we need to keep track of where the flit has to go after leaving the crypto unit → flag at crypto unit itself?
-        \item Speed: NoC usually runs at ~500 MHz or a bit lower, but definitely runs a lot faster than the maximum frequency of the lightweight encryption algorithms. Using multiple clock domains is hard and requires expertise
+        \item Speed: \gls{noc} usually runs at ~500 MHz or a bit lower, but definitely runs a lot faster than the maximum frequency of the lightweight encryption algorithms. Using multiple clock domains is hard and requires expertise
         \item Crypto algorithms: 18 units for mCrypton was planned; also possible to use multiple (but less) PRINCE units, but then the clock domain problem arises again
     \end{itemize}
+
+    % % % Glossary % % %
+    \glsaddall % Print all glossary entries, not only the referenced ones
+    \printglossaries
 	
 	% % % Bibliography % % %
 	%\nocite{*} % Put all entries in the bibliography, not only those cited in the document
-	\printbibliography
+    \printbibliography[heading=bibintoc]
 \end{document}

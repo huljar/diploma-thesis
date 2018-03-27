@@ -9,6 +9,12 @@
 *.lot
 *.synctex.gz
 *.fls
+*.glg
+*.glo
+*.gls
+*.ist
+
+# latexmk auxiliary files
 *.fdb_latexmk
 
 # Compiled document

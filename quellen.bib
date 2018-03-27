@@ -1,4 +1,32 @@
-% NoC Architektur & Design
+% NoCs becoming popular and gaining traction
+@INPROCEEDINGS{dally01routepacketsnotwires,
+	author = "W. J. Dally and B. Towles",
+	booktitle = "Proceedings of the 38th Design Automation Conference (IEEE Cat. No.01CH37232)",
+	title = "Route packets, not wires: on-chip interconnection networks",
+	year = "2001",
+	volume = "",
+	number = "",
+	pages = "684-689",
+	keywords = "CMOS digital integrated circuits;circuit optimisation;crosstalk;integrated circuit interconnections;integrated circuit layout;modules;wiring;area overhead;electrical parameters;latency;modular design;on-chip interconnection networks;system modules;timing iterations;top level wires;Bandwidth;Circuits;Communication system control;Digital signal processing chips;Logic;Multiprocessor interconnection networks;Network-on-a-chip;Tiles;Wires;Wiring",
+	doi = "10.1109/DAC.2001.156225",
+	ISSN = "0738-100X",
+	month = ""
+}
+
+@ARTICLE{benini02nocparadigm,
+	author = "L. Benini and G. De Micheli",
+	journal = "Computer",
+	title = "Networks on chips: a new SoC paradigm",
+	year = "2002",
+	volume = "35",
+	number = "1",
+	pages = "70-78",
+	keywords = "hardware-software codesign;microprocessor chips;multiprocessor interconnection networks;reconfigurable architectures;SoC design methodologies;SoC paradigm;average values;complex SoCs;complex electronic engines;design objectives;deterministic models;future SoC designs;hardware design;integrated solution;interacting system-on-chip components;interconnecting components;layered methodology;layered micronetwork design methodology;modular component-based approach;networks on chips;on-chip micronetworks;plug-and-play fashion;probabilistic metrics;process technologies;software design;stochastic models;system on chip;time-to-market pressure;Consumer electronics;Design methodology;Engines;Fasteners;Multimedia systems;Network-on-a-chip;Process design;System-on-a-chip;Telecommunication network reliability;Time to market",
+	doi = "10.1109/2.976921",
+	ISSN = "0018-9162",
+	month = "01"
+}
+
 @article{ivanov05nocintroduction,
 	author = "A. Ivanov and G. De Micheli",
 	journal = "IEEE Design Test of Computers",
@@ -13,13 +41,22 @@
 	month = "09"
 }
 
-@book{tatas2016designingnocs,
-    title = "Designing 2D and 3D network-on-chip architectures",
-    author = "Tatas, Konstantinos and Siozios, Kostas and Soudris, Dimitrios and Jantsch, Axel",
-    year = "2016",
-    publisher = "Springer"
+% Information on HTs
+@ARTICLE{bhunia14hardwaretrojans,
+	author = "S. Bhunia and M. S. Hsiao and M. Banga and S. Narasimhan",
+	journal = "Proceedings of the IEEE",
+	title = "Hardware Trojan Attacks: Threat Analysis and Countermeasures",
+	year = "2014",
+	volume = "102",
+	number = "8",
+	pages = "1229-1247",
+	keywords = "electronics industry;invasive software;computer system security;electronic hardware malicious modifications;electronics industry;global economic trend;hardware Trojan attack;information processing;proactive protection approach;reactive protection approach;threat analysis;Circuit faults;Computer security;Fabrication;Hardware;Integrated circuit modeling;Integrated circuits;Trojan horses;Hardware intellectual property (IP) trust;Trojan detection;Trojan taxonomy;Trojan tolerance;hardware Trojan attacks;hardware obfuscation;self-referencing;side-channel analysis",
+	doi = "10.1109/JPROC.2014.2334493",
+	ISSN = "0018-9219",
+	month = "08"
 }
 
+% Attacks on NoCs and security measures
 @INPROCEEDINGS{ancajas14fortnocs,
 	author = "D. M. Ancajas and K. Chakraborty and S. Roy",
 	booktitle = "2014 51st ACM/EDAC/IEEE Design Automation Conference (DAC)",
@@ -34,7 +71,7 @@
 	month = "06"
 }
 
-@Article{biswas2015routerattack,
+@Article{biswas15routerattack,
 	author = "Biswas, Arnab Kumar and Nandy, S. K. and Narayan, Ranjani",
 	title = "Router Attack toward NoC-enabled MPSoC and Monitoring Countermeasures against such Threat",
 	journal = "Circuits, Systems, and Signal Processing",
@@ -174,7 +211,7 @@
 	address = "New York, NY, USA"
 }
 
-@Article{kapoor2013nocauthenc,
+@Article{kapoor13nocauthenc,
 	author = "Kapoor, Hemangee K. and Rao, G. Bhoopal and Arshi, Sharique and Trivedi, Gaurav",
 	title = "A Security Framework for NoC Using Authenticated Encryption and Session Keys",
 	journal = "Circuits, Systems, and Signal Processing",
@@ -230,6 +267,40 @@
 	month = "02"
 }
 
+% Security zones / trusted-untrusted separation / access rights limitation
+@ARTICLE{fiorin08memoryaccesses,
+	author = "L. Fiorin and G. Palermo and S. Lukovic and V. Catalano and C. Silvano",
+	journal = "IEEE Transactions on Computers",
+	title = "Secure Memory Accesses on Networks-on-Chip",
+	year = "2008",
+	volume = "57",
+	number = "9",
+	pages = "1216-1229",
+	keywords = "embedded systems;microprocessor chips;network-on-chip;security of data;shared memory systems;authentication techniques;data protection units;embedded devices;memory accesses security;multiprocessor systems;network interfaces;network security manager;network-on-chip architectures;run-time configuration;shared memory;Communication system security;Context;Data security;Multiprocessing systems;Network interfaces;Network-on-a-chip;Next generation networking;Permission;Protection;Runtime;Data Protection;Multiprocessor System-on-Chip;Networks-on-Chips;Security",
+	doi = "10.1109/TC.2008.69",
+	ISSN = "0018-9340",
+	month = "09"
+}
+
+% Software protection measures
+@inproceedings{wassel13surfnoc,
+    author = "Wassel, Hassan M. G. and Gao, Ying and Oberg, Jason K. and Huffmire, Ted and Kastner, Ryan and Chong, Frederic T. and Sherwood, Timothy",
+    title = "SurfNoC: A Low Latency and Provably Non-interfering Approach to Secure Networks-on-chip",
+    booktitle = "Proceedings of the 40th Annual International Symposium on Computer Architecture",
+    series = "ISCA '13",
+    year = "2013",
+    isbn = "978-1-4503-2079-5",
+    location = "Tel-Aviv, Israel",
+    pages = "583--594",
+    numpages = "12",
+    url = "http://doi.acm.org/10.1145/2485922.2485972",
+    doi = "10.1145/2485922.2485972",
+    acmid = "2485972",
+    publisher = "ACM",
+    address = "New York, NY, USA",
+    keywords = "high assurance systems, networks-on-chip, non-interference"
+}
+
 % Network Coding
 @article{chou07networkcoding,
 	author = "P. A. Chou and Y. Wu",
@@ -245,7 +316,7 @@
 	month = "09"
 }
 
-% Leichtgewichtige Krypto-Algorithmen
+% Lightweight crypto algorithms
 @article{kuon07fpgavsasic,
 	author = "I. Kuon and J. Rose",
 	journal = "IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems",
@@ -263,7 +334,15 @@
 @article{harttung17lightweightcrypto,
     author = "J. Harttung",
     title = "Evaluation of Lightweight Cryptographic Algorithms",
-	journal = "Analyse eines Forschungsthemas",
+	journal = "Analysis of Research Topics",
     year = "2017",
     month = "04"
+}
+
+% Other interesting stuff
+@book{tatas16designingnocs,
+    title = "Designing 2D and 3D network-on-chip architectures",
+    author = "Tatas, Konstantinos and Siozios, Kostas and Soudris, Dimitrios and Jantsch, Axel",
+    year = "2016",
+    publisher = "Springer"
 }
