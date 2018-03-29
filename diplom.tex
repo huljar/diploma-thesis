@@ -177,7 +177,30 @@
 
     The rest/remainder of this thesis is organized as follows.
 
-    \chapter{Related Work} % TODO: filter papers by number of citations and conferences
+    \chapter{Fundamentals}\label{ch:fundamentals}
+
+    \chapter{Related Work}\label{ch:relatedwork} % TODO: filter papers by number of citations and conferences
+
+    \section{Network-on-Chip}\label{sec:networkonchip}
+    Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
+    general-purpose on-chip networks has been introduced in the early 2000s
+    \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
+    \cite[e.g.][]{ivanov05nocintroduction}. With ever-increasing design complexity of modern chips \cite{mack11mooreslaw}, specialized on-chip
+    interconnections become infeasible to implement; designing such a system "would take too much time and mapping of applications to dedicated architectures would
+    be impossible" \cite[1]{kumar02networkonchip}. Thus, the \gls{noc} approach was devised to "facilitate [...] modularity by defining a
+    standard interface" \cite[1]{dally01routepacketsnotwires}.
+
+    As the popularity of \glspl{noc} increases, so does the interest of adversaries to compromise \glspl{mpsoc} that implement them as their communication
+    backbone. In recent research, many different attack vectors have been explored, and a variety of countermeasures has been proposed to mitigate
+    attacks. 
+
+    \Glspl{mpsoc} that utilize \glspl{noc} typically have a large number of processing elements that can run many different
+    tasks in parallel. Especially in cloud computing setups, untrusted applications run in parallel (cite paper mentioning cloud here).
+
+    \subsection{Software-Based Attacks on \glspl{mpsoc}}\label{subsec:softwareattacks}
+
+    \subsection{Hardware Trojans in \glspl{noc}}\label{subsec:hardwaretrojans}
+
     \begin{itemize}
         \item \textbf{\citetitle{ivanov05nocintroduction}}
             \begin{itemize}
@@ -573,7 +596,7 @@
     \end{itemize}
 
     % % % Glossary % % %
-    \glsaddall % Print all glossary entries, not only the referenced ones
+    %\glsaddall % Print all glossary entries, not only the referenced ones
     \printglossaries
 	
 	% % % Bibliography % % %
