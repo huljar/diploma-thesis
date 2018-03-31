@@ -9,7 +9,7 @@ In this case, each network node is connected to its four neighbors (excluding th
 
 A node typically consists of a processing element, a network interface (\textit{\gls{ni}}), and a router. (e.g. cites here). The router manages the connections to
 neighboring nodes while also allowing the local processing element to communicate with the network through the network interface. An example of this
-architecture is given in Figure \vref{fig:nocexample}. % TODO: add figure
+architecture is given in Figure \vref{fig:nocexample}.
 
 In a \gls{noc} architecture, each processing element has a \textit{network interface (\gls{ni})}. This interface connects the processing element to a
 router. The actual network is established between all
@@ -27,6 +27,13 @@ Furthermore, with the constantly increasing design complexity of modern chips \c
 interconnections become infeasible to implement. Designing such a system \enquote{would take too much time and mapping of applications to dedicated
 architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, \glspl{noc} aims to be general purpose interconnect systems; they
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{noc_3x3_colored}
+    \caption[Short text]{Long text} % TODO: caption
+    \label{fig:nocexample}
+\end{figure}
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 
