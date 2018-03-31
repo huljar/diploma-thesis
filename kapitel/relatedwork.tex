@@ -2,23 +2,16 @@
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
 general-purpose on-chip networks has been introduced in the early 2000s
 \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
-\cite[e.g.][]{ivanov05nocintroduction}. With the ever-increasing design complexity of modern chips \cite{mack11mooreslaw}, specialized on-chip
-interconnections become infeasible to implement; designing such a system "would take too much time and mapping of applications to dedicated architectures would
-be impossible" \cite[1]{kumar02networkonchip}. Thus, the \gls{noc} approach was devised to "facilitate […] modularity by defining a
-standard interface" \cite[1]{dally01routepacketsnotwires}.
-
+\cite[e.g.][]{ivanov05nocintroduction}. 
 \Glspl{mpsoc} that utilize \glspl{noc} typically have a large number of processing elements that can run many different
 tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
 untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
 
 As the popularity of \glspl{noc} increases, so does the interest of adversaries to compromise \glspl{mpsoc} that implement them as their communication
 backbone. In recent research, many different attack vectors have been explored, and a variety of countermeasures has been proposed to mitigate
-attacks. The following sections will present them in detail.
+attacks. The remainder of this section will explain them in detail.
 
-\subsection{Software-Based Attacks}\label{subsec:softwareattacks}
-
-\subsection{Hardware Trojans}\label{subsec:hardwaretrojans}
-
+Another popular approach is to divide the \gls{noc} into security zones.
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}. However,
