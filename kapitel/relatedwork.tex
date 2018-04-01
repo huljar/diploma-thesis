@@ -1,4 +1,4 @@
-\section{Network-on-Chip}\label{sec:networkonchip}
+\section{Network-on-Chip}\label{sec:networkonchiprel}
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
 general-purpose on-chip networks has been introduced in the early 2000s
 \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
@@ -7,11 +7,44 @@ general-purpose on-chip networks has been introduced in the early 2000s
 tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
 untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
 
-As the popularity of \glspl{noc} increases, so does the interest of adversaries to compromise \glspl{mpsoc} that implement them as their communication
-backbone. In recent research, many different attack vectors have been explored, and a variety of countermeasures has been proposed to mitigate
+In recent research, many different attack vectors have been explored, and a variety of countermeasures has been proposed to mitigate
 attacks. The remainder of this section will explain them in detail.
 
+% HT Survey & building trustworthy hardware
+\citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
+approaches. In a survey-like paper, they provide a detailed summary of attack scenarios, countermeasures, and detection paradigms. Similarly,
+\citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the problem of building systems from untrusted
+hardware conponents. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
+integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable for them nonetheless.
+
+% Fort-NoCs
+\citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans for \glspl{noc}. They show that the usage of
+third party \gls{noc} \gls{ip} is very popular due to cost efficiency, opening up an infection vector for hardware
+trojans. Together with a software accomplice (i.e. an infected processing element) that can send commands to the trojan, this may
+lead to information leaks, data corruption or denial of service attacks.
+
+The authors focus on mitigating \enquote{covert data theft by a compromised \gls{noc}} \cite[3]{ancajas14fortnocs}. They suggest a three-layer
+approach to mitigate this threat, consisting of data scrambling, packet certification, and node obfuscation. These techniques are
+implemented solely in the network interfaces, which are not provided by a third party and hence assumed to be trustworthy. The goal of these measures
+is to prevent activation of the hardware trojan and render transmitted information unreadable to the attacker.
+
+% Hardened NoC design
+\citeauthor{frey17hardenednoc} \cite{frey17hardenednoc} also worked on mitigating the effect of hardware trojans in a \gls{noc}. Their goal is to
+harden the \gls{noc} design against potential hardware trojans located inside the routers. In contrast to \citeauthor{ancajas14fortnocs}
+\cite{ancajas14fortnocs}, the protective measures are implemented at the router level and not in the network interfaces. They are designed to
+\enquote{complement […] the previous \gls{noc} works aiming for \gls{ni} security} \cite[16]{frey17hardenednoc} and address \gls{dos} attacks rather
+than information leakage.
+
+The approach of the authors is to detect any flit tampering right after they leave a router. To achieve this, an error control code and dynamic flit
+permutation are applied to all flits before they enter a router, and the reverse transformations are applied after they exit the router again. This
+prevents (or at least detects) small and targeted modifications to the flit headers. % TODO: not the best wording
+
+While \citeauthor{ancajas14fortnocs} have devised a method to preemptively protect an \gls{mpsoc} against potential hardware trojans, XY focus on
+detecting them.
+
 Another popular approach is to divide the \gls{noc} into security zones.
+
+\section{Network Coding}\label{sec:networkcodingrel}
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}. However,
@@ -23,6 +56,7 @@ computation delay while still providing an adequate level of security. Examples 
 mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}. Some of them will be explained further later in this
 thesis. % TODO: reference this when explaining PRINCE later on
 
+\section{Notes}
 \begin{itemize}
     \item \textbf{\citetitle{ivanov05nocintroduction}}
         \begin{itemize}

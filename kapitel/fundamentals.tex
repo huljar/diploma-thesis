@@ -1,18 +1,15 @@
-\section{Networks-On-Chip}\label{sec:networkonchip}
+\section{Networks-On-Chip}\label{sec:networkonchipfun}
 \textit{Networks-on-Chip} (or \textit{\glspl{noc}} for short) are a method of interconnecting components on a chip. Typically employed on
 \textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, they
 provide the communication infrastructure for \textit{processing elements (\glspl{pe})} and possibly other \gls{ip} cores.
 
-The topology of a \gls{noc} can vary. Researchers usually assume a 2D mesh topology (cites here), which will also be used throughout this thesis.
-% TODO: find a paper where a non-2D-mesh topology is used
+The topology of a \gls{noc} can vary. Researchers usually work with a 2D mesh topology
+\cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}, which will also be used throughout this thesis.
 In this case, each network node is connected to its four neighbors (excluding the boundary nodes).
 
-A node typically consists of a processing element, a network interface (\textit{\gls{ni}}), and a router. (e.g. cites here). The router manages the connections to
-neighboring nodes while also allowing the local processing element to communicate with the network through the network interface. An example of this
-architecture is given in Figure \vref{fig:nocexample}.
-
-In a \gls{noc} architecture, each processing element has a \textit{network interface (\gls{ni})}. This interface connects the processing element to a
-router. The actual network is established between all
+A node typically consists of a processing element, a network interface (\textit{\gls{ni}}), and a router. \cite{dally01routepacketsnotwires} The
+router manages the connections to neighboring nodes while also allowing the local processing element to communicate with the network through the
+network interface. An example of this architecture is given in Figure \vref{fig:nocexample}.
 
 Compared to traditional bus-based interconnect systems, \glspl{noc} can provide a lot of advantages, especially for many-core systems.
 \cite[5\psqq]{tatas16designingnocs} One big advantage is scalability; because the cores do not share a global bus, \enquote{local performance is not
@@ -31,9 +28,27 @@ architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{noc_3x3_colored}
-    \caption[Short text]{Long text} % TODO: caption
+    \caption[Example of a 3x3 NoC]{Example of a 3x3 Network-on-Chip. The processing elements (red) contain a network interface
+    (green), through which they are connected to a router (blue). The routers are connected in a 2D mesh topology.}
     \label{fig:nocexample}
 \end{figure}
 
-\section{Hardware Trojans}\label{sec:hardwaretrojans}
+\section{Flits}\label{sec:flits}
+Flits (short for \textit{flow control units}) % TODO: explain that there are flit headers/body
 
+\section{Hardware Trojans}\label{sec:hardwaretrojans}
+% What are HTs, why can they get into other hardware, what are their properties
+Hardware trojans are \enquote{malicious modifications of electronic hardware} \cite[1]{bhunia14hardwaretrojans} with the intent of disrupting normal
+system behavior or extract sensitive information. Because the integration of third party \gls{ip} has become increasingly popular due to circuit
+complexity and cost efficiency \cites[1]{ancajas14fortnocs}[2]{bhunia14hardwaretrojans}, it is possible for adversaries to introduce hardware
+trojans into larger systems, such as \glspl{mpsoc}.
+
+In order to remain undetected, attackers aim to construct hardware trojans that are \enquote{stealthy in nature} \cite[1]{bhunia14hardwaretrojans}
+and \enquote{evade […] detection through conventional postmanufacturing test} \cite[1]{bhunia14hardwaretrojans}. Hardware trojans are usually in a
+dormant state until they are activated by a trigger signal to carry out their task. \cites{bhunia14hardwaretrojans}{ancajas14fortnocs} While the
+trojan is inactive, communications through the \gls{noc} are unaffected and the system operates normally.
+
+Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, deadlock, livelock)
+% TODO: is this a fundamental? or write this when describing our attacker model?
+
+\section{Network Coding}\label{sec:networkcodingfun}
