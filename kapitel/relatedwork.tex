@@ -7,15 +7,38 @@ general-purpose on-chip networks has been introduced in the early 2000s
 tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
 untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
 
-In recent research, many different attack vectors have been explored, and a variety of countermeasures has been proposed to mitigate
-attacks. The remainder of this section will explain them in detail.
+In recent research, many different attack vectors have been explored, and a variety of countermeasures have been proposed to mitigate
+attacks. The remainder of this section will explore them in detail.
 
 % HT Survey & building trustworthy hardware
 \citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
 approaches. In a survey-like paper, they provide a detailed summary of attack scenarios, countermeasures, and detection paradigms. Similarly,
-\citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the problem of building systems from untrusted
+\citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the challenge of building systems from untrusted
 hardware conponents. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
-integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable for them nonetheless.
+integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable to them nonetheless.
+
+% Security framework (2003)
+The necessity of security measures as part of the design was already recognized early on in \gls{noc} research. In 2003,
+\citeauthor{gebotys03securityframework} \cite{gebotys03securityframework} proposed a \enquote{general security architecture}
+\cite[1]{gebotys03securityframework} to impede attacks \enquote{at both the network level […] and at the core level}
+\cite[1]{gebotys03securityframework}.
+
+At the network level, they differentiate between secure cores and other cores. The secure cores are capable of encrypting and authenticating network
+traffic, and are thus designed to handle sensitive user information. In addition, there is a dedicated key-keeper core that handles key distribution
+amongst the secure cores. At the core level (or application level), the authors propose to use a modified implementation of elliptic curve
+cryptography to facilitate encryption and authentication. Aiming to provide resistance against side channel power attacks, their modifications conceal
+the power traces of the different algebraic computations during the cryptographic operations. This hinders adversaries from extracting key bits based
+on power spikes.
+
+\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc} have persued a similar approach. They also separate the cores into secure and non-secure
+ones (often referred to as \textit{security zones}) and propose to implement authenticated encryption in the network interfaces. While the secure
+cores employ permanent keys to communicate with each other, the non-secure ones may use plain text messages. Additionally, in order to allow
+communication between the security zones, sessions may be established with individually generated session keys. Furthermore, the authors employ
+traffic limitations in the network interfaces to prevent \gls{dos} attacks by malicious cores, while access rights tables prohibit unauthorized
+memory accesses.
+
+Another popular approach is to divide the \gls{noc} into security zones. Not to defend against HTs, but potentially malicious applications running on
+parts of the NoC. Apps working with critical information → secure zone.
 
 % Fort-NoCs
 \citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans for \glspl{noc}. They show that the usage of
@@ -35,16 +58,18 @@ harden the \gls{noc} design against potential hardware trojans located inside th
 \enquote{complement […] the previous \gls{noc} works aiming for \gls{ni} security} \cite[16]{frey17hardenednoc} and address \gls{dos} attacks rather
 than information leakage.
 
-The approach of the authors is to detect any flit tampering right after they leave a router. To achieve this, an error control code and dynamic flit
+The idea of the authors is to detect any flit tampering right after the flit leaves a router. To achieve this, an error control code and dynamic flit
 permutation are applied to all flits before they enter a router, and the reverse transformations are applied after they exit the router again. This
 prevents (or at least detects) small and targeted modifications to the flit headers. % TODO: not the best wording
+
+% Runtime hardening
+Another \gls{noc} hardening approach was investigated by 
 
 While \citeauthor{ancajas14fortnocs} have devised a method to preemptively protect an \gls{mpsoc} against potential hardware trojans, XY focus on
 detecting them.
 
-Another popular approach is to divide the \gls{noc} into security zones.
-
 \section{Network Coding}\label{sec:networkcodingrel}
+% TODO: put this completely in fundamentals?
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}. However,
