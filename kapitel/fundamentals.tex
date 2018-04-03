@@ -17,7 +17,7 @@ Compared to traditional bus-based interconnect systems, \glspl{noc} can provide 
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
 
-In addition, the absence of global connections facilitates the use of different clock domains. This enables the implementation of the
+In addition, the absence of global interconnection wires facilitates the use of different clock domains. This enables the implementation of the
 \textit{globally asynchronous, locally synchronous (\gls{gals})} paradigm, which becomes increasingly important in chip design.
 \cites[3]{kumar02networkonchip}[2]{ivanov05nocintroduction}
 
@@ -60,3 +60,19 @@ Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, dead
 % TODO: is this a fundamental? or write this when describing our attacker model?
 
 \section{Network Coding}\label{sec:networkcodingfun}
+Network coding is a technique for transmitting packets efficiently over a network. First described in 2003 by \citeauthor{li03linearnc}
+\cite{li03linearnc}, the idea is to maximize the information flow through a network and achieve higher throughput than traditional transmission
+schemes. It is achieved by allowing intermediate network nodes to encode incoming packets before passing them on, creating combinations of different
+packets in the process. At the destinations, the received data can be decoded again to obtain the original packets.
+
+A simple coding scheme, dubbed \textit{linear network coding}, is to regard all packets arriving at a node from different incoming links as a vector.
+Then, linear transformations can be applied to it to obtain new combinations to send out. \cite[1]{li03linearnc} To allow receivers to decode the
+combinations into the original packets, the encoding patterns applied at each node can be \enquote{agreed upon beforehand} \cite[1]{li03linearnc} or
+can be attached to the packets in the form of a \textit{global encoding vector (\gls{gev})} \cite[5\psq]{chou07ncforinternetandwireless}.
+
+In addition to increasing the network performance by maximizing throughput, network coding can also provide an additional layer of resilience against
+malicious intermediate nodes. It facilitates \enquote{a natural way to take advantage of multipath diversity for security against wiretapping attacks}
+\cite[8]{fragouli07ncfundamentals} and can also be helpful against active attackers.
+
+During this thesis, network coding is used primarily as a means of resilience against attackers. Furthermore, only the sender nodes will compute
+combinations of different flits, while intermediate nodes merely forward them. Section (insert vref here) illuminates this subject in detail.
