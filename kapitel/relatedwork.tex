@@ -1,4 +1,4 @@
-\section{Network-on-Chip}\label{sec:networkonchiprel}
+\section{Network-On-Chip Security}\label{sec:networkonchipsecurity}
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
 general-purpose on-chip networks has been introduced in the early 2000s
 \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
@@ -17,13 +17,15 @@ approaches. In a survey-like paper, they provide a detailed summary of attack sc
 hardware conponents. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
 integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable to them nonetheless.
 
-% Security framework (2003)
-The necessity of security measures as part of the design was already recognized early on in \gls{noc} research. In 2003,
-\citeauthor{gebotys03securityframework} \cite{gebotys03securityframework} proposed a \enquote{general security architecture}
-\cite[1]{gebotys03securityframework} to impede attacks \enquote{at both the network level […] and at the core level}
-\cite[1]{gebotys03securityframework}.
+% Security zones
+The necessity of security measures as part of the design was already recognized early on in \gls{noc} research. A popular approach is to
+divide the \gls{noc} into security zones with different levels of protection, where sensitive information is handled exclusively inside a
+high-security zone. \cites(e.g.)(){gebotys03securityframework}{fernandes16nocrouting}{kapoor13nocauthenc}
 
-At the network level, they differentiate between secure cores and other cores. The secure cores are capable of encrypting and authenticating network
+Published in 2003, \citeauthor{gebotys03securityframework} \cite{gebotys03securityframework} were among the first to propose a \enquote{general security architecture}
+\cite[1]{gebotys03securityframework} to impede attacks \enquote{at both the network level […] and at the core level}
+\cite[1]{gebotys03securityframework}. At the network level, they differentiate between secure cores and other cores, thus establishing two security
+zones. The secure cores are capable of encrypting and authenticating network
 traffic, and are thus designed to handle sensitive user information. In addition, there is a dedicated key-keeper core that handles key distribution
 amongst the secure cores. At the core level (or application level), the authors propose to use a modified implementation of elliptic curve
 cryptography to facilitate encryption and authentication. Aiming to provide resistance against side channel power attacks, their modifications conceal
@@ -31,14 +33,20 @@ the power traces of the different algebraic computations during the cryptographi
 on power spikes.
 
 \citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc} have persued a similar approach. They also separate the cores into secure and non-secure
-ones (often referred to as \textit{security zones}) and propose to implement authenticated encryption in the network interfaces. While the secure
+ones and propose to implement authenticated encryption in the network interfaces. While the secure
 cores employ permanent keys to communicate with each other, the non-secure ones may use plain text messages. Additionally, in order to allow
 communication between the security zones, sessions may be established with individually generated session keys. Furthermore, the authors employ
 traffic limitations in the network interfaces to prevent \gls{dos} attacks by malicious cores, while access rights tables prohibit unauthorized
 memory accesses.
 
-Another popular approach is to divide the \gls{noc} into security zones. Not to defend against HTs, but potentially malicious applications running on
-parts of the NoC. Apps working with critical information → secure zone.
+Another work that revolves around security zones in \glspl{noc} was published by \citeauthor{fernandes16nocrouting} \cite{fernandes16nocrouting}.
+However, in contrast to the papers presented above, they deem the underlying hardware to be secure. Assuming that \enquote{software attacks account
+for 80\% of security incidents in embedded systems} \cite[1]{fernandes16nocrouting}, their work focuses on the defense against software-based
+\gls{dos} and timing attacks.
+
+The goal of the authors is to ensure that packets from one security zone are not routed through nodes of a different zone, if possible. To achieve
+this, they have adapted the routing algorithm of the network to prioritize paths that do not cross zone boundaries. In addition, they have
+refined the algorithm to guarantee deadlock freedom despite the constraints imposed by the security zones.
 
 % Fort-NoCs
 \citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans for \glspl{noc}. They show that the usage of
@@ -74,21 +82,22 @@ detecting them.
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}, as many of the
 researchers mentioned above have done. However,
 standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task. \cite[1]{bogdanov07present}
+
 In the work preceding this thesis, lightweight cryptographic algorithms were thoroughly explored. \cite{harttung17lightweightcrypto} Such
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
-mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}. Some of them will be explained further later in this
-thesis. % TODO: reference this when explaining PRINCE later on
+mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}. Some of them will be examined later in this
+thesis; see Section (insert vref here) for details. % TODO: reference this when explaining PRINCE later on
 
 \section{Notes}
 \begin{itemize}
-    \item \textbf{\citetitle{ivanov05nocintroduction}}
+    \item \textbf{\citetitle{ivanov05nocintroduction}} \checkmark
         \begin{itemize}
             \item Aus dem Jahr 2005, als SoC-Kommunikationsschwierigkeiten wichtiger wurden
             \item Wird als langfristiger Einstiegspunkt in NoC-Forschung gesehen von den Autoren
         \end{itemize}
-    \item \textbf{\citetitle{sethumadhavan15trustworthyhardware}}
+    \item \textbf{\citetitle{sethumadhavan15trustworthyhardware}} \checkmark
         \begin{itemize}
             \item Introduction into hardware design process and compromisation vectors
             \item Explains how the hardware design and fabrication chain is vulnerable to exploits/attacks
@@ -99,7 +108,7 @@ thesis. % TODO: reference this when explaining PRINCE later on
                     \item Runtime on-chip monitoring (of instruction counts, opcode types, ...) to detect enabled backdoors
                 \end{enumerate}
         \end{itemize}
-    \item \textbf{\citetitle{ancajas14fortnocs}}
+    \item \textbf{\citetitle{ancajas14fortnocs}} \checkmark
         \begin{itemize}
             \item MPSoCs with 3rd party IP NoCs (i.e. the interconnect system is 3rd party)
             \item Software accomplices (malicious/infected processing elements)
@@ -122,7 +131,7 @@ thesis. % TODO: reference this when explaining PRINCE later on
             \item HT modifying state transitions causes FSM to enter illegal/invalid state → HT warning
             \item High HT detection rate (for this specific type of HT)
         \end{itemize}
-    \item \textbf{\citetitle{frey17hardenednoc}}
+    \item \textbf{\citetitle{frey17hardenednoc}} \checkmark
         \begin{itemize}
             \item Published two years after state obfuscation paper above
             \item Router level hardware trojans (HTs)
@@ -138,7 +147,7 @@ thesis. % TODO: reference this when explaining PRINCE later on
             \item Check flit integrity after leaving input queue and right before departing through the computed output port
             \item Cites lots of useful other related work
         \end{itemize}
-    \item \textbf{\citetitle{fernandes16nocrouting}}
+    \item \textbf{\citetitle{fernandes16nocrouting}} \checkmark
         \begin{itemize}
             \item "Attacks at MPSoC aim to extract sensitive data, modify the system behavior or denial the system operation (Denial-of-Service,
                 DoS)"
@@ -182,7 +191,7 @@ thesis. % TODO: reference this when explaining PRINCE later on
             \item Attack scenario: routing table is loaded onto NoC at boot or runtime (by host processor or NoC controller), which is modified by
                 the attacker → unauthorized access and misrouting (routing to other environment)
         \end{itemize}
-    \item \textbf{\citetitle{gebotys03securityframework}}
+    \item \textbf{\citetitle{gebotys03securityframework}} \checkmark
         \begin{itemize}
             \item Framework: protection both at network and application layer
             \item Network layer
@@ -199,7 +208,7 @@ thesis. % TODO: reference this when explaining PRINCE later on
             \item Strong assumptions on trusted software and hardware
             \item No clear attacker model, paper seems more like a "framework suggestion"
         \end{itemize}
-    \item \textbf{\citetitle{kapoor13nocauthenc}}
+    \item \textbf{\citetitle{kapoor13nocauthenc}} \checkmark
         \begin{itemize}
             \item 2 NoC zones: secure and non-secure IP cores
             \item Authenticated Encryption implemented in NIs of secure cores
