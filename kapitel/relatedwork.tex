@@ -4,12 +4,12 @@ Research on new and efficient ways to interconnect components on a single chip h
 general-purpose on-chip networks has been introduced in the early 2000s
 \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
 \cite[e.g.][]{ivanov05nocintroduction}. 
-\Glspl{mpsoc} that utilize \glspl{noc} typically have a large number of processing elements that can run many different
-tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
-untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
+%\Glspl{mpsoc} that utilize \glspl{noc} typically have a large number of processing elements that can run many different
+%tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
+%untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
 
-In recent research, many different attack vectors have been explored, and a variety of countermeasures have been proposed to mitigate
-attacks. The remainder of this section will explore them in detail.
+In recent research, many different attack vectors on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed
+to mitigate attacks. The remainder of this section will explore them in detail.
 
 % HT Survey & building trustworthy hardware
 \citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
@@ -81,16 +81,34 @@ Following up on their previous work, the authors published a 2018 paper \cite{bo
 trojan detection and mitigation. In contrast to many of the previously presented works \cites(e.g.)(){ancajas14fortnocs}{frey17hardenednoc}, they aim
 to first detect a potential hardware trojan before activating further security measures. The described attacker model employs fault injections to
 intentionally trigger responses from the error correction codes (like the \gls{amd} code explored earlier \cite{boraten16packetsecurity}), thus
-creating a \gls{dos} attack.
+performing a \gls{dos} attack.
 
 Trojans are discovered with a \enquote{heuristic-based fault detection model} \cite[25]{boraten18mitigationdos} that classifies faults into accidental
-and intentional ones. Once this scheme detects the presence of a trojan, additional security measures are employed. % TODO: continue here
+and intentional ones. Once this scheme detects the presence of a trojan, additional security measures are employed. First, the authors try to keep
+using the malicious links in order to not degrade network performance. Before a packet is routed through an infected area, it is obfuscated to prevent
+the hardware trojan from triggering. If this fails, and faults are still being injected, \enquote{links must be disabled and routers should route
+around them} \cite[32]{boraten18mitigationdos}.
 
-While \citeauthor{ancajas14fortnocs} have devised a method to preemptively protect an \gls{mpsoc} against potential hardware trojans, XY focus on
-detecting them.
+\citeauthor{stefan11enhancingnocs} \cite{stefan11enhancingnocs} explore the potential of multipath routing as a security enhancement in \glspl{noc}.
+Extending the existing \textit{\AE thereal} framework \cite{goossens05aethereal}, they implemented time-division multiplexing for choosing a route at
+the sender's network interface. Two variants were pursued: static, deterministic path selection and dynamic selection at run-time (e.g. by using a
+hardware random number generator). Through several experiments, they conclude that the static variant has significantly less chip area overhead than
+the dynamic one and thus should be the preferred method.
+
+Also focusing on time-division multiplexed \glspl{noc}, \citeauthor{wassel13surfnoc} \cite{wassel13surfnoc} promote the usage of different domains for
+the network traffic with strict non-interference requirements. Categorizing packets into such domains \enquote{help[s] prevent cascading failures}
+\cite[1]{wassel13surfnoc} and hampers \gls{dos} attacks from affecting the whole system. In their work, the authors propose an efficient method of
+this domain-based routing with very low latency, making this security measure practical.
 
 \section{Network Coding For Network-On-Chip}
-% NC in NoCs
+Few attempts have been made to integrate network coding into \gls{noc} architectures. It was briefly mentioned by
+\citeauthor{fragouli08ncapplications} \cite{fragouli08ncapplications}, where emerging network coding applications are discussed. However, it was
+mostly seen as a method to help \enquote{simplify and minimize the length of on-chip wiring} \cite[260]{fragouli08ncapplications}, rather than as a
+security measure.
+
+\citeauthor{xue15ncnoc} \cite{xue15ncnoc} have integrated network coding into a \gls{noc} architecture for multicast communications. They propose to
+send both encoded and regular flits of the same packets into the network, creating a redundant transmission. This introduces benefits during the
+routing of the flits, like allowing to drop some flits to potentially prevent network congestion.
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}, as many of the
