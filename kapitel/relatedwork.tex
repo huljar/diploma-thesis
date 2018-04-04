@@ -1,3 +1,4 @@
+% TODO: tenses?
 \section{Network-On-Chip Security}\label{sec:networkonchipsecurity}
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
 general-purpose on-chip networks has been introduced in the early 2000s
@@ -70,12 +71,25 @@ The idea of the authors is to detect any flit tampering right after the flit lea
 permutation are applied to all flits before they enter a router, and the reverse transformations are applied after they exit the router again. This
 prevents (or at least detects) small and targeted modifications to the flit headers. % TODO: not the best wording
 
-% Runtime hardening
-Another \gls{noc} hardening approach was investigated by 
+% AMD codes
+\citeauthor{boraten16packetsecurity} pursue a very similar approach. In their 2016 paper \cite{boraten16packetsecurity}, they propose to apply
+\gls{amd} and \gls{crc} codes in the network interfaces to protect packets from fault injections by a malicious \gls{noc}. The authors suggest to use
+\gls{amd} for sensitive data and \gls{crc} for \enquote{all other non-critical traffic} \cite[2]{boraten16packetsecurity}. First introduced in 2008
+\cite{cramer08amdcodes}, \gls{amd} codes are capable of \enquote{[detecting] any tampering by an adversary} \cite[1]{cramer08amdcodes}.
+
+Following up on their previous work, the authors published a 2018 paper \cite{boraten18mitigationdos} that refines their methods to faciliate hardware
+trojan detection and mitigation. In contrast to many of the previously presented works \cites(e.g.)(){ancajas14fortnocs}{frey17hardenednoc}, they aim
+to first detect a potential hardware trojan before activating further security measures. The described attacker model employs fault injections to
+intentionally trigger responses from the error correction codes (like the \gls{amd} code explored earlier \cite{boraten16packetsecurity}), thus
+creating a \gls{dos} attack.
+
+Trojans are discovered with a \enquote{heuristic-based fault detection model} \cite[25]{boraten18mitigationdos} that classifies faults into accidental
+and intentional ones. Once this scheme detects the presence of a trojan, additional security measures are employed. % TODO: continue here
 
 While \citeauthor{ancajas14fortnocs} have devised a method to preemptively protect an \gls{mpsoc} against potential hardware trojans, XY focus on
 detecting them.
 
+\section{Network Coding For Network-On-Chip}
 % NC in NoCs
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
@@ -158,7 +172,7 @@ thesis; see Section (insert vref here) for details. % TODO: reference this when 
             \item Security zone is e.g. the set of IP blocks that an application was mapped on
             \item Routing algorithm tries to keep the sensitive path completely inside the same security zone, if possible
         \end{itemize}
-    \item \textbf{\citetitle{boraten16packetsecurity}}
+    \item \textbf{\citetitle{boraten16packetsecurity}} \checkmark
         \begin{itemize}
             \item Packet-Security (P-Sec)
             \item Threat model: compromised NoC does fault injection (side channel attack)
@@ -166,7 +180,7 @@ thesis; see Section (insert vref here) for details. % TODO: reference this when 
             \item → ensure integrity of packets using error correction codes (ECCs) (→ AMD, CRC)
             \item AMD for sensitive communications (together with encryption), otherwise CRC to provide minimal fault tolerance
         \end{itemize}
-    \item \textbf{\citetitle{boraten18mitigationdos}}
+    \item \textbf{\citetitle{boraten18mitigationdos}} \checkmark
         \begin{itemize}
             \item Published 2 year after Packet Security paper above (builds upon previous research)
             \item HT does DoS attack: inspect packets, inject fault, trigger ECC response (ECC cannot correct error) → repeated transmissions,
