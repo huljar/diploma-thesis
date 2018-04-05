@@ -6,7 +6,7 @@ general-purpose on-chip networks has been introduced in the early 2000s
 \cite[e.g.][]{ivanov05nocintroduction}. 
 %\Glspl{mpsoc} that utilize \glspl{noc} typically have a large number of processing elements that can run many different
 %tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
-%untrusted applications may run at the same time. \cite{ancajas14fortnocs} % TODO: move this out of related work? also drop the untrusted applications part
+%untrusted applications may run at the same time \cite{ancajas14fortnocs}. % TODO: move this out of related work? also drop the untrusted applications part
 
 In recent research, many different attack vectors on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed
 to mitigate attacks. The remainder of this section will explore them in detail.
@@ -15,13 +15,13 @@ to mitigate attacks. The remainder of this section will explore them in detail.
 \citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
 approaches. In a survey-like paper, they provide a detailed summary of attack scenarios, countermeasures, and detection paradigms. Similarly,
 \citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the challenge of building systems from untrusted
-hardware conponents. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
+hardware components. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
 integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable to them nonetheless.
 
 % Security zones
 The necessity of security measures as part of the design was already recognized early on in \gls{noc} research. A popular approach is to
 divide the \gls{noc} into security zones with different levels of protection, where sensitive information is handled exclusively inside a
-high-security zone. \cites(e.g.)(){gebotys03securityframework}{fernandes16nocrouting}{kapoor13nocauthenc}
+high-security zone \cites(e.g.)(){gebotys03securityframework}{fernandes16nocrouting}{kapoor13nocauthenc}.
 
 Published in 2003, \citeauthor{gebotys03securityframework} \cite{gebotys03securityframework} were among the first to propose a \enquote{general security architecture}
 \cite[1]{gebotys03securityframework} to impede attacks \enquote{at both the network level […] and at the core level}
@@ -33,7 +33,7 @@ cryptography to facilitate encryption and authentication. Aiming to provide resi
 the power traces of the different algebraic computations during the cryptographic operations. This hinders adversaries from extracting key bits based
 on power spikes.
 
-\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc} have persued a similar approach. They also separate the cores into secure and non-secure
+\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc} have pursued a similar approach. They also separate the cores into secure and non-secure
 ones and propose to implement authenticated encryption in the network interfaces. While the secure
 cores employ permanent keys to communicate with each other, the non-secure ones may use plain text messages. Additionally, in order to allow
 communication between the security zones, sessions may be established with individually generated session keys. Furthermore, the authors employ
@@ -74,7 +74,7 @@ prevents (or at least detects) small and targeted modifications to the flit head
 % AMD codes
 \citeauthor{boraten16packetsecurity} pursue a very similar approach. In their 2016 paper \cite{boraten16packetsecurity}, they propose to apply
 \gls{amd} and \gls{crc} codes in the network interfaces to protect packets from fault injections by a malicious \gls{noc}. The authors suggest to use
-\gls{amd} for sensitive data and \gls{crc} for \enquote{all other non-critical traffic} \cite[2]{boraten16packetsecurity}. First introduced in 2008
+\gls{amd} codes for sensitive data and \gls{crc} for \enquote{all other non-critical traffic} \cite[2]{boraten16packetsecurity}. First introduced in 2008
 \cite{cramer08amdcodes}, \gls{amd} codes are capable of \enquote{[detecting] any tampering by an adversary} \cite[1]{cramer08amdcodes}.
 
 Following up on their previous work, the authors published a 2018 paper \cite{boraten18mitigationdos} that refines their methods to faciliate hardware
@@ -113,9 +113,9 @@ routing of the flits, like allowing to drop some flits to potentially prevent ne
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}, as many of the
 researchers mentioned above have done. However,
-standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task. \cite[1]{bogdanov07present}
+standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task \cite[1]{bogdanov07present}.
 
-In the work preceding this thesis, lightweight cryptographic algorithms were thoroughly explored. \cite{harttung17lightweightcrypto} Such
+In the work preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
