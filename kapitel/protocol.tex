@@ -1,0 +1,28 @@
+\begin{itemize}
+    \item Uncoded transmission
+        \begin{itemize}
+            \item no network coding
+            \item 2 methods: 1 data flit + 1 MAC flit OR 2 data/MAC split flits
+        \end{itemize}
+    \item Flit structure
+        \begin{itemize}
+            \item burst bit, source/target address, mode, address, GID/FID, GEV, payload
+            \item mode: define if data/mac/split/arq
+        \end{itemize}
+    \item Network coded transmission
+        \begin{itemize}
+            \item Number of flits: G2C3 or G2C4
+            \item 3 methods: 1 data flit + 1 MAC flit OR 1 MAC flit per generation OR 2 data/MAC split flits
+        \end{itemize}
+    \item ARQs
+        \begin{itemize}
+            \item Limited number of ARQs per transmission unit (UC: data/MAC pair or split pair, NC: generation)
+            \item Timeout of x (e.g. 8) cycles until first ARQ is sent
+            \item If limit >1: start larger timeout (→ round-trip of ARQ)
+            \item Many different cases, insert some flow diagrams here
+            \item The higher the ARQ timeout/limit, the less likely the flit is still in retransmission buffer
+            \item → ARQ timeout/limit and retransmission buffer size have to correlate
+            \item In the case that we only have 1 ARQ left that we are allowed to send: Wait for any ongoing MAC verifications
+                so in case they fail, the flits can be included in the ARQ
+        \end{itemize}
+\end{itemize}
