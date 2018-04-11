@@ -105,14 +105,48 @@ the network traffic with strict non-interference requirements. Categorizing pack
 this domain-based routing with very low latency, making this security measure practical.
 
 \section{Network Coding For Network-On-Chip}
-Few attempts have been made to integrate network coding into \gls{noc} architectures. It was briefly mentioned by
+The integration of network coding into \gls{noc} architectures is a relatively new field of research. It was briefly mentioned a decade ago by
 \citeauthor{fragouli08ncapplications} \cite{fragouli08ncapplications}, where emerging network coding applications are discussed. However, it was
 mostly seen as a method to help \enquote{simplify and minimize the length of on-chip wiring} \cite[260]{fragouli08ncapplications}, rather than as a
-security measure.
+robustness measure. In recent years, several works have been published that investigate the applicability and practicality of network coding for
+\glspl{noc}.
+
+\citeauthor{indrusiak11ncfornocs} \cite{indrusiak11ncfornocs} has looked into the benefits of network coding in multicast settings. A traditional
+example of a network topology where this can entail large performance improvements is the so-called \textit{butterfly network} \cites(cf.)(){ahlswede00networkflow}{li03linearnc}.
+To transfer the advantages of this particular setup to \glspl{noc}, he focuses on finding such butterfly arrangements in 2D mesh topologies and
+mapping them onto the underlying architecture by finding appropriate intermediate nodes.
+
+Following up on this idea, \citeauthor{shalaby12nodeselection} \cite{shalaby12nodeselection} have also looked into finding butterfly arrangements in
+\glspl{noc}. Their emphasis lies on enhancing the selection of the intermediate nodes and the way this choice impacts network performance. While
+evaluation showed only modest performance improvements, their results \enquote{confirm the great potential of network coding to improve \gls{noc}
+performance} \cite[5]{shalaby12nodeselection}.
+
+\citeauthor{duongba11ncinmulticore} \cite{duongba11ncinmulticore} have examined network throughput and latency for multi-core processors when applying
+network coding. In contrast to many-core systems, the processors were assumed to have relatively small \glspl{noc}, namely with six or nine nodes.
+They show that network coding improves network throughput in both unicast and multicast scenarios while slightly increasing the latencies. For
+multicast communication in saturated networks, however, the average latency was drastically improved.
 
 \citeauthor{xue15ncnoc} \cite{xue15ncnoc} have integrated network coding into a \gls{noc} architecture for multicast communications. They propose to
 send both encoded and regular flits of the same packets into the network, creating a redundant transmission. This introduces benefits during the
 routing of the flits, like allowing to drop some flits to potentially prevent network congestion.
+
+The goal of \citeauthor{vonbun13nchopcount} \cite{vonbun13nchopcount} is to improve the evaluation of the impact that network coding has on
+\glspl{noc}. According to the authors, previous works mostly used specific evaluation metrics tailored to the investigated approach, such as only
+considering butterfly connections. In contrast, they aim to \enquote{demonstrate the potential of network coding in generalized connection settings}
+\cite[2]{vonbun13nchopcount} and have developed an extensive framework to compute appropriate metrics based on hop counts. By applying their
+evaluation method to a number of different network configurations, they were able to show that network coding almost always performs better than uncoded,
+deterministic routing. In the worst cases, performance stayed the same.
+
+In a recent work at the TU Dresden, \citeauthor{moriam15manycorenc} \cite{moriam15manycorenc} have investigated the applicability of network coding in
+a unicast setting. They argue that many transmission errors may occur \enquote{due to dynamic variations of voltage and temperature}
+\cite[1]{moriam15manycorenc}, leading to a large number of retransmissions and thus a severe degradation of \gls{noc} performance. In their work, they
+have analyzed how different variants of network coding may remedy this situation. Using a \enquote{cycle-accurate \gls{noc} traffic simulator}
+\cite[3]{moriam15manycorenc}, several performance metrics such as average latency and information rate were examined. The results show significant
+improvements for error-prone transmissions, but decreased performance in reliable networks.
+
+This thesis partially builds upon the work of \citeauthor{moriam15manycorenc}. Their network coding scheme is reimplemented here, which is
+elaborated in Section (insert vref here). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as described
+in Section (insert vref here).
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}, as many of the

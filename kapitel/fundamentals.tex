@@ -44,6 +44,10 @@ In the context of \glspl{noc}, flits are often used as the standard unit of tran
 are used in this thesis can be found in (insert section/chapter vref).
 % TODO: insert reference
 
+\section{Automatic Repeat Requests}\label{sec:arqs}
+Traditionally: acknowledgements for each arrived flit/packet. Here: no acknowledgements to save network bandwidth, but send retransmission requests
+when a flit does not arrive. Those are referred to as ARQs throughout this thesis.
+
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
 Hardware trojans are \enquote{malicious modifications of electronic hardware} \cite[1]{bhunia14hardwaretrojans} with the intent of disrupting normal
@@ -63,7 +67,8 @@ Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, dead
 Network coding is a technique for transmitting packets efficiently over a network. First described in 2000 by \citeauthor{ahlswede00networkflow}
 \cite{ahlswede00networkflow}, the idea is to maximize the information flow through a network and achieve higher throughput than traditional transmission
 schemes. It is achieved by allowing intermediate network nodes to encode incoming packets before passing them on, creating combinations of different
-packets in the process. At the destinations, the received data can be decoded again to obtain the original packets.
+packets in the process. At the destinations, the received data can be decoded again to obtain the original packets. Traditionally, network coding is
+used in multicast communication patterns, but it has also been applied successfully to unicast scenarios \cite[e.g.][]{moriam15manycorenc}.
 
 A popular coding scheme, dubbed \textit{linear network coding} \cite{li03linearnc}, is to regard all packets arriving at a node from different incoming links as a vector.
 Then, linear transformations can be applied to it to obtain new combinations to send out \cite[1]{li03linearnc}. To allow receivers to decode the
@@ -78,4 +83,6 @@ malicious intermediate nodes. It facilitates \enquote{a natural way to take adva
 
 During this thesis, network coding is used primarily as a means of resilience against attackers. Furthermore, only the sender nodes will compute
 combinations of different flits, while intermediate nodes merely forward them. Section (insert vref here) illuminates this subject in detail.
+% TODO: mention that mostly used with multicast, we do unicast
+% TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
 % TODO: insert vref
