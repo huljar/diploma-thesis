@@ -8,16 +8,11 @@ general-purpose on-chip networks has been introduced in the early 2000s
 %tasks in parallel. \citeauthor{ancajas14fortnocs} have shown that the threat is relevant, especially in cloud computing setups, where several
 %untrusted applications may run at the same time \cite{ancajas14fortnocs}. % TODO: move this out of related work? also drop the untrusted applications part
 
-In recent research, many different attack vectors on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed
-to mitigate attacks. The remainder of this section will explore them in detail.
+However, with rising popularity, the interest of adversaries to compromise such systems also grows. In recent research, many different attack vectors
+on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed to mitigate attacks. The following sections will
+explore them in detail.
 
-% HT Survey & building trustworthy hardware
-\citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
-approaches. In a survey-like paper, they provide a detailed summary of attack scenarios, countermeasures, and detection paradigms. Similarly,
-\citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the challenge of building systems from untrusted
-hardware components. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
-integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable to them nonetheless.
-
+\subsection{Security Zones}
 % Security zones
 The necessity of security measures as part of the design was already recognized early on in \gls{noc} research. A popular approach is to
 divide the \gls{noc} into security zones with different levels of protection, where sensitive information is handled exclusively inside a
@@ -28,7 +23,7 @@ Published in 2003, \citeauthor{gebotys03securityframework} \cite{gebotys03securi
 \cite[1]{gebotys03securityframework}. At the network level, they differentiate between secure cores and other cores, thus establishing two security
 zones. The secure cores are capable of encrypting and authenticating network
 traffic, and are thus designed to handle sensitive user information. In addition, there is a dedicated key-keeper core that handles key distribution
-amongst the secure cores. At the core level (or application level), the authors propose to use a modified implementation of elliptic curve
+amongst the secure cores. At the core level (also referred to as application level), the authors propose to use a modified implementation of elliptic curve
 cryptography to facilitate encryption and authentication. Aiming to provide resistance against side channel power attacks, their modifications conceal
 the power traces of the different algebraic computations during the cryptographic operations. This hinders adversaries from extracting key bits based
 on power spikes.
@@ -47,11 +42,19 @@ for 80\% of security incidents in embedded systems} \cite[1]{fernandes16nocrouti
 
 The goal of the authors is to ensure that packets from one security zone are not routed through nodes of a different zone, if possible. To achieve
 this, they have adapted the routing algorithm of the network to prioritize paths that do not cross zone boundaries. In addition, they have
-refined the algorithm to guarantee deadlock freedom despite the constraints imposed by the security zones.
+refined the algorithm to guarantee deadlock freedom despite the constraints imposed by the new path restrictions.
+
+\subsection{Hardware Trojans}
+% HT Survey & building trustworthy hardware
+\citeauthor{bhunia14hardwaretrojans} \cite{bhunia14hardwaretrojans} have looked thoroughly into the threat of hardware trojans and possible protection
+approaches. In a survey-like paper, they provide a detailed summary of attack scenarios, countermeasures, and detection paradigms. Similarly,
+\citeauthor{sethumadhavan15trustworthyhardware} \cite{sethumadhavan15trustworthyhardware} analyze the challenge of building systems from untrusted
+hardware components. They explain in detail how the hardware design and fabrication chain can be adapted to significantly lower the probability of
+integrating malicious components. The methods in both works are not specific to \gls{noc} architectures, but are applicable to them nonetheless.
 
 % Fort-NoCs
-\citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans for \glspl{noc}. They show that the usage of
-third party \gls{noc} \gls{ip} is very popular due to cost efficiency, opening up an infection vector for hardware
+\citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans specifically for \glspl{noc}. They show that the usage of
+third party \gls{noc} \gls{ip} is very popular due to cost efficiency, opening up a practical infection vector for hardware
 trojans. Together with a software accomplice (i.e. an infected processing element) that can send commands to the trojan, this may
 lead to information leaks, data corruption or denial of service attacks.
 
@@ -89,6 +92,7 @@ using the malicious links in order to not degrade network performance. Before a 
 the hardware trojan from triggering. If this fails, and faults are still being injected, \enquote{links must be disabled and routers should route
 around them} \cite[32]{boraten18mitigationdos}.
 
+\subsection{Routing Strategies}
 \citeauthor{stefan11enhancingnocs} \cite{stefan11enhancingnocs} explore the potential of multipath routing as a security enhancement in \glspl{noc}.
 Extending the existing \textit{\AE thereal} framework \cite{goossens05aethereal}, they implemented time-division multiplexing for choosing a route at
 the sender's network interface. Two variants were pursued: static, deterministic path selection and dynamic selection at run-time (e.g. by using a
