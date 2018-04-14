@@ -144,16 +144,20 @@ have analyzed how different variants of network coding may remedy this situation
 \cite[3]{moriam15manycorenc}, several performance metrics such as average latency and information rate were examined. The results show significant
 improvements for error-prone transmissions, but decreased performance in reliable networks.
 
-Following up on this research, ... % TODO: the other TUD paper
+Following up on this research, \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} have constructed an authentication layer on top of
+their network coding system. % TODO: the other TUD paper
 
-This thesis partially builds upon the work of \citeauthor{moriam15manycorenc}. Their network coding scheme is reimplemented here, which is
-elaborated in Section (insert vref here). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as described
-in Section (insert vref here).
+Since this thesis seeks to build upon their work, some concepts of \citeauthor{moriam18activeattackers} can be found here as well. Their network coding
+scheme was reimplemented, which is elaborated in Section (insert vref here). Additionally, the authentication methods that they experimented with
+are taken up (see Section (insert vref here)). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as
+described in Section (insert vref here).
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, it is often desirable to add encryption and authentication to
 the communication passing through a \gls{noc}, as many of the researchers mentioned above have done. However,
-standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task \cite[1]{bogdanov07present}.
+standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task \cite[1]{bogdanov07present}. With the tight area
+and power consumption constraints in \glspl{mpsoc} (cf. Section \ref{sec:networkonchipfun}), novel designs that tackle this problem have become essential
+for the implementation of cryptographic protection measures.
 
 In the work directly preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are

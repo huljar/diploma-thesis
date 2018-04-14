@@ -12,6 +12,14 @@ and a router \cite{dally01routepacketsnotwires}. The router manages the connecti
 the local processing element to communicate with the network through the network interface. An example of this architecture is given in Figure
 \vref{fig:nocexample}.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{noc_3x3_colored}
+    \caption[Example of a 3x3 mesh NoC]{Example of a Network-on-Chip in a 2D mesh topology of size 3x3. The processing elements (red) contain a network interface
+    (green) through which they are connected to a router (blue). The routers are interconnected as a 2D mesh.}
+    \label{fig:nocexample}
+\end{figure}
+
 Compared to traditional bus-based interconnect systems, \glspl{noc} can provide a lot of advantages, especially for many-core systems
 \cite[5\psqq]{tatas16designingnocs}. One big advantage is scalability; because the cores do not share a global bus, \enquote{local performance is not
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
@@ -26,13 +34,7 @@ interconnections become infeasible to implement. Designing such a system \enquot
 architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, \glspl{noc} aims to be general purpose interconnect systems; they
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{noc_3x3_colored}
-    \caption[Example of a 3x3 mesh NoC]{Example of a Network-on-Chip in a 2D mesh topology of size 3x3. The processing elements (red) contain a network interface
-    (green) through which they are connected to a router (blue). The routers are interconnected as a 2D mesh.}
-    \label{fig:nocexample}
-\end{figure}
+% TODO: talk about area and power constraints
 
 \section{Flits}\label{sec:flits}
 Flits (short for \textit{flow control units}) are small pieces of data that are sent over a network. They are usually created by breaking a larger
