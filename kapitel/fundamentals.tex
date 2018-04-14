@@ -45,8 +45,19 @@ are used in this thesis can be found in (insert section/chapter vref).
 % TODO: insert reference
 
 \section{Automatic Repeat Requests}\label{sec:arqs}
-Traditionally: acknowledgements for each arrived flit/packet. Here: no acknowledgements to save network bandwidth, but send retransmission requests
-when a flit does not arrive. Those are referred to as ARQs throughout this thesis.
+When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive at their
+intended destinations. A common way to achieve this is the usage of \textit{automatic repeat requests}, or \textit{\glspl{arq}} for short.
+
+In traditional implementations, the receiver confirms the arrival of packets and informs the sender by answering each packet with an acknowledgment.
+If the sender does not receive a confirmation within a given time span, the corresponding packet is assumed lost and automatically retransmitted.
+
+A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
+and dropped flits. Another possibility is compromised, malicious routers that drop flits to disrupt the normal network operations, e.g. as part of a
+\gls{dos} attack.
+
+In this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
+flits by issuing an \gls{arq} back to the sender. Upon arrival, the sender will retransmit the flits in question. This scheme is described in detail
+in Section (insert vref here).
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
@@ -86,3 +97,6 @@ combinations of different flits, while intermediate nodes merely forward them. S
 % TODO: mention that mostly used with multicast, we do unicast
 % TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
 % TODO: insert vref
+
+\section{Protection Goals}\label{sec:protectiongoals}
+% Confidentiality, integrity

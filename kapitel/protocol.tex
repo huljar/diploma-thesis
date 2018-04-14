@@ -1,4 +1,65 @@
+To accomplish the goals 
+
+This chapter will illuminate the details of how encryption, authentication, network coding, and ARQ management are implemented in the network
+interfaces.
+
+Recall that the architecture of a \gls{noc} consists of a router grid with each node connected to a local processing element through a network
+interface (cf. Figure \vref{fig:nocexample}). The 
+
+There are different variants of the protocol, which are explained in detail in Section (insert vref here). While the emphasis lies on network coded
+variants, uncoded versions have also been implemented for comparison purposes. However, not all methods have a corresponding uncoded variant.
+% TODO: this goes to the overview chapter
+
+\section{Flit Structure}
+% Figure of the flit (bar) with header fields (for coded+uncoded)
+% Explain purpose of header fields
+
+\section{ARQ Structure}
+
+\section{Network Coding}
+% Why G2C3 and G2C4? → refer to previous TUD papers
+
+\section{Routing Strategies}
 \begin{itemize}
+    \item Routing Strategies
+        \begin{itemize}
+            \item XY/YX
+                \begin{itemize}
+                    \item Deterministic path
+                    \item Attacker controlling a single router can reliably disrupt communication between certain nodes
+                    \item does not distribute flits of a generation across different paths
+                \end{itemize}
+            \item XY/YX + Valiant
+                \begin{itemize}
+                    \item Deterministic path only if fixed valiant
+                \end{itemize}
+            \item Random XorY
+            \item Random XorY + Valiant
+            \item When writing about this: MANHATTAN DISTANCE (same for XY, YX, random XY, ROMM)
+        \end{itemize}
+\end{itemize}
+
+\section{Protocol Variants}
+Three different communication schemes were envisioned.
+
+\subsection{Uncoded separate data/MAC flits}
+\subsection{Network coded separate data/MAC flits}
+\subsection{Uncoded data/MAC splits}
+\subsection{Network coded data/MAC splits}
+\subsection{Network coded data flits with generation MAC}
+
+\section{Notes}
+\begin{itemize}
+    \item Encryption/authentication ordering
+        \begin{itemize}
+            \item Encrypt-then-MAC: best practice. Sequential encrypt/authenticate on sender side, but parallel decrypt/verify
+                on receiver side. Advantage: MAC can be computed on receiver side immediately when ciphertext arrives, even when
+                MAC flit has not arrived yet (if ARQ is necessary, it can be issued right away)
+            \item MAC-then-encrypt: bad. Sequential authenticate/encrypt on sender side and sequential decrypt/verify on receiver
+                side.
+            \item Encrypt-and-MAC: okay. Parallel encrypt/authenticate on sender side, but sequential decrypt/verify on receiver
+                side (overall same latency as Encrypt-then-MAC, but without advantage of fast ARQs)
+        \end{itemize}
     \item Uncoded transmission
         \begin{itemize}
             \item no network coding

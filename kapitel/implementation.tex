@@ -1,16 +1,6 @@
 \section{Design Considerations}
 2D mesh as NoC topology is very common in research (insert many cites here).
 \begin{itemize}
-    \item Encryption/authentication ordering
-        \begin{itemize}
-            \item Encrypt-then-MAC: best practice. Sequential encrypt/authenticate on sender side, but parallel decrypt/verify
-                on receiver side. Advantage: MAC can be computed on sender side immediately when ciphertext arrives, even when
-                MAC flit has not arrived yet (if ARQ is necessary, it can be issued right away)
-            \item MAC-then-encrypt: bad. Sequential authenticate/encrypt on sender side and sequential decrypt/verify on receiver
-                side.
-            \item Encrypt-and-MAC: okay. Parallel encrypt/authenticate on sender side, but sequential decrypt/verify on receiver
-                side (overall same latency as Encrypt-then-MAC, but without advantage of fast ARQs)
-        \end{itemize}
     \item GALS (Globally Asynchronous, Locally Synchronous)
         \begin{itemize}
             \item not relevant for simulations, just for actual hardware (e.g. power spikes on active clock edges, low-power PEs etc.)
@@ -22,6 +12,9 @@
             \item integer overflow after $2^{24}-1$
             \item this is the latest time when session keys should be changed, otherwise packet injection (repeat attacks) become
                 possible
+            \item look at work paper for calculations about value ranges considered and why they chose 24 bit
+            \item Continuous flit IDs: advantage of detecting fully lost transmission units, but for the simulation we use globally unique IDs for
+                easier statistics recording → for fully lost units no ARQ is sent
         \end{itemize}
     \item Retransmission Buffer structure and lookup times
         \begin{itemize}
@@ -48,34 +41,25 @@
         \end{itemize}
     \item Crypto units
         \begin{itemize}
-            \item Separate units for encryption and decryption
+            \item Separate units for encryption and authentication
+            \item Encryption units can also decrypt → very easy to see with PRINCE
             \item Send/receive pipeline share the same set of crypto units
             \item Talk about auth. method 3: 32 bit block size, what algorithms?
+            \item Latency: assume PRINCE → ~35MHz FPGA, *~4 for ASIC → paper. Look at PRINCE paper and survey paper for numbers
         \end{itemize}
-    \item Routing Strategies
-        \begin{itemize}
-            \item XY/YX
-                \begin{itemize}
-                    \item Deterministic path
-                    \item Attacker controlling a single router can reliably disrupt communication between certain nodes
-                    \item does not distribute flits of a generation across different paths
-                \end{itemize}
-            \item XY/YX + Valiant
-                \begin{itemize}
-                    \item Deterministic path only if fixed valiant
-                \end{itemize}
-            \item Random XorY
-            \item Random XorY + Valiant
-            \item When writing about this: MANHATTAN DISTANCE (same for XY, YX, random XY, ROMM)
-        \end{itemize}
-    \item Injection rate
-        \begin{itemize}
-            \item Value if 0.2 is realistic
-            \item Possibility to generate pairs for fair comparison of UC/NC
-        \end{itemize}
+    \item Tracking finished IDs: prevent repeat attacks, prevent re-processing a unit due to redundant retransmissions or repeat attacks, but still
+        allow out-of-order arrivals SeemsGood
 \end{itemize}
 
 \section{Simulation Framework}
+% Talk about OMNeT++
 
 \section{Components}
 \subsection{Network Interface}
+% 1 paragraph per component
+% at the end: table with all components, their delay (cycles)
+\subsection{Routers}
+% Only input buffers → single cycle routing
+% Routing is only performed when receiving router's input queue is not full
+
+\section{Configurable Parameters}

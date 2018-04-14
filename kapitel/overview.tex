@@ -1,4 +1,18 @@
-As mentioned in Chapter \ref{ch:introduction}, this thesis follows up on previous work done at the \thechair. In 2015, the effect of network coding
+% 1. novel approach, why? protection goals and performance → security and efficiency
+% 2. what precisely was done at the TUD chair → say that their research proved the potential of NC and that's why we persue it here again
+% 3. NC provides no confidentiality/integrity guarantees → we implement encryption+authentication
+% 3.5 recall NoC architecture → this is implemented in the network interfaces
+% 4. Different variants envisioned (3 methods) + comparison with uncoded variant where applicable
+% 5. Multiple paths focus → why multiple paths in the first place? → chance to avoid compromised routers, still have enough flits
+%    thanks to NC
+% 6. Routing strategies: deterministic vs. non-deterministic routing → XY, smart random XY, ROMM+XY, ROMM+srXY
+% 7. Attacker/Threat model
+% 8. Evaluation
+% Always refer to the chapters that explain this in detail
+As mentioned in Chapter \ref{ch:introduction}, this thesis aims to pursue a novel approach for providing secure and efficient communication in
+\glspl{noc}.
+
+This thesis follows up on previous work done at the \thechair. In 2015, the effect of network coding
 on communications in a partially compromised \gls{noc} was evaluated and discussed. Now, the emphasis lies on combining network coding with
-cryptographic measures to fulfill the protection goals (see Section (vref to fundamentals)). % TODO: move this to introduction?
+cryptographic measures to fulfill the desired protection goals (see Section (vref to fundamentals)). % TODO: move this to introduction?
 % Mention that NoC will be simulated

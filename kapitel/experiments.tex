@@ -1,12 +1,23 @@
 \section{Parameters}
 In the experiments, a base network injection rate of 0.2 is assumed\footnote{The actual injection rate can be higher once \glspl{arq} come into play
 and retransmissions are required.}
+\begin{itemize}
+    \item Injection rate
+        \begin{itemize}
+            \item Value if 0.2 is realistic
+            \item Possibility to generate pairs for fair comparison of UC/NC
+        \end{itemize}
+\end{itemize}
 
 \section{Attacker Model}
 \begin{itemize}
     \item Variable number of compromised routers (e.g. 8 for an 8x8 grid)
     \item Compromised routers randomly drop or modify packets (no intelligent modifications/drops)
 \end{itemize}
+
+\section{Environment}
+% 50,000 cycles (why?)
+% Warmup and cooldown times
 
 \section{Determining The Hyperparameters}
 \subsection{ARQ Timeouts}

@@ -144,22 +144,25 @@ have analyzed how different variants of network coding may remedy this situation
 \cite[3]{moriam15manycorenc}, several performance metrics such as average latency and information rate were examined. The results show significant
 improvements for error-prone transmissions, but decreased performance in reliable networks.
 
+Following up on this research, ... % TODO: the other TUD paper
+
 This thesis partially builds upon the work of \citeauthor{moriam15manycorenc}. Their network coding scheme is reimplemented here, which is
 elaborated in Section (insert vref here). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as described
 in Section (insert vref here).
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
-For security reasons, it is often desirable to add encryption and authentication to the communication passing through a \gls{noc}, as many of the
-researchers mentioned above have done. However,
+In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, it is often desirable to add encryption and authentication to
+the communication passing through a \gls{noc}, as many of the researchers mentioned above have done. However,
 standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task \cite[1]{bogdanov07present}.
 
-In the work preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
+In the work directly preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
 mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}. Some of them will be examined later in this
 thesis; see Section (insert vref here) for details. % TODO: reference this when explaining PRINCE later on
 
+\iffalse
 \section{Notes}
 \begin{itemize}
     \item \textbf{\citetitle{ivanov05nocintroduction}} \checkmark
@@ -336,4 +339,4 @@ against bandwidth depletion, but this is not the goal.
 Deterministic vs. static routing? No security zones or division into secure/non-secure zones/cores.
 
 The concept of security zones can be implemented in different ways. Bla et al. propose to do X, while bla enforce them through the routing protocol.
-
+\fi
