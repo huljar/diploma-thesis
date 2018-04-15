@@ -1,14 +1,24 @@
-\section{Networks-On-Chip}\label{sec:networkonchipfun}
-\textit{Network-on-Chip} (or \textit{\gls{noc}} for short) is a paradigm for interconnecting components on a chip. Typically employed on
-\textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, they
-provide the communication infrastructure for \textit{processing elements (\glspl{pe})} and possibly other \gls{ip} cores.
+% TODO: Leser leiten, was kommt jetzt, warum gehe ich auf bestimmte Dinge ein
+% TODO: ist components eindeutig/korrekt?
+% TODO: Abkürzungen kursiv oder nicht?
+% TODO: einmal IP ausschreiben?
 
+\section{Networks-On-Chip}\label{sec:networkonchipfun}
+\textit{Networks-on-Chip \glspl{noc})} are a paradigm for interconnecting components on a chip. Typically employed on
+\textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, they
+provide the communication infrastructure for \textit{processing elements (\glspl{pe})} and possibly other \gls{ip} cores\footnote{Besides PEs, IP
+cores encompass other types of components, such as memory nodes}.
+% TODO: Leser leiten, Begriffe erwähnen, die nachfolgend erklärt werden
+
+% TODO: 2. Satz als erstes, Fußnote um zu sagen, dass HAEC 3D mesh benutzt als Gegenbeispiel?
+% TODO: "which is also used throughout ..." inhaltlich korrekt?
 The topology of a \gls{noc} can vary. Researchers usually work with a 2D mesh topology
-\cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}, which will also be used throughout this thesis.
+\cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}, which is also used throughout this thesis.
 In this case, each network node is connected to its four neighbors (excluding the boundary nodes).
 
-A node typically consists of a processing element (often referred to as an \textit{\gls{ip} core} or just \textit{core}), a network interface,
-and a router \cite{dally01routepacketsnotwires}. The router manages the connections to neighboring nodes while also allowing
+% TODO: short sentence about PE and NI
+A node consists of a processing element (often referred to as an \textit{\gls{ip} core} or just \textit{core}), a network interface,
+and a router \cite{dally01routepacketsnotwires}. The router manages the connections to neighboring nodes and allows
 the local processing element to communicate with the network through the network interface. An example of this architecture is given in Figure
 \vref{fig:nocexample}.
 
@@ -20,31 +30,35 @@ the local processing element to communicate with the network through the network
     \label{fig:nocexample}
 \end{figure}
 
-Compared to traditional bus-based interconnect systems, \glspl{noc} can provide a lot of advantages, especially for many-core systems
-\cite[5\psqq]{tatas16designingnocs}. One big advantage is scalability; because the cores do not share a global bus, \enquote{local performance is not
+% TODO: Fußnote
+Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are also disadvantages entailed by
+the use of \glspl{noc} over bus-based systems, but the benefits outweigh them. A detailed comparison is given in 30.}, especially for many-core systems
+\cite[5\psqq]{tatas16designingnocs}. A significant advantage is scalability: since the cores do not share a global bus, \enquote{local performance is not
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
 
+% TODO: fehlt hier was in der Erzählkette? Begründung für "increasingly important"?
 In addition, the absence of global interconnection wires facilitates the use of different clock domains. This enables the implementation of the
 \textit{globally asynchronous, locally synchronous (\gls{gals})} paradigm, which becomes increasingly important in chip design
 \cites[3]{kumar02networkonchip}[2]{ivanov05nocintroduction}.
 
-Furthermore, with the constantly increasing design complexity of modern chips \cite{mack11mooreslaw}, specialized on-chip
-interconnections become infeasible to implement. Designing such a system \enquote{would take too much time and mapping of applications to dedicated
-architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, \glspl{noc} aims to be general purpose interconnect systems; they
+Furthermore, the constantly increasing design complexity of modern chips \cite{mack11mooreslaw} renders specialized on-chip
+interconnections infeasible to implement. Designing such a system \enquote{would take too much time and mapping of applications to dedicated
+architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, \glspl{noc} are intended to be general purpose interconnect systems; they
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
 
 % TODO: talk about area and power constraints
 
 \section{Flits}\label{sec:flits}
-Flits (short for \textit{flow control units}) are small pieces of data that are sent over a network. They are usually created by breaking a larger
-packet down into parts that can be transmitted individually \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
-destination address, sequence number, or identifier) that are required for routing and handling \cite[2]{flitslectureutah}. In addition, it contains
-a payload that carries the actual information to be transmitted.
+\textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
+packet down into parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
+destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
+In addition, it contains a payload that carries the actual information to be transmitted.
 
 In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
 are used in this thesis can be found in (insert section/chapter vref).
 % TODO: insert reference
+% TODO: "used in this thesis" correct?
 
 \section{Automatic Repeat Requests}\label{sec:arqs}
 When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive at their
@@ -63,10 +77,11 @@ in Section (insert vref here).
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
-Hardware trojans are \enquote{malicious modifications of electronic hardware} \cite[1]{bhunia14hardwaretrojans} with the intent of disrupting normal
-system behavior or extracting sensitive information. Because the integration of third party \gls{ip} has become increasingly popular due to circuit
+% TODO: third party IP nicht der einzige Grund
+Hardware trojans are \enquote{malicious modifications of electronic hardware} \cite[1]{bhunia14hardwaretrojans} intended to disrupt normal
+system behavior or to extract sensitive information. As the integration of third party \gls{ip} has become increasingly popular due to circuit
 complexity and cost efficiency \cites[1]{ancajas14fortnocs}[2]{bhunia14hardwaretrojans}, it is possible for adversaries to introduce hardware
-trojans into larger systems, such as \glspl{mpsoc}.
+trojans into larger systems such as \glspl{mpsoc}.
 
 In order to remain undetected, attackers aim to construct hardware trojans that are \enquote{stealthy in nature} \cite[1]{bhunia14hardwaretrojans}
 and \enquote{evade […] detection through conventional postmanufacturing test} \cite[1]{bhunia14hardwaretrojans}. Hardware trojans are usually in a
