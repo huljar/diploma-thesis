@@ -1,5 +1,5 @@
 % TODO: tenses?
-\section{Network-On-Chip Security}\label{sec:networkonchipsecurity}
+\section{Network-On-Chip Security}\label{sec:nocsecurity}
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
 general-purpose on-chip networks has been introduced in the early 2000s
 \cites{dally01routepacketsnotwires}{kumar02networkonchip}{benini02nocparadigm} and has quickly gained a lot of traction in the research community
@@ -153,11 +153,11 @@ are taken up (see Section (insert vref here)). The performance metrics used to e
 described in Section (insert vref here).
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
-In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, it is often desirable to add encryption and authentication to
-the communication passing through a \gls{noc}, as many of the researchers mentioned above have done. However,
-standard cryptographic algorithms such as \gls{aes} are usually not efficient enough for this task \cite[1]{bogdanov07present}. With the tight area
-and power consumption constraints in \glspl{mpsoc} (cf. Section \ref{sec:networkonchipfun}), novel designs that tackle this problem have become essential
-for the implementation of cryptographic protection measures.
+In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, the addition of encryption and authentication to
+the communication passing through a \gls{noc} suggests itself. However, care needs to be taken to stay within the latency, area, and power constraints
+of this environment (cf. Section \ref{sec:networkonchipfun}). As standard cryptographic algorithms, such as \gls{aes}, are usually not efficient
+enough for this task \cite[1]{bogdanov07present}, novel designs that meet these requirements have become essential for the implementation of
+cryptographic protection measures.
 
 In the work directly preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are

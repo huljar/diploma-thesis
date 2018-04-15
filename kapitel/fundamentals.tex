@@ -9,6 +9,7 @@
 provide the communication infrastructure for \textit{processing elements (\glspl{pe})} and possibly other \gls{ip} cores\footnote{Besides PEs, IP
 cores encompass other types of components, such as memory nodes}.
 % TODO: Leser leiten, Begriffe erwähnen, die nachfolgend erklärt werden
+% TODO: footnote
 
 % TODO: 2. Satz als erstes, Fußnote um zu sagen, dass HAEC 3D mesh benutzt als Gegenbeispiel?
 % TODO: "which is also used throughout ..." inhaltlich korrekt?
@@ -24,15 +25,15 @@ the local processing element to communicate with the network through the network
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\textwidth]{noc_3x3_colored}
+    \includegraphics[width=0.6\textwidth]{noc-3x3-colored}
     \caption[Example of a 3x3 mesh NoC]{Example of a Network-on-Chip in a 2D mesh topology of size 3x3. The processing elements (red) contain a network interface
     (green) through which they are connected to a router (blue). The routers are interconnected as a 2D mesh.}
     \label{fig:nocexample}
 \end{figure}
 
-% TODO: Fußnote
-Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are also disadvantages entailed by
-the use of \glspl{noc} over bus-based systems, but the benefits outweigh them. A detailed comparison is given in 30.}, especially for many-core systems
+Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are disadvantages entailed by
+the use of \glspl{noc} over bus-based systems, but research has shown them to be outweighed by the benefits. \citeauthor{tatas16designingnocs}
+\cite{tatas16designingnocs} give a detailed comparison.}, especially for many-core systems
 \cite[5\psqq]{tatas16designingnocs}. A significant advantage is scalability: since the cores do not share a global bus, \enquote{local performance is not
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
@@ -49,31 +50,18 @@ architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, 
 
 % TODO: talk about area and power constraints
 
-\section{Flits}\label{sec:flits}
-\textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
-packet down into parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
-destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
-In addition, it contains a payload that carries the actual information to be transmitted.
+\section{Protection Goals}\label{sec:protectiongoals}
+% Confidentiality, integrity, availability
+Protection goals describe desired properties of a system with regard to information security. They are divided into \textit{confidentiality},
+\textit{integrity}, and \textit{availability}\footnote{The goals may be further classified to include e.g. \textit{unobservability} or \textit{plausible
+deniability}. However, these are extraneous to this thesis.}. Confidentiality is achieved by preventing unauthorized access to information, which
+can be accomplished e.g. by means of encryption. Integrity is attained by ensuring that any unintentional modifications to information, both accidental and
+malicious, are detected, e.g. through authentication techniques. Finally, availability refers to the reliable accessibility of information. It is
+achieved via methods like backup systems and redundant hardware.
 
-In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
-are used in this thesis can be found in (insert section/chapter vref).
-% TODO: insert reference
-% TODO: "used in this thesis" correct?
-
-\section{Automatic Repeat Requests}\label{sec:arqs}
-When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive at their
-intended destinations. A common way to achieve this is the usage of \textit{automatic repeat requests}, or \textit{\glspl{arq}} for short.
-
-In traditional implementations, the receiver confirms the arrival of packets and informs the sender by answering each packet with an acknowledgment.
-If the sender does not receive a confirmation within a given time span, the corresponding packet is assumed lost and automatically retransmitted.
-
-A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
-and dropped flits. Another possibility is compromised, malicious routers that drop flits to disrupt the normal network operations, e.g. as part of a
-\gls{dos} attack.
-
-In this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
-flits by issuing an \gls{arq} back to the sender. Upon arrival, the sender will retransmit the flits in question. This scheme is described in detail
-in Section (insert vref here).
+In \gls{noc} architectures, it is naturally desirable to fulfill these goals\footnote{The necessity for security measures was demonstrated in
+related research, which is elaborated in Section \ref{sec:nocsecurity}.}. In this thesis, confidentiality and integrity through encryption and
+authentication are examined.
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
@@ -90,6 +78,32 @@ trojan is inactive, communications through the \gls{noc} are unaffected and the 
 
 Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, deadlock, livelock)
 % TODO: is this a fundamental? or write this when describing our attacker model?
+
+\section{Flits}\label{sec:flits}
+\textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
+packet down into parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
+destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
+In addition, it contains a payload that carries the actual information to be transmitted.
+
+In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
+are used in this thesis can be found in (insert section/chapter vref).
+% TODO: insert reference
+% TODO: "used in this thesis" correct?
+
+\section{Automatic Repeat Requests}\label{sec:arqs}
+When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive unmodified
+at their intended destinations. A common way to achieve this is the usage of \textit{automatic repeat requests (\glspl{arq})}.
+
+In traditional implementations, such as \gls{tcp}, the receiver confirms the arrival of packets by answering each one with an acknowledgment.
+If the sender does not receive a confirmation within a given time span, the corresponding packet is assumed lost and automatically retransmitted.
+
+A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
+and dropped flits. Another possibility is compromised, malicious routers that drop or modify flits to disrupt the normal network operations, e.g. as part of a
+\gls{dos} attack.
+
+In this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
+flits by issuing an \gls{arq} back to the sender. Upon arrival, the sender will retransmit the flits in question. In combination with
+authentication techniques, this aids in fulfilling the protection goal of integrity. This scheme is described in detail in Section (insert vref here).
 
 \section{Network Coding}\label{sec:networkcodingfun}
 Network coding is a technique for transmitting packets efficiently over a network. First described in 2000 by \citeauthor{ahlswede00networkflow}
@@ -114,6 +128,3 @@ combinations of different flits, while intermediate nodes merely forward them. S
 % TODO: mention that mostly used with multicast, we do unicast
 % TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
 % TODO: insert vref
-
-\section{Protection Goals}\label{sec:protectiongoals}
-% Confidentiality, integrity
