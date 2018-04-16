@@ -159,7 +159,7 @@ of this environment (cf. Section \ref{sec:networkonchipfun}). As standard crypto
 enough for this task \cite[1]{bogdanov07present}, novel designs that meet these requirements have become essential for the implementation of
 cryptographic protection measures.
 
-In the work directly preceding this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
+In an analysis conducted prior to this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
@@ -337,10 +337,6 @@ partners. Other threat model: software attacks (NoC itself is secure).
 
 How to get HT into hardware: rogue employee, 3rd party IP, 3rd party manufacturing/integration partners, ...
 
-This thesis: no hardware synthesis, use software simulation. Focus on malicious flit modification (→ attacker model) rather than DoS attacks. Our
-model assumes that the NoC routers and links may be compromised and thus relies on the NIs for the security measures → no effective protection
-against bandwidth depletion, but this is not the goal.
-Deterministic vs. static routing? No security zones or division into secure/non-secure zones/cores.
 
 The concept of security zones can be implemented in different ways. Bla et al. propose to do X, while bla enforce them through the routing protocol.
 \fi
