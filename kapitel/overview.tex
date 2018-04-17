@@ -47,16 +47,24 @@ trojan, while the network interfaces are considered trustworthy. This is the sam
 more likely to be obtained from third party vendors than network interfaces, making them more susceptible to concealed hardware trojans. The reasoning
 for this is that \enquote{routers have a deterministic functionality} \cite[2]{moriam18activeattackers} that does not depend on the peculiarities of
 a specific system. In contrast, network interfaces often contain product-specific logic and are thus \enquote{rather developed in house and under
-control} \cite[2]{moriam18activeattackers}, eliminating the attack vector of third party \gls{ip}. This model is visualized in Figure (insert vref
-here).
-% TODO: figure with red routers, green rest, maybe small bars at the trust boundaries
+control} \cite[2]{moriam18activeattackers}, eliminating the attack vector of third party \gls{ip}. This model is visualized in Figure
+\vref{fig:noctrustboundaries}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{noc-trust-boundaries}
+    \caption[Trust boundaries in a NoC]{Visualization of the trusted and untrusted hardware components in a NoC. The processing elements and network
+    interfaces, which are assumed to be trusted, are marked green. The network itself, which is comprised of the routers and their interconnections,
+    is not trustworthy and thus marked red. The dotted lines at the local connections mark the trust boundaries.}
+    \label{fig:noctrustboundaries}
+\end{figure}
 
 \section{Encryption And Authentication}
 The intent of integrating encryption and authentication is to provide confidentiality and integrity to communications passing through a \gls{noc}. To
 implement this, a new network interface design is proposed. Since all flits that enter the \gls{noc} must pass through a network interface, this is the
 ideal location to implement cryptographic protection. In the proposed design, it encrypts all outgoing flits, which can only be decrypted by the
 receiver. In addition, a \gls{mac} is computed that is sent together with the encrypted flits. On the receiver side, the flits are decrypted and the
-\gls{mac} is verified. This scheme is visualized in Figure \vref{fig:nocflitencauth} and further explained in Section (insert ref here).
+\gls{mac} is verified. This scheme is illustrated in Figure \vref{fig:nocflitencauth} and further explained in Section (insert ref here).
 
 \begin{figure}
     \centering
