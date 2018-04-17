@@ -60,9 +60,9 @@ control} \cite[2]{moriam18activeattackers}, eliminating the attack vector of thi
 \end{figure}
 
 \section{Encryption And Authentication}
-The intent of integrating encryption and authentication is to provide confidentiality and integrity to communications passing through a \gls{noc}. To
-implement this, a new network interface design is proposed. Since all flits that enter the \gls{noc} must pass through a network interface, this is the
-ideal location to implement cryptographic protection. In the proposed design, it encrypts all outgoing flits, which can only be decrypted by the
+The intent of integrating encryption and authentication is to provide confidentiality and integrity to messages passing through a \gls{noc}. To
+implement this, a novel network interface design is proposed. Since all flits that enter the \gls{noc} must pass through a network interface, this is the
+ideal location to implement cryptographic protections. In the proposed design, it encrypts all outgoing flits, which can only be decrypted by the
 receiver. In addition, a \gls{mac} is computed that is sent together with the encrypted flits. On the receiver side, the flits are decrypted and the
 \gls{mac} is verified. This scheme is illustrated in Figure \vref{fig:nocflitencauth} and further explained in Section (insert ref here).
 
@@ -76,9 +76,11 @@ receiver. In addition, a \gls{mac} is computed that is sent together with the en
     \label{fig:nocflitencauth}
 \end{figure}
 
-The ciphers that were investigated for this purpose use symmetric cryptography, as this allows for efficient cryptographic computations.
-In addition, the produced \glspl{mac} are short enough to fit into a single flit. However, their usage implies that each pair of
-sender and receiver needs to possess a shared secret key. To obtain or renegotiate such a key in a secure manner, a key exchange algorithm is required.
+For the implementation of encryption and authentication, only symmetric ciphers were investigated, as they allow for efficient computation.
+Furthermore, the produced \glspl{mac} are short enough to fit into a single flit. However, their usage implies that each pair of
+sender and receiver needs to possess a shared secret key. To obtain or renegotiate such a key in a secure manner, a key exchange algorithm is required
+\footnote{One way to realize a secure key exchange in the context of \glspl{noc} is the utilization of central key-keeper cores, as proposed by
+\citeauthor{gebotys03securityframework} \cite{gebotys03securityframework} (see also Section \ref{subsec:securityzones}).}.
 As this goes beyond the scope of this thesis, each pair of sender and receiver is assumed to own a shared secret key. The alternative, asymmetric
 cryptography, is not considered, since it \enquote{implies a high computational effort} \cite[3]{moriam18activeattackers}. Additionally, this class of
 algorithms produces signatures instead of \glspl{mac}, which are \enquote{too long to be included in a flit} \cite[3]{moriam18activeattackers}.
@@ -87,6 +89,17 @@ algorithms produces signatures instead of \glspl{mac}, which are \enquote{too lo
 While network coding provides robustness against sporadic flit loss, it does not provide any guarantees on the integrity of flits.
 
 \section{Multipath Routing}
+The exploration of different routing strategies is a central aspect of this thesis. Both deterministic and non-deterministic strategies were
+examined and evaluated. With a deterministic strategy, there is a predetermined, time-invariant path that a flit will take to reach a certain destination
+from a particular sender. In contrast, non-deterministic strategies implement random factors that influence the routing decisions for each
+transmission. The emphasis of this thesis lies on the latter in order to capture the envisioned benefits of multipath routing.
+
+As a deterministic strategy, XY routing is used. On the non-deterministic side, \gls{dsr} and \gls{romm} routing are explored. The properties and
+details of these strategies are presented in depth in Section (insert ref here).
+
+% TODO: continue here
+Mention the perceived/envisioned advantages of non-deterministic routing (different paths for each flit within the same sender-receiver pair → thanks
+to NC enough flits will arrive hopefully even if one path contains a corrupted router).
 
 \section{Protocol Variants}
 
