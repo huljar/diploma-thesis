@@ -10,6 +10,11 @@ There are different variants of the protocol, which are explained in detail in S
 variants, uncoded versions have also been implemented for comparison purposes. However, not all methods have a corresponding uncoded variant.
 % TODO: this goes to the overview chapter
 
+Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, fundamental
+assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
+mostly in the authentication scheme, the simplest one (uncoded individual authentication) is used to give a step-by-step explanation of the full
+protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual authentication.
+
 \section{Flit Structure}
 % Figure of the flit (bar) with header fields (for coded+uncoded)
 % Explain purpose of header fields
@@ -20,6 +25,9 @@ variants, uncoded versions have also been implemented for comparison purposes. H
 % Why G2C3 and G2C4? → refer to previous TUD papers
 
 \section{Routing Strategies}
+Mention the perceived/envisioned advantages of non-deterministic routing (different paths for each flit within the same sender-receiver pair → thanks
+to NC enough flits will arrive hopefully even if one path contains a corrupted router).
+
 \begin{itemize}
     \item Routing Strategies
         \begin{itemize}
@@ -39,15 +47,16 @@ variants, uncoded versions have also been implemented for comparison purposes. H
         \end{itemize}
 \end{itemize}
 
-\section{Authentication Approaches}
+\section{The Protocol}
 Three different communication schemes were envisioned.
 
-\subsection{Uncoded separate data/MAC flits}
-\subsection{Network coded separate data/MAC flits}
-\subsection{Uncoded data/MAC splits}
-\subsection{Network coded data/MAC splits}
-\subsection{Network coded data flits with generation MAC}
+\subsection{Uncoded Individual Authentication}
+\subsection{Network Coded Individual Authentication}
+\subsection{Uncoded Interwoven Authentication}
+\subsection{Network Coded Interwoven Authentication}
+\subsection{Network Coded Full-Generation Authentication}
 
+\iffalse
 \section{Notes}
 \begin{itemize}
     \item Encryption/authentication ordering
@@ -88,3 +97,4 @@ Three different communication schemes were envisioned.
                 so in case they fail, the flits can be included in the ARQ
         \end{itemize}
 \end{itemize}
+\fi

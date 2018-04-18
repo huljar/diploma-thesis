@@ -97,11 +97,14 @@ transmission. The emphasis of this thesis lies on the latter in order to capture
 As a deterministic strategy, XY routing is used. On the non-deterministic side, \gls{dsr} and \gls{romm} routing are explored. The properties and
 details of these strategies are presented in depth in Section (insert ref here).
 
-% TODO: continue here
-Mention the perceived/envisioned advantages of non-deterministic routing (different paths for each flit within the same sender-receiver pair → thanks
-to NC enough flits will arrive hopefully even if one path contains a corrupted router).
-
 \section{Protocol Variants}
+To unearth and analyze the most efficient way of applying the ideas outlined above, different variants of the protocol were implemented. They differ
+in the way the authentication \glspl{mac} are included in the flit transmissions. Furthermore, both network coded and uncoded versions are compared to
+examine the effects of network coding in combination with the cryptographic procedures.
+
+The examined variants are \textit{individual authentication}, \textit{interwoven authentication}, and \textit{full-generation authentication}. For the
+first two, both uncoded and network coded variants are implemented. For the latter, only a network coded variant is feasible. Since the authentication
+scheme relies on the implications of network coding, no uncoded counterpart exists. (insert ref to protocol section here)
 
 \section{Evaluation Approach}
 First: fix the hyperparameters, then experiments with the remaining parameters and protocol variants
