@@ -22,15 +22,36 @@ protocol. Following this, the other variants are described by drawing upon the d
 \section{ARQ Structure}
 
 \section{Network Coding}
+% Only the sender codes
+% 2 sub-variants: G2C3, G2C4
 % Why G2C3 and G2C4? → refer to previous TUD papers
+
+\section{The Protocol}
+Three different communication schemes were envisioned.
+
+\subsection{Individual Authentication}
+% uncoded (full explanation), network coded
+\subsection{Interwoven Authentication}
+\subsection{Full-Generation Authentication}
 
 \section{Routing Strategies}
 Mention the perceived/envisioned advantages of non-deterministic routing (different paths for each flit within the same sender-receiver pair → thanks
 to NC enough flits will arrive hopefully even if one path contains a corrupted router).
 
+\subsection{Deterministic XY}
+The term \enquote{XY routing} stems directly from the behavior of the routers: flits are only routed along the X axis until they arrive in the column
+that the receiver lies in, at which they are routed along the Y axis until reaching the receiver node.
+% TODO: figure with a 2D mesh, X and Y arrows on the sides, example path marked for a transmission
+\subsection{Dynamic Smart Random}
+\subsection{Randomized Oblivious Multi-phase Minimal}
+% Both with XY phases and DSR phases
+This strategy essentially splits the routing problem into two phases: find a path from sender to proxy node and from proxy to receiver. For each
+phase, one of the aforementioned strategies can be applied as is.
+
 \begin{itemize}
     \item Routing Strategies
         \begin{itemize}
+            \item Mention routing is general, we are special case of 2D mesh with uniform edge weights → much simpler than arbitrary networks
             \item XY/YX
                 \begin{itemize}
                     \item Deterministic path
@@ -46,15 +67,6 @@ to NC enough flits will arrive hopefully even if one path contains a corrupted r
             \item When writing about this: MANHATTAN DISTANCE (same for XY, YX, random XY, ROMM)
         \end{itemize}
 \end{itemize}
-
-\section{The Protocol}
-Three different communication schemes were envisioned.
-
-\subsection{Uncoded Individual Authentication}
-\subsection{Network Coded Individual Authentication}
-\subsection{Uncoded Interwoven Authentication}
-\subsection{Network Coded Interwoven Authentication}
-\subsection{Network Coded Full-Generation Authentication}
 
 \iffalse
 \section{Notes}
