@@ -86,7 +86,17 @@ cryptography, is not considered, since it \enquote{implies a high computational 
 algorithms produces signatures instead of \glspl{mac}, which are \enquote{too long to be included in a flit} \cite[3]{moriam18activeattackers}.
 
 \section{Random Linear Network Coding}
-While network coding provides robustness against sporadic flit loss, it does not provide any guarantees on the integrity of flits.
+A promising approach to improve the performance of \glspl{noc} is network coding. \citeauthor{moriam15manycorenc} have shown that it is particularly
+effective in error-prone networks, decreasing latency up to 95\% \cite[7]{moriam15manycorenc}. In the context of this thesis, \glspl{noc} are assumed
+to be unreliable: accidental flit losses may occur, and compromised routers enable deliberate fault injections and flit drops. Hence, this approach is
+taken up here.
+
+While network coding provides robustness against sporadic flit loss, it does not provide any guarantees on the integrity of flits. Thus, modifications
+during the transmission of the coded data are not detected, potentially leading to faulty decodings. This deficit is remedied by the cryptographic
+measures described above. To evaluate the consequences of the integration of network coding, uncoded versions of the protocol were implemented and
+examined as well (see Section \ref{sec:protocolvariants}).
+
+% TODO: explain network coding (generations, GEVs)? → how much is explained in fundamentals?
 
 \section{Multipath Routing}
 The exploration of different routing strategies is a central aspect of this thesis. Both deterministic and non-deterministic strategies were
@@ -97,16 +107,32 @@ transmission. The emphasis of this thesis lies on the latter in order to capture
 As a deterministic strategy, XY routing is used. On the non-deterministic side, \gls{dsr} and \gls{romm} routing are explored. The properties and
 details of these strategies are presented in depth in Section (insert ref here).
 
-\section{Protocol Variants}
+\section{Retransmissions}\label{sec:retransmissions}
+In case the proposed techniques fail to achieve flawless transmission of a flit or generation, it is crucial to provide a method for requesting
+their retransmission. This occurs when the integrity check via \gls{mac} verification fails, indicating a modification in one or more of the
+associated flits. Furthermore, it is necessary when not enough flits arrive at the destination to perform the verifications in the first place.
+Additionally, the network coded variants require at least partially intact transmissions in order to successfully decode a generation, necessitating
+retransmissions otherwise.
+
+A retransmission scheme is integrated into the protocol by means of \glspl{arq}. If one or more of the aforementioned events occur, the affected
+receiver will issue an \gls{arq} back to the sender, who will then resend the flits in question.
+
+To render retransmissions possible, a copy of each flit that is sent through the network must be kept by the sender in order to answer a potential
+\gls{arq} arriving later on. This is facilitated by a retransmission buffer that is included in every network interface. Each flit that is sent to the
+network (except for the \glspl{arq} themselves) must pass through this buffer, where a copy of it is stored. When an \gls{arq} arrives from another
+node, the requested flits are retrieved from the buffer and resent. As the retransmission buffer cannot grow infinitely in size, old flits are
+replaced in a \gls{fifo} manner once maximum size is reached.
+
+\section{Protocol Variants}\label{sec:protocolvariants}
 To unearth and analyze the most efficient way of applying the ideas outlined above, different variants of the protocol were implemented. They differ
 in the way the authentication \glspl{mac} are included in the flit transmissions. Furthermore, both network coded and uncoded versions are compared to
 examine the effects of network coding in combination with the cryptographic procedures.
 
 The examined variants are \textit{individual authentication}, \textit{interwoven authentication}, and \textit{full-generation authentication}. For the
-first two, both uncoded and network coded variants are implemented. For the latter, only a network coded variant is feasible. Since the authentication
-scheme relies on the implications of network coding, no uncoded counterpart exists. (insert ref to protocol section here)
+first two, both uncoded and network coded variants are implemented. For the latter, only a network coded version is feasible. Since the authentication
+scheme relies on the existance of generations, no uncoded counterpart exists. (insert ref to protocol section here)
 
-\section{Evaluation Approach}
+\section{Analysis And Evaluation}
 First: fix the hyperparameters, then experiments with the remaining parameters and protocol variants
 \subsection{Simulation}
 
