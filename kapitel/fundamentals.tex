@@ -1,15 +1,15 @@
-% TODO: Leser leiten, was kommt jetzt, warum gehe ich auf bestimmte Dinge ein
-% TODO: ist components eindeutig/korrekt?
-% TODO: Abkürzungen kursiv oder nicht?
-% TODO: einmal IP ausschreiben?
+Throughout this chapter, core terms and concepts that are essential to the understanding of this thesis are explained. First, networks-on-chip are
+described, as this whole work builds upon and analyzes them. Afterwards, fundamental concepts of information security and their relevance for this
+thesis are outlined. Finally, essential aspects of the communication strategy devised in this thesis are delineated.
 
 \section{Networks-On-Chip}\label{sec:networkonchipfun}
-\textit{Networks-on-Chip \glspl{noc})} are a paradigm for interconnecting components on a chip. Typically employed on
-\textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, they
-provide the communication infrastructure for \textit{processing elements (\glspl{pe})} and possibly other \gls{ip} cores\footnote{Besides PEs, IP
-cores encompass other types of components, such as memory nodes}.
-% TODO: Leser leiten, Begriffe erwähnen, die nachfolgend erklärt werden
-% TODO: footnote
+\textit{Networks-on-Chip \glspl{noc})} are a paradigm for interconnecting components on a chip. They are employed on
+\textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, where they
+provide the communication infrastructure for the \textit{processing elements} and other \textit{intellectual property (\gls{ip}) cores}\footnote{The
+term \textit{\gls{ip} cores} encompasses many kinds of chip components. Besides processing elements, it includes e.g. memory nodes and
+hardware accelerators.}. The basic concept is to incorporate many point-to-point connections between neighboring cores, breaking with the traditional
+concept of global interconnection buses. After describing the internal structure of \glspl{noc} in the following paragraphs, the advantages of this
+approach will be explained.
 
 % TODO: 2. Satz als erstes, Fußnote um zu sagen, dass HAEC 3D mesh benutzt als Gegenbeispiel?
 % TODO: "which is also used throughout ..." inhaltlich korrekt?
@@ -17,11 +17,11 @@ The topology of a \gls{noc} can vary. Researchers usually work with a 2D mesh to
 \cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}, which is also used throughout this thesis.
 In this case, each network node is connected to its four neighbors (excluding the boundary nodes).
 
-% TODO: short sentence about PE and NI
-A node consists of a processing element (often referred to as an \textit{\gls{ip} core} or just \textit{core}), a network interface,
-and a router \cite{dally01routepacketsnotwires}. The router manages the connections to neighboring nodes and allows
-the local processing element to communicate with the network through the network interface. An example of this architecture is given in Figure
-\vref{fig:nocexample}.
+A node consists of a processing element\footnote{As already mentioned, other types of cores are also possible. Since only processing elements are of
+relevance to this thesis, no further distinctions will be made.}, a network interface, and a router \cite{dally01routepacketsnotwires}. The processing
+element executes applications, requiring it to be able to send and receive messages. The network interface facilitates this by connecting the
+processing element to the router. Finally, the router manages the connections to neighboring nodes and the local processing element. An example of
+this architecture is given in Figure \vref{fig:nocexample}.
 
 \begin{figure}
     \centering
@@ -38,10 +38,9 @@ the use of \glspl{noc} over bus-based systems, but research has shown them to be
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
 
-% TODO: fehlt hier was in der Erzählkette? Begründung für "increasingly important"?
 In addition, the absence of global interconnection wires facilitates the use of different clock domains. This enables the implementation of the
-\textit{globally asynchronous, locally synchronous (\gls{gals})} paradigm, which becomes increasingly important in chip design
-\cites[3]{kumar02networkonchip}[2]{ivanov05nocintroduction}.
+\textit{globally asynchronous, locally synchronous (\gls{gals})} paradigm, which becomes increasingly important in chip design due to the growing
+number of cores and resulting timing closure issues \cites[3]{kumar02networkonchip}[2]{ivanov05nocintroduction}.
 
 Furthermore, the constantly increasing design complexity of modern chips \cite{mack11mooreslaw} renders specialized on-chip
 interconnections infeasible to implement. Designing such a system \enquote{would take too much time and mapping of applications to dedicated
