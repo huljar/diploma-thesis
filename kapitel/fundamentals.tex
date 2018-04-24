@@ -11,11 +11,11 @@ hardware accelerators.}. The basic concept is to incorporate many point-to-point
 concept of global interconnection buses. After describing the internal structure of \glspl{noc} in the following paragraphs, the advantages of this
 approach will be explained.
 
-% TODO: 2. Satz als erstes, Fußnote um zu sagen, dass HAEC 3D mesh benutzt als Gegenbeispiel?
-% TODO: "which is also used throughout ..." inhaltlich korrekt?
-The topology of a \gls{noc} can vary. Researchers usually work with a 2D mesh topology
-\cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}, which is also used throughout this thesis.
-In this case, each network node is connected to its four neighbors (excluding the boundary nodes).
+In recent research, the topology of a \gls{noc} is usually assumed to be a 2D mesh
+\cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}. While this is not a
+requirement\footnote{Other \gls{noc} topologies include e.g. 2D folded tori and 3D meshes \cite[2]{feero07noc3d}.}, it is both convenient
+to work with and applicable in practice. Thus, in this thesis, the network nodes are also laid out in this manner.
+In a 2D mesh, each node is connected to its four neighbors (excluding the ones located at the boundaries).
 
 A node consists of a processing element\footnote{As already mentioned, other types of cores are also possible. Since only processing elements are of
 relevance to this thesis, no further distinctions will be made.}, a network interface, and a router \cite{dally01routepacketsnotwires}. The processing
@@ -47,7 +47,11 @@ interconnections infeasible to implement. Designing such a system \enquote{would
 architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, \glspl{noc} are intended to be general purpose interconnect systems; they
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
 
-% TODO: talk about area and power constraints
+When utilizing \gls{noc} architectures in practice, it is crucial that they allow for an efficient implementation and swift communications. The
+former is attained by reducing the chip area requirements and power consumption as much as possible, while the latter is realized
+through low electronic delays and message transmission latencies. To achieve this, all components of the \gls{noc} need to be optimized regarding
+these criteria. In this thesis, several approaches like specifically lightweight cryptographic algorithms and single-cycle routing are pursued to
+meet them. They are explained in detail in Sections (insert refs here).% TODO: refs to relevant sections with details
 
 \section{Protection Goals}\label{sec:protectiongoals}
 % Confidentiality, integrity, availability
