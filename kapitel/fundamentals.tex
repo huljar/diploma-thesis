@@ -68,7 +68,6 @@ authentication are examined.
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
-% TODO: third party IP nicht der einzige Grund
 Hardware trojans are \enquote{malicious modifications of electronic hardware} \cite[1]{bhunia14hardwaretrojans} intended to disrupt normal
 system behavior or to extract sensitive information. The introduction of hardware trojans into larger systems (such as \glspl{mpsoc}) is possible
 through a number of different infection vectors (see Section \ref{sec:necessityofsecurity} for details).
@@ -78,19 +77,17 @@ and \enquote{evade […] detection through conventional postmanufacturing test} 
 dormant state until they are activated by a trigger signal to carry out their task \cites{bhunia14hardwaretrojans}{ancajas14fortnocs}. While the
 trojan is inactive, communications through the \gls{noc} are unaffected and the system operates normally.
 
-Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, deadlock, livelock)
+%Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, deadlock, livelock)
 % TODO: is this a fundamental? or write this when describing our attacker model?
-
-\section{Flits}\label{sec:flits}
+%
+\section{Flow Control Units}\label{sec:flits}
 \textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
-packet down into parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
+packet down into multiple parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
 destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
 In addition, it contains a payload that carries the actual information to be transmitted.
 
 In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
-are used in this thesis can be found in (insert section/chapter vref).
-% TODO: insert reference
-% TODO: "used in this thesis" correct?
+are employed in the protocol devised in this thesis can be found in Chapter \ref{ch:protocol}.
 
 \section{Automatic Repeat Requests}\label{sec:arqs}
 When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive unmodified
@@ -117,17 +114,16 @@ used in multicast communication patterns, but it has also been applied successfu
 
 A popular coding scheme, dubbed \textit{linear network coding} \cite{li03linearnc}, is to regard all packets arriving at a node from different incoming links as a vector.
 Then, linear transformations can be applied to it to obtain new combinations to send out \cite[1]{li03linearnc}. To allow receivers to decode the
-combinations into the original packets, the encoding patterns applied at each node can be \enquote{agreed upon beforehand} \cite[1]{li03linearnc}.
-However, this requires global knowledge of the network topology. A practical alternative is to attach the encoding information to the packets in the
-form of a \textit{global encoding vector (\gls{gev})} \cites[2\psqq]{chou03practicalnc}[5\psq]{chou07ncforinternetandwireless} that is updated at each intermediate node to
-represent the current encoding pattern.
+combinations into the original packets, they need to be aware of the encoding patterns applied at each node. Those can be \enquote{agreed upon
+beforehand} \cite[1]{li03linearnc}, but this requires global knowledge of the network topology. As this is generally not the case, a practical
+alternative is to attach the encoding information to the packets in the form of a \textit{global encoding vector (\gls{gev})}
+\cites[2\psqq]{chou03practicalnc}[5\psq]{chou07ncforinternetandwireless} that is updated at each intermediate node to represent the current encoding
+pattern. A receiver can then decode the combinations solely using the supplied \glspl{gev}.
 
-In addition to increasing the network performance by maximizing throughput, network coding can also provide an additional layer of resilience against
-malicious intermediate nodes. It facilitates \enquote{a natural way to take advantage of multipath diversity for security against wiretapping attacks}
-\cite[8]{fragouli07ncfundamentals} and can also be helpful against active attackers.
-
-During this thesis, network coding is used primarily as a means of resilience against attackers. Furthermore, only the sender nodes will compute
-combinations of different flits, while intermediate nodes merely forward them. Section (insert vref here) illuminates this subject in detail.
-% TODO: mention that mostly used with multicast, we do unicast
-% TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
-% TODO: insert vref
+The objective of applying network coding is to maximize the information flow and throughput in a network. Depending on the communication patterns and
+network reliability, it may result in better overall performance and lower transmission delays, especially in saturated networks
+\cite[7]{duongba11ncinmulticore}. Furthermore, it provides \enquote{a natural way to take advantage of multipath diversity for security against
+wiretapping attacks} \cite[8]{fragouli07ncfundamentals}. In the context of \glspl{noc}, it has the potential to hinder eavesdropping attempts inside
+the network, but only for limited passive attackers that merely have access to distinct parts of the network. Therefore, in this thesis, it is not
+viewed as a security measure, but as a complementary technique to increase the network's performance. This approach is detailed in Section
+\ref{sec:designnc}.

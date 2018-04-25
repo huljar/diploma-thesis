@@ -1,3 +1,9 @@
+The concepts that are explored, implemented, and evaluated in this thesis have been the subject of much research in recent years. This chapter aims to
+summarize the important and relevant works and papers that have been published concerning these topics. Beginning with security in \gls{noc}
+environments, many different attack scenarios and the proposed corresponding defenses are highlighted. Afterwards, advances in network coding with
+respect to its application in \glspl{noc} are presented. Following this, the work preceding this thesis is introduced, which gives an overview of
+state-of-the-art lightweight cryptography. Finally, the relevance of these works and their relation to this thesis is discussed.
+
 % TODO: tenses?
 \section{Network-On-Chip Security}\label{sec:nocsecurity}
 Research on new and efficient ways to interconnect components on a single chip has been an important field of research for decades. The concept of
@@ -104,7 +110,7 @@ the network traffic with strict non-interference requirements. Categorizing pack
 \cite[1]{wassel13surfnoc} and hampers \gls{dos} attacks from affecting the whole system. In their work, the authors propose an efficient method of
 this domain-based routing with very low latency, making this security measure practical.
 
-\section{Network Coding For Network-On-Chip}
+\section{Network Coding For Network-On-Chip}\label{sec:ncfornoc}
 The integration of network coding into \gls{noc} architectures is a relatively new field of research. It was briefly mentioned a decade ago by
 \citeauthor{fragouli08ncapplications} \cite{fragouli08ncapplications}, where emerging network coding applications are discussed. However, it was
 mostly seen as a method to help \enquote{simplify and minimize the length of on-chip wiring} \cite[260]{fragouli08ncapplications}, rather than as a
@@ -163,8 +169,45 @@ In an analysis conducted prior to this thesis, lightweight cryptographic algorit
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
-mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}. Some of them will be examined later in this
-thesis; see Section (insert vref here) for details. % TODO: reference this when explaining PRINCE later on
+mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}.
+
+The algorithms are evaluated and compared in terms of latency and chip area requirements. A dedicated \gls{fpga} implementation for each algorithm
+was used to allow for a fair comparison. PRESENT required the least chip area, while PRINCE managed to be the fastest to encrypt a block.
+Additionally, the large discrepancy of \gls{aes} to the lightweight algorithms was confirmed, cementing its ineptitude for the task at hand.
+
+\section{Assessment And Significance}
+Overall, the studies presented in the sections above corroborate the importance of both efficient and secure \glspl{noc} for \gls{mpsoc}
+communications. Furthermore, the feasibility of network coding and cryptography in \gls{noc} architectures was confirmed.
+
+In Section \ref{sec:nocsecurity}, a variety of attack vectors and proposed countermeasures was explored. While the approaches based on security zones
+look very promosing, they suggest a classification of communications into sensitive and nonsensitive and emphasize the isolation of data between these two
+categories. However, such a separation seems difficult in practice, especially when third party \gls{ip} is used throughout the whole network. Thus, a
+holistic approach appears to be more desirable. Still, the cryptographic protections, such as the authenticated encryption proposed by
+\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc}, are closely related to the ideas pursued in this thesis.
+
+The studies investigating mitigations of the threat of hardware trojans follow holistic approaches. They protect communications at the network
+interfaces, potentially complemented by checks at the router boundaries. For this thesis, the approach of \citeauthor{ancajas14fortnocs}
+\cite{ancajas14fortnocs} is particularly relevant. Their three-layer system includes data scrambling and packet certification in the network
+interfaces, which closely corresponds to the encryption and authentication techniques explored in this work. Furthermore, they have confirmed the
+practicality of hardware trojan attacks, which are the basis for the threat model that is analyzed in this thesis.
+
+The investigation of different routing strategies is also highly relevant. Since a key objective of this thesis is the usage of multiple paths, several
+routing strategies will consequently be explored. The comparison of deterministic and dynamic path selection that \citeauthor{stefan11enhancingnocs}
+\cite{stefan11enhancingnocs} have conducted is of particular interest, as similar variants are also pursued here. Although
+\citeauthor{stefan11enhancingnocs} conclude that the deterministic approach is better suited for most applications, dynamic path selections may prove
+advantageous, especially in combination with network coding.
+
+In Section \ref{sec:ncfornoc}, it was shown that network coding is applicable to \glspl{noc} with notable performance improvements. While many
+researchers have explored the effect of network coding for \glspl{noc}, a lot of them pursued the mapping of butterfly networks onto 2D meshes in
+order to improve multicast performance. As the experiments in this thesis solely deal with the unicast scenario, those ideas cannot be picked up
+directly. However, \citeauthor{duongba11ncinmulticore} \cite{duongba11ncinmulticore} and \citeauthor{moriam15manycorenc} \cite{moriam15manycorenc}
+have achieved significant performance gains in the unicast setting. The latter work is particularly relevant, as their concept of network coding
+inspired its usage for this thesis, resulting in a similar implementation here.
+
+Finally, the work preceding this thesis was presented in Section \ref{sec:lightweightcrypto}. It confirmed the applicability of lightweight
+cryptographic algorithms in constrained hardware environments (such as \glspl{noc}). Especially the PRINCE algorithm is of high interest due to its
+low latency, which is a direct requirement for efficient communication\footnote{Since low area is also a requirement, PRESENT is of a similar
+interest. However, latency was deemed more important than area. The reasoning is explained in Section (insert ref here).} (cf. Section \ref{sec:networkonchipfun}).
 
 \iffalse
 \section{Notes}
