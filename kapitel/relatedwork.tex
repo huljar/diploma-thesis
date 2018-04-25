@@ -151,7 +151,12 @@ have analyzed how different variants of network coding may remedy this situation
 improvements for error-prone transmissions, but decreased performance in reliable networks.
 
 Following up on this research, \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} have constructed an authentication layer on top of
-their network coding system. % TODO: the other TUD paper
+their network coding system. Seeking to ensure the integrity of messages, they employ \enquote{lightweight message authentication codes (\glspl{mac})
+to guarantee detection of modification} \cite[1]{moriam18activeattackers} like faults injected by compromised routers. In case an integrity breach is
+detected by a receiver, an \gls{arq} is issued back to the sender to request retransmission of the affected flits. The infected routers are assumed to
+be randomly distributed among the network and to constitute only a small portion of the routers. Their evaluation shows that network coding is able to
+significantly reduce the number of required retransmissions and the residual error probability at the cost of a lower information rate\footnote{The
+information rate describes the amount of transmitted information in relation to the total number of flits.}.
 
 Since this thesis seeks to build upon their work, some concepts of \citeauthor{moriam18activeattackers} can be found here as well. Their network coding
 scheme was reimplemented, which is elaborated in Section (insert vref here). Additionally, the authentication methods that they experimented with
@@ -169,7 +174,8 @@ In an analysis conducted prior to this thesis, lightweight cryptographic algorit
 algorithms are
 specifically designed to have efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
-mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince} and Klein \cite{gong12klein}.
+mCrypton \cite{lim06mcrypton} (which is used by \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers}), PRINCE \cite{borghoff12prince}
+and Klein \cite{gong12klein}.
 
 The algorithms are evaluated and compared in terms of latency and chip area requirements. A dedicated \gls{fpga} implementation for each algorithm
 was used to allow for a fair comparison. PRESENT required the least chip area, while PRINCE managed to be the fastest to encrypt a block.
@@ -183,7 +189,8 @@ In Section \ref{sec:nocsecurity}, a variety of attack vectors and proposed count
 look very promosing, they suggest a classification of communications into sensitive and nonsensitive and emphasize the isolation of data between these two
 categories. However, such a separation seems difficult in practice, especially when third party \gls{ip} is used throughout the whole network. Thus, a
 holistic approach appears to be more desirable. Still, the cryptographic protections, such as the authenticated encryption proposed by
-\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc}, are closely related to the ideas pursued in this thesis.
+\citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc}, are closely related to the ideas pursued in this thesis\footnote{To implement authenticated
+encryption, they employ \gls{aes} in the \gls{gcm} mode of operation. This scheme, however, is not lightweight enough to consider it for this thesis.}.
 
 The studies investigating mitigations of the threat of hardware trojans follow holistic approaches. They protect communications at the network
 interfaces, potentially complemented by checks at the router boundaries. For this thesis, the approach of \citeauthor{ancajas14fortnocs}
@@ -201,8 +208,11 @@ In Section \ref{sec:ncfornoc}, it was shown that network coding is applicable to
 researchers have explored the effect of network coding for \glspl{noc}, a lot of them pursued the mapping of butterfly networks onto 2D meshes in
 order to improve multicast performance. As the experiments in this thesis solely deal with the unicast scenario, those ideas cannot be picked up
 directly. However, \citeauthor{duongba11ncinmulticore} \cite{duongba11ncinmulticore} and \citeauthor{moriam15manycorenc} \cite{moriam15manycorenc}
-have achieved significant performance gains in the unicast setting. The latter work is particularly relevant, as their concept of network coding
-inspired its usage for this thesis, resulting in a similar implementation here.
+have achieved significant performance gains in the unicast setting. The latter work is particularly relevant, as the usage of network coding in this
+thesis is inspired by their concept. Furthermore, the combination of network coding and authentication techniques investigated by
+\citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} proves that such an approach is feasible and able to effectively provide integrity
+in a partially compromised \gls{noc}. However, their implementation requires 18 parallel cryptographic modules per network interface, resulting in a
+noticeable area overhead.
 
 Finally, the work preceding this thesis was presented in Section \ref{sec:lightweightcrypto}. It confirmed the applicability of lightweight
 cryptographic algorithms in constrained hardware environments (such as \glspl{noc}). Especially the PRINCE algorithm is of high interest due to its
