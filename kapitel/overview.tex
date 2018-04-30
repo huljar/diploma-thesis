@@ -12,8 +12,9 @@
 % Always refer to the chapters that explain this in detail
 In this thesis, a novel approach for securing the communications in a \gls{noc} is pursued. The goal is to design and implement a protocol that
 remedies both accidental and malicious modifications to the transmitted data as much as possible while meeting the performance requirements of a \gls{noc} (cf. Section
-\ref{sec:networkonchipfun}). In this thesis, a scheme is envisioned and investigated that attempts to satisfy these ambitions by combining encryption
-and authentication techniques with network coding and multipath routing.
+\ref{sec:networkonchipfun}). Furthermore, confidentiality shall be assured by preventing attackers from accessing the transmitted information. In this
+thesis, a scheme is envisioned and investigated that attempts to satisfy these ambitions by combining encryption and authentication techniques with
+network coding and multipath routing.
 
 In the next section, the necessity of such security measures is corroborated. Subsequently, the attacker model that the schemes explored in this
 thesis aim to defend against is illustrated. Afterwards, an overview of the utilized techniques and how they are
@@ -29,7 +30,8 @@ during this thesis. % TODO: schöner formulieren?
 There are a number of possible infection vectors that adversaries may try to exploit in order to covertly introduce a hardware trojan into a \gls{noc}
 implemented in an \gls{mpsoc}\footnote{Theoretically, the aforementioned infection vectors are not specific to \glspl{mpsoc} and \glspl{noc}, but
 this is the relevant constellation for the scope of this thesis.}. One such vector is the integration of third party \gls{ip}\footnote{An example of
-this is the Arteris FlexNoC interconnect, which is used by \enquote{four out of the top five Chinese fabless semiconductor OEM companies}
+this is the Arteris FlexNoC interconnect, which in \citeyear{ancajas14fortnocs} was used by \enquote{four out of the top five Chinese fabless
+semiconductor \gls{oem} companies}
 \cite[2]{ancajas14fortnocs}.}, which has become increasingly popular due to cost efficiency and growing circuit complexity
 \cites[1]{ancajas14fortnocs}[2]{bhunia14hardwaretrojans}. These third parties may have an interest in equipping their \gls{ip} with a hardware trojan,
 and their trustworthiness is usually not guaranteed \cite[3]{sethumadhavan15trustworthyhardware}.
