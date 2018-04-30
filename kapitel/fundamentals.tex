@@ -6,14 +6,14 @@ thesis are outlined. Finally, essential aspects of the communication strategy de
 \textit{Networks-on-Chip (\glspl{noc})} are a paradigm for interconnecting components on a chip. They are employed on
 \textit{Multi-Processor Systems-on-Chip (\glspl{mpsoc})} \cites(e.g.)(){ivanov05nocintroduction}{biswas15routerattack}{tatas16designingnocs}, where they
 provide the communication infrastructure for the \textit{processing elements} and other \textit{intellectual property (\gls{ip}) cores}\footnote{The
-term \textit{\gls{ip} cores} encompasses many kinds of chip components. Besides processing elements, it includes e.g. memory nodes and
-hardware accelerators.}. The basic concept is to incorporate many point-to-point connections between neighboring cores, breaking with the traditional
+term \textit{\gls{ip} cores} encompasses many kinds of chip components. Besides processing elements, it includes memory nodes and hardware
+accelerators, for example.}. The basic concept is to incorporate many point-to-point connections between neighboring cores, breaking with the traditional
 concept of global interconnection buses. After describing the internal structure of \glspl{noc} in the following paragraphs, the advantages of this
 approach will be explained.
 
 In recent research, the topology of a \gls{noc} is usually assumed to be a 2D mesh
 \cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}. While this is not a
-requirement\footnote{Other \gls{noc} topologies include e.g. 2D folded tori and 3D meshes \cite[2]{feero07noc3d}.}, it is both convenient
+requirement\footnote{Examples of other \gls{noc} topologies are 2D folded tori and 3D meshes \cite[2]{feero07noc3d}.}, it is both convenient
 to work with and applicable in practice. Thus, in this thesis, the network nodes are also laid out in this manner.
 In a 2D mesh, each node is connected to its four neighbors (excluding the ones located at the boundaries).
 
@@ -56,10 +56,10 @@ meet them. They are explained in detail in Sections (insert refs here).% TODO: r
 \section{Protection Goals}\label{sec:protectiongoals}
 % Confidentiality, integrity, availability
 Protection goals describe desired properties of a system with regard to information security. They are divided into \textit{confidentiality},
-\textit{integrity}, and \textit{availability}\footnote{The goals may be further classified to include e.g. \textit{unobservability} or \textit{plausible
-deniability}. However, these are extraneous to this thesis.}. Confidentiality is achieved by preventing unauthorized access to information, which
-can be accomplished e.g. by means of encryption. Integrity is attained by ensuring that any unintentional modifications to information, both accidental and
-malicious, are detected, e.g. through authentication techniques. Finally, availability refers to the reliable accessibility of information. It is
+\textit{integrity}, and \textit{availability}\footnote{The goals may be further classified to include \textit{unobservability} and \textit{plausible
+deniability}, for example. However, these are extraneous to this thesis.}. Confidentiality is achieved by preventing unauthorized access to information, which
+can be accomplished, for example, by means of encryption. Integrity is attained by ensuring that any unintentional modifications to information, both accidental and
+malicious, are detected, for instance through authentication techniques. Finally, availability refers to the reliable accessibility of information. It is
 achieved via methods like backup systems and redundant hardware.
 
 In \gls{noc} architectures, it is naturally desirable to fulfill these goals\footnote{The necessity for security measures was demonstrated in
@@ -97,8 +97,8 @@ In traditional implementations, such as \gls{tcp}, the receiver confirms the arr
 If the sender does not receive a confirmation within a given time span, the corresponding packet is assumed lost and automatically retransmitted.
 
 A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
-and dropped flits. Another possibility is compromised, malicious routers that drop or modify flits to disrupt the normal network operations, e.g. as part of a
-\gls{dos} attack.
+and dropped flits. Another possibility is compromised, malicious routers that drop or modify flits to disrupt the normal network operations, for
+instance as part of a \gls{dos} attack.
 
 In this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
 flits by issuing an \gls{arq} back to the sender. Upon arrival, the sender will retransmit the flits in question. In combination with
