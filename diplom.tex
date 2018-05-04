@@ -48,6 +48,16 @@
 \usepackage{graphicx}
 \graphicspath{{bilder/}}
 
+% % % SVG % % %
+% Since we use lualatex, some pdftex commands need to be imported first
+\usepackage{pdftexcmds}
+\makeatletter
+\let\pdfstrcmp\pdf@strcmp
+\let\pdffilemoddate\pdf@filemoddate
+\makeatother
+
+\usepackage[svgpath=grafiken/]{svg}
+
 % % % Glossaries % % %
 \usepackage[toc,nonumberlist]{glossaries}
 \include{glossar}
