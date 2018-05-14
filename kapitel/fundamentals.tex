@@ -1,4 +1,4 @@
-Throughout this chapter, core terms and concepts that are essential to the understanding of this thesis are explained. First, networks-on-chip are
+In this chapter, core terms and concepts that are essential to the understanding of this thesis are explained. First, networks-on-chip are
 described, as this whole work builds upon and analyzes them. Afterwards, fundamental concepts of information security and their relevance for this
 thesis are outlined. Finally, essential aspects of the communication strategy devised in this thesis are delineated.
 
@@ -11,17 +11,17 @@ accelerators, for example.}. The basic concept is to incorporate many point-to-p
 concept of global interconnection buses. After describing the internal structure of \glspl{noc} in the following paragraphs, the advantages of this
 approach will be explained.
 
-In recent research, the topology of a \gls{noc} is usually assumed to be a 2D mesh
+\glspl{noc} are represented as a topology of network nodes. In recent research, the topology is usually assumed to be a 2D mesh
 \cites(e.g.)(){frey17hardenednoc}{kumar02networkonchip}{fernandes16nocrouting}{boraten16packetsecurity}. While this is not a
 requirement\footnote{Examples of other \gls{noc} topologies are 2D folded tori and 3D meshes \cite[2]{feero07noc3d}.}, it is both convenient
-to work with and applicable in practice. Thus, in this thesis, the network nodes are also laid out in this manner.
+to work with and applicable in practice. Thus, for this thesis, the network nodes are also laid out in this manner.
 In a 2D mesh, each node is connected to its four neighbors (excluding the ones located at the boundaries).
 
 A node consists of a processing element\footnote{As already mentioned, other types of cores are also possible. Since only processing elements are of
 relevance to this thesis, no further distinctions will be made.}, a network interface, and a router \cite{dally01routepacketsnotwires}. The processing
-element executes applications, requiring it to be able to send and receive messages. The network interface facilitates this by connecting the
-processing element to the router. Finally, the router manages the connections to neighboring nodes and the local processing element. An example of
-this architecture is given in Figure \vref{fig:nocexample}.
+element executes applications that require it to be able to send and receive messages. The network interface facilitates this by connecting the
+processing element to the router. Finally, the router manages the interconnections with neighboring nodes and the local processing element. It is also
+responsible for forwarding incoming messages towards their destinations. An example of this architecture is given in Figure \vref{fig:nocexample}.
 
 \begin{figure}
     \centering
@@ -32,8 +32,8 @@ this architecture is given in Figure \vref{fig:nocexample}.
 \end{figure}
 
 Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are disadvantages entailed by
-the use of \glspl{noc} over bus-based systems, but research has shown them to be outweighed by the benefits. \citeauthor{tatas16designingnocs}
-\cite{tatas16designingnocs} give a detailed comparison.}, especially for many-core systems
+the use of \glspl{noc} over bus-based systems, such as incompatibility with bus-oriented \glspl{ip}, but research has shown them to be outweighed
+by the benefits. \citeauthor{tatas16designingnocs} \cite[6]{tatas16designingnocs} give a detailed comparison.}, especially for many-core systems
 \cite[5\psqq]{tatas16designingnocs}. A significant advantage is scalability: since the cores do not share a global bus, \enquote{local performance is not
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
@@ -48,23 +48,22 @@ architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, 
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
 
 When utilizing \gls{noc} architectures in practice, it is crucial that they allow for an efficient implementation and swift communications. The
-former is attained by reducing the chip area requirements and power consumption as much as possible, while the latter is realized
-through low electronic delays and message transmission latencies. To achieve this, all components of the \gls{noc} need to be optimized regarding
-these criteria. In this thesis, several approaches like specifically lightweight cryptographic algorithms and single-cycle routing are pursued to
-meet them. They are explained in detail in Sections (insert refs here).% TODO: refs to relevant sections with details
+former is attained by optimizing the components for low area requirements and power consumption, while the latter is realized
+through small electronic delays and message transmission latencies. In this thesis, several approaches like specifically lightweight cryptographic
+algorithms and single-cycle routing are pursued to meet these criteria. They are explained in detail in Sections (insert refs here).% TODO: refs to relevant sections with details
 
 \section{Protection Goals}\label{sec:protectiongoals}
 % Confidentiality, integrity, availability
-Protection goals describe desired properties of a system with regard to information security. They are divided into \textit{confidentiality},
+Protection goals describe desired properties of a system with regard to information security. They consist of \textit{confidentiality},
 \textit{integrity}, and \textit{availability}\footnote{The goals may be further classified to include \textit{unobservability} and \textit{plausible
 deniability}, for example. However, these are extraneous to this thesis.}. Confidentiality is achieved by preventing unauthorized access to information, which
 can be accomplished, for example, by means of encryption. Integrity is attained by ensuring that any unintentional modifications to information, both accidental and
 malicious, are detected, for instance through authentication techniques. Finally, availability refers to the reliable accessibility of information. It is
 achieved via methods like backup systems and redundant hardware.
 
-In \gls{noc} architectures, it is naturally desirable to fulfill these goals\footnote{The necessity for security measures was demonstrated in
+Naturally, in \gls{noc} architectures, it is desirable to fulfill these goals\footnote{The necessity for security measures was demonstrated in
 related research, which is elaborated in Section \ref{sec:nocsecurity}.}. In this thesis, confidentiality and integrity through encryption and
-authentication are examined.
+authentication, respectively, are examined.
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
@@ -90,18 +89,18 @@ In the context of \glspl{noc}, flits are often used as the standard unit of tran
 are employed in the protocol devised in this thesis can be found in Chapter \ref{ch:protocol}.
 
 \section{Automatic Repeat Requests}\label{sec:arqs}
-When reliable data transmissions over an unreliable network are desired, the communication protocol needs to ensure that all packets arrive unmodified
+When reliable data transmissions over an unreliable network are required, the communication protocol needs to ensure that all packets arrive unmodified
 at their intended destinations. A common way to achieve this is the usage of \textit{automatic repeat requests (\glspl{arq})}.
 
 In traditional implementations, such as \gls{tcp}, the receiver confirms the arrival of packets by answering each one with an acknowledgment.
-If the sender does not receive a confirmation within a given time span, the corresponding packet is assumed lost and automatically retransmitted.
+If the sender does not receive such a confirmation within a given time span, the corresponding packet is assumed lost and retransmitted.
 
 A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
-and dropped flits. Another possibility is compromised, malicious routers that drop or modify flits to disrupt the normal network operations, for
+and dropped flits. Another possibility are compromised, malicious routers that drop or modify flits to disrupt the normal network operations, for
 instance as part of a \gls{dos} attack.
 
-In this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
-flits by issuing an \gls{arq} back to the sender. Upon arrival, the sender will retransmit the flits in question. In combination with
+In the protocol devised for this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
+flits by issuing an \gls{arq} flit back to the sender. Upon arrival, the sender will retransmit the flits in question. In combination with
 authentication techniques, this aids in fulfilling the protection goal of integrity. This scheme is described in detail in Section
 \ref{sec:retransmissions}.
 
