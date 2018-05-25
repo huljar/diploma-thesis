@@ -48,7 +48,7 @@ architectures would be impossible} \cite[1]{kumar02networkonchip}. In contrast, 
 \enquote{facilitate […] modularity by defining a standard interface} \cite[1]{dally01routepacketsnotwires}.
 
 When utilizing \gls{noc} architectures in practice, it is crucial that they allow for an efficient implementation and swift communications. The
-former is attained by optimizing the components for low area requirements and power consumption, while the latter is realized
+former is attained by optimizing the components for low area requirements and power consumption, while the latter is realized % TODO: attained
 through small electronic delays and message transmission latencies. In this thesis, several approaches like specifically lightweight cryptographic
 algorithms and single-cycle routing are pursued to meet these criteria. They are explained in detail in Sections (insert refs here).% TODO: refs to relevant sections with details
 
@@ -81,9 +81,10 @@ trojan is inactive, communications through the \gls{noc} are unaffected and the 
 %
 \section{Flow Control Units}\label{sec:flits}
 \textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
-packet down into multiple parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit must contain a set of header fields (such as source and
+packet down into multiple parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit contains a set of header fields (such as source and
 destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
-In addition, it contains a payload that carries the actual information to be transmitted.
+In addition, it contains a payload that carries the actual information to be transmitted. % TODO: mention that flits are the atomic logical unit that
+%can be sent in a single cycle
 
 In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
 are employed in the protocol devised in this thesis can be found in Chapter \ref{ch:protocol}.
