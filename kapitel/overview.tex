@@ -92,8 +92,7 @@ algorithms produces signatures instead of \glspl{mac}, which are \enquote{too lo
 \section{Random Linear Network Coding}
 A promising approach to improve the performance of \glspl{noc} is network coding. \citeauthor{moriam15manycorenc} have shown that it is particularly
 effective in error-prone networks, decreasing latency up to 95\% \cite[7]{moriam15manycorenc}. In the context of this thesis, \glspl{noc} are assumed
-to be unreliable: accidental flit losses may occur, and compromised routers enable deliberate fault injections and flit drops. Hence, this approach is
-taken up here.
+to be unreliable: compromised routers may deliberately inject faults drop flits. Hence, this approach is taken up here.
 
 While network coding provides robustness against sporadic flit loss, it does not provide any guarantees on the integrity of flits. Thus, modifications
 during the transmission of the coded data are not detected, potentially leading to faulty decodings. This deficit is remedied by the cryptographic
@@ -138,7 +137,21 @@ scheme relies on the existance of generations, no uncoded counterpart exists. A 
 \ref{sec:theprotocol}. % TODO: wiederholung mit "both uncoded and network coded versions/variants"
 
 \section{Analysis And Evaluation}
-First: fix the hyperparameters, then experiments with the remaining parameters and protocol variants
+The aforementioned protocol variants were thoroughly analyzed to empirically determine their quality and suitability for the task at hand. Many
+experiments were conducted through software simulation of an \gls{mpsoc} with a \gls{noc} using varying parameters, component layouts, and design
+decisions.
+
+The experiments were performed with a simulator specifically crafted for this thesis. Based on the free and open source framework \omnet\cite{omnet}, it allows
+for cycle-accurate simulations with fully customizable statistics recording. Furthermore, its modular design allows for quickly swapping and
+reordering components, which is required to test the different protocol variants. The details of the implementation are described in Chapter
+\ref{ch:implementation}.
+
+The workflow of the evaluation was as follows: at first, the hyperparameters were determined once, with the resulting values being used in all
+subsequent experiments. These hyperparameters include, e.g., the number of required parallel crypto units\footnote{The term \textit{crypto units} is
+used to refer to both encryption and authentication units.} per network interface and the \gls{arq} timeouts. Afterwards, the remaining parameters are
+varied to find the optimal configuration for each protocol variant. Finally, the most promising of these variant is identified. The full evaluation
+process is elaborated in Chapter \ref{ch:evaluation}.
+
 \subsection{Simulation}
 
 
