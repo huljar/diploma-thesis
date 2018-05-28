@@ -6,10 +6,6 @@ interfaces.
 Recall that the architecture of a \gls{noc} consists of a router grid with each node connected to a local processing element through a network
 interface (cf. Figure \vref{fig:nocexample}). The 
 
-There are different variants of the protocol, which are explained in detail in Section (insert vref here). While the emphasis lies on network coded
-variants, uncoded versions have also been implemented for comparison purposes. However, not all methods have a corresponding uncoded variant.
-% TODO: this goes to the overview chapter
-
 Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, fundamental
 assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
 mostly in the authentication scheme, the simplest one (uncoded individual authentication) is used to give a step-by-step explanation of the full
@@ -17,6 +13,33 @@ protocol. Following this, the other variants are described by drawing upon the d
 
 \section{Design Considerations}
 \subsection{Flit Structure}
+As mentioned in Section \ref{sec:flitsfun}, flits are the fundamental unit of transmission for this thesis. They contain several header fields and a
+payload. Their structure differs slightly depending on whether or not network coding is employed. In a network coded environment, one additional
+header field is required (the global encoding vector) and the generation ID replaces the flit ID. This structure is depicted in Figure
+\vref{fig:flitstructureuncoded} (uncoded) and Figure \ref{fig:flitstructurenetworkcoded} (network coded).
+% TODO: table comparing the protocol variants, their properties (e.g. lane width)
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{flit-structure-uc}
+    \caption[The structure of a flit without network coding]{The structure and data layout of a flit in an environment without network coding
+    (uncoded). The fixed size of the header fields and the payload results in an invariant total size of 141 bit.}
+    \label{fig:flitstructureuncoded}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{flit-structure-nc}
+    \caption[The structure of a flit with network coding]{The structure and data layout of a flit in a network coded environment. The fixed size of
+    the header fields and the payload results in an invariant total size of 149 bit.}
+    \label{fig:flitstructurenetworkcoded}
+\end{figure}
+
+Flits can be transferred in a single clock
+cycle between directly connected components. For example, sending a flit from one router to a neighboring one, or sending it from a processing element
+to the corresponding network interface takes one cycle. In a hardware implementation, this is facilitated by having parallel communication channels
+that can transmit all bits of a flit at the same time. To do so, one wire is required at the physical layer for each bit to be transmitted in
+parallel, resulting in a channel width of at least 141 bit for uncoded flits and 149 bit for network coded flits.
 % Figure of the flit (bar) with header fields (for coded+uncoded)
 % Explain purpose of header fields
 

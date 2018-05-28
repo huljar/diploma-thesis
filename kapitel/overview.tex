@@ -135,11 +135,12 @@ replaced in a \gls{fifo} manner once maximum size is reached.
 \section{Protocol Variants}\label{sec:protocolvariants}
 To unearth and analyze the most efficient way of applying the ideas outlined above, different variants of the protocol were implemented. They differ
 in the way the authentication \glspl{mac} are included in the flit transmissions. Furthermore, both network coded and uncoded versions are compared to
-examine the effects of network coding in combination with the cryptographic procedures.
+examine the effects of network coding in combination with the cryptographic procedures. The emphasis of this thesis, however, is put on the network
+coded forms.
 
 The examined variants are \textit{individual authentication}, \textit{interwoven authentication}, and \textit{full-generation authentication}. For the
-first two, both uncoded and network coded variants are implemented. For the latter, only a network coded version is feasible. Since the authentication
-scheme relies on the existance of generations, no uncoded counterpart exists. A comprehensive description of all variants is given in Section
+first two, both uncoded and network coded variants are implemented. For the latter, only a network coded version is feasible: the authentication
+scheme relies on the existance of generations. A comprehensive description of all variants is given in Section
 \ref{sec:theprotocol}. % TODO: wiederholung mit "both uncoded and network coded versions/variants"
 
 \section{Analysis And Evaluation}

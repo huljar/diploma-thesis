@@ -78,7 +78,7 @@ trojan is inactive, communications through the \gls{noc} are unaffected and the 
 %Attack types: information leak/eavesdropping, DoS (→ bandwidth depletion, deadlock, livelock)
 % TODO: is this a fundamental? or write this when describing our attacker model?
 %
-\section{Flow Control Units}\label{sec:flits}
+\section{Flow Control Units}\label{sec:flitsfun}
 \textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
 packet down into multiple parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit contains a set of header fields (such as source and
 destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
