@@ -36,14 +36,16 @@
 
 \setlength{\bibitemsep}{.7\baselineskip} % Empty lines between literature sources
 
-\renewcommand{\labelnamepunct}{\addcolon\addspace}
+\renewcommand{\labelnamepunct}{\addcolon\addspace} % Colon between author and title in bibliography
+
+\interfootnotelinepenalty=10000 % Prevent breaking of footnotes across pages
 
 % % % Bookmark % % %
 \usepackage[open,openlevel=1]{bookmark}
 
 % % % VarioRef % % %
-\usepackage{varioref}
-%\newcommand\vref{\ref}
+%\usepackage{varioref}
+\newcommand\vref{\ref} % TODO: disabling varioref for now because it causes unstable typesetting
 
 % % % GraphicX % % %
 \usepackage{graphicx}

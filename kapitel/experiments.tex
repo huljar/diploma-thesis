@@ -11,6 +11,9 @@ and retransmissions are required.}
 
 \section{Attacker Model}
 \begin{itemize}
+    \item Focuses on malicious modifications rather than DoS attacks
+    \item Assumption: compromised routers → rely on NIs for security
+    \item No protection against bandwidth depletion, but this is not the goal here
     \item Variable number of compromised routers (e.g. 8 for an 8x8 grid)
     \item Compromised routers randomly drop or modify packets (no intelligent modifications/drops)
     \item Reasoning for having only some compromised routers (in regard to the 3rd party NoC problem → why would they not make all routers the same?)
