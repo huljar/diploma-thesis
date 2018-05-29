@@ -35,13 +35,60 @@ header field is required (the global encoding vector) and the generation ID repl
     \label{fig:flitstructurenetworkcoded}
 \end{figure}
 
+The header fields are required for routing the flits to their destinations and for correct processing by the receivers, while the payload carries the
+transmitted information. Uncoded flits have the following fields:
+\begin{itemize}
+    \item \textbf{Burst.} The burst bit is used to indicate an uninterrupted stream of flits between the same sender and receiver. For example, when a
+        larger packet is being broken down into multiple flits, the burst bit can be used to indicate the beginning of a flit stream, allowing the
+        intermediate routers on the path to the receiver to adjust their routing behavior accordingly in order to minimize stream interruptions. In
+        this thesis, however, the burst bit is unused. As there are plans to build upon this work and explore burst configurations, it is still
+        included for documentation purposes.
+    \item \textbf{Source X, Source Y.} Recalling that the topology of the \gls{noc} is a 2D mesh, the usage of 2D cartesian coordinates to uniquely
+        identify nodes suggested itself. Here, zero-based X and Y indices indicate the column and row of a node, respectively. Each field is 4 bit long,
+        resulting in at most $16 \cdot 16 = 256$ nodes being addressable. Hence, the maximum \gls{noc} size is \textit{16x16} as well, which is deemed
+        sufficient\footnote{It is certainly possible to increase the field sizes to, e.g., 8 bit, allowing for up to $256 \cdot 256 = 65536$ addressable
+        nodes, should the need arise. However, as this would increase the flit size, it is not implemented here.}. The source header fields describe
+        the address of the flit's sender.
+    \item \textbf{Destination X, Destination Y.} These fields also describe the address of a node in 2D cartesian coordinates. As opposed to the
+        source fields, they indicate the intended destination of the flit.
+    \item \textbf{Mode.} The mode field indicates what type of data the flit contains. It signals to the receiver whether the flit contains, e.g.,
+        encrypted data, a \gls{mac}, or an \gls{arq}. There are a few more special modes that are explained in Section \ref{sec:theprotocol}. The
+        field size is 4 bit, allowing for 16 different modes. Not all of them are used for this thesis, so it is possible to define additional modes
+        in a future work if necessary.
+    \item \textbf{Address.} This field may contain a 32 bit memory address. In case the flit payload needs to be read from or written to memory, it
+        indicates the location of the data. Since this is only relevant to the processing elements and not the network interfaces, the field remains
+        unused for this thesis. Nevertheless, it is included in the flits since it affects their size.
+    \item \textbf{Flit ID.} The flit ID is a 24 bit numeric identifier. Starting at zero, the IDs are incremented as more flits are generated.
+        Similar to sequence numbers (e.g., as employed in \gls{tcp}), they are used to ensure that all flits arrive at the destined processing
+        elements in order. Furthermore, it is used to associate related flits. For instance, an encrypted data flit and the corresponding \gls{mac}
+        flit have the same ID to express their correlation.
+    \item \textbf{Payload.} The payload carries the actual data that are transmitted with a flit. Its size is 64 bit as this is a common plaintext
+        size for block ciphers, such as the one used for this thesis, PRINCE \cite{borghoff12prince}.
+\end{itemize}
+
+When network coding is employed, the following fields are added:
+\begin{itemize}
+    \item \textbf{Generation ID.} Replacing the flit ID, the generation ID is also a 24 bit numeric idenfier. As network coding intermingles multiple
+        flits, their original IDs become meaningless and are replaced by the generation ID (which is the same for all flits of a generation). Apart
+        from this, they follow the same rules as the flit IDs described above.
+    \item \textbf{Global Encoding Vector.} This field contains the global encoding vector used to create the flit when applying network coding. It is
+        required for the receiver to successfully decode a generation and obtain the original flits. Furthermore, since all flits in a generation have
+        the same ID, it is used to distinguish between those flits. As with flit IDs in an uncoded setting, corresponding flits (like data and
+        \gls{mac}) are associated by having the same \gls{gev} in addition to the same generation ID.
+\end{itemize}
+
 Flits can be transferred in a single clock
 cycle between directly connected components. For example, sending a flit from one router to a neighboring one, or sending it from a processing element
-to the corresponding network interface takes one cycle. In a hardware implementation, this is facilitated by having parallel communication channels
-that can transmit all bits of a flit at the same time. To do so, one wire is required at the physical layer for each bit to be transmitted in
-parallel, resulting in a channel width of at least 141 bit for uncoded flits and 149 bit for network coded flits.
-% Figure of the flit (bar) with header fields (for coded+uncoded)
-% Explain purpose of header fields
+to the corresponding network interface takes one cycle. In a hardware implementation, this is facilitated by parallel communication channels that can
+transmit multiple bits simultaneously. At the physical layer, this results in multiple wires (or other electical conductors), as each one may convey
+precisely one bit of information \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
+in a network coded setting.
+
+% TODO: where to put the following paragraph?
+For each sender-receiver pair, a
+flit's ID must be unique when it is generated by the sending processing element\footnote{As the maximum possible value of a 24 bit number is
+$2^{24}-1$, long-running systems are bound to cause an arithmetic overflow at some point. If this happens, IDs are allowed to repeat themselves,
+restarting at zero.}. 
 
 \subsection{ARQ Structure}
 

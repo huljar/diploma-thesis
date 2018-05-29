@@ -95,12 +95,13 @@ cryptography, is not considered since it \enquote{implies a high computational e
 algorithms produces signatures instead of \glspl{mac}, which are \enquote{too long to be included in a flit} \cite[3]{moriam18activeattackers}.
 % TODO: better formulation for "inspired this thesis"
 
-\section{Random Linear Network Coding}
+\section{Network Coding}
 A promising approach to improve the performance of \glspl{noc} is network coding. \citeauthor{moriam15manycorenc} have shown that it is particularly
 effective in error-prone networks, decreasing latency up to 95\% \cite[7]{moriam15manycorenc}. In the context of this thesis, \glspl{noc} are assumed
-to be unreliable: compromised routers may deliberately inject faults or drop flits. Hence, this approach is taken up here.
+to be unreliable: compromised routers may deliberately inject faults or drop flits. Hence, this approach is taken up here to improve the network
+performance.
 
-While network coding provides robustness against sporadic flit loss, it does not provide any guarantees on the integrity of flits. Thus, modifications
+While network coding provides robustness against sporadic flit loss, it does not offer any guarantees on the integrity of flits. Thus, modifications
 during the transmission of the coded data are not detected, potentially leading to faulty decodings. This deficit is remedied by the cryptographic
 measures described above. To evaluate the consequences of the integration of network coding, uncoded versions of the protocol were implemented and
 examined as well (see Section \ref{sec:protocolvariants}).
