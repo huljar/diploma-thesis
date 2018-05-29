@@ -12,7 +12,7 @@ mostly in the authentication scheme, the simplest one (uncoded individual authen
 protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual authentication.
 
 \section{Design Considerations}
-\subsection{Flit Structure}
+\subsection{Flit Structure}\label{subsec:flitstructure}
 As mentioned in Section \ref{sec:flitsfun}, flits are the fundamental unit of transmission for this thesis. They contain several header fields and a
 payload. Their structure differs slightly depending on whether or not network coding is employed. In a network coded environment, one additional
 header field is required (the global encoding vector) and the generation ID replaces the flit ID. This structure is depicted in Figure
@@ -93,12 +93,25 @@ restarting at zero.}.
 \subsection{ARQ Structure}
 
 \subsection{Network Coding}\label{sec:designnc}
+As mentioned in Section \ref{sec:networkcodingover}, network coding is employed to counteract performance degradations stemming from the unreliable
+transmissions introduced by compromised routers.
+
 The coding scheme used in this work slightly differs from the one described above. First, it is applied to unicast transmissions, while traditional
 network coding focuses on multicast scenarios \cites{ahlswede00networkflow}{li03linearnc}. Second, only the sender nodes will compute combinations of
 different flits, while intermediate nodes merely forward them. The rationale behind this are the tight performance requirements of \glspl{noc}. If
 each network node waited for enough flits to perform local encoding before forwarding, routing latencies would increase. Furthermore, the
 implementation of local encoding implies additional logic in each router, making their design more complex and entailing a higher chip area
 requirement. However, this directly contradicts the \gls{noc} design goals laid out in Section \ref{sec:networkonchipfun} and is thus not considered.
+
+\begin{itemize}
+    \item Random Linear Network Coding
+    \item Only intra-session coding, no recoding by intermediate nodes
+    \item Following: NC for one sender-receiver pair
+    \item The flits $f_i | i = 0, …, n$ are divided into generations $g_i | i = 0, …, m$ with size $G$ (here: $G = 2$)
+    \item GEV is added to the flits (cf. Section \ref{subsec:flitstructure})
+    \item GEV: $\beta_i = (\beta_{i_1}, …, \beta_{i_G})$ where $\beta_{i_i} = 1$ and $\beta_{i_j} = 0 \forall j \neq i$ % TODO: nicht ganz korrekt,
+        % nur, wenn i wieder bei 0 beginnt mit einer neuen Generation
+\end{itemize}
 % Only the sender codes
 % TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
 % TODO: a bit of math and formulas on how NC is done (inspired by previous TUD papers)
