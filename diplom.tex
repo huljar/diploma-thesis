@@ -38,6 +38,7 @@
 
 \renewcommand{\labelnamepunct}{\addcolon\addspace} % Colon between author and title in bibliography
 
+% General settings
 \interfootnotelinepenalty=10000 % Prevent breaking of footnotes across pages
 
 % % % Bookmark % % %
@@ -214,10 +215,6 @@
 
     \chapter{Talk About}
     \begin{itemize}
-        \item Encrypt-then-MAC vs. Encrypt-and-MAC (bei Encrypt-then-MAC encrypt+authenticate sequentiell, aber decrypt+verify parallel.
-            Bei Encrypt-and-MAC encrypt+authenticate parallel, aber decrypt+verify sequentiell). Bei Encrypt-and-MAC: decrypt kann schon
-            beginnen, wenn MAC noch nicht da ist, verringert die Latenz in manchen Fällen.
-        \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
         \item Welche Komponenten brauchen wie viele Takte
         \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
         \item GALS design pattern - wir sind aber auf jeden Fall synchron innerhalb einer Node, d.h. wenn GALS vs GS diskutiert wird,
@@ -227,8 +224,6 @@
         \item Statistiken: Wie viele Crypto Units für Auth+Enc sind gleichzeitig besetzt (→ Auslastung)
         \item Threat model, protection goals
         \item node-unique FIDs/GIDs have advantage that 24 bits are not full nearly as fast as with globally unique IDs
-		\item large flits (128 bits) need 2 crypto units (w/ block size 64 bit)
-        \item Lack of error correcting code (ECC) in simulation
         \item Deadlock/Livelock possibilities? D yes, L not
         \item Unicast/Multicast
         \item Head-of-line blocking in routers → future work w/ virtual channels/TDM etc.
