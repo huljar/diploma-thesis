@@ -6,57 +6,12 @@
 %Recall that the architecture of a \gls{noc} consists of a router grid with each node connected to a local processing element through a network
 %interface (cf. Figure \vref{fig:nocexample}). The 
 
-Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, necessary definitions and fundamental
+Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, fundamental
 assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
 mostly in the authentication scheme, the simplest one (uncoded individual authentication) is used to give a step-by-step explanation of the full
 protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual authentication.
 
-\section{Definitions}
-Mathematical definitions here: C = e(P, K), MAC = e(P, K2), ...
-
-\section{Design Considerations}
-\subsection{Cryptography}
-\begin{itemize}
-    \item Encrypt-then-MAC vs. Encrypt-and-MAC (bei Encrypt-then-MAC encrypt+authenticate sequentiell, aber decrypt+verify parallel.
-        Bei Encrypt-and-MAC encrypt+authenticate parallel, aber decrypt+verify sequentiell). Bei Encrypt-and-MAC: decrypt kann schon
-        beginnen, wenn MAC noch nicht da ist, verringert die Latenz in manchen Fällen.
-\end{itemize}
-
-The integration of cryptographic operations inevitably entails a degradation of the network performance which manifests itself in higher transmission
-latencies and increased chip area requirements. There usually is a reversely proportional relation between performance and safety: as the level of security
-increases, the communication performance declines. In order to satisfy the protection goals of confidentiality and integrity, both encryption and
-authentication are required\footnote{Depending on the use case, it may be adequate to fulfill only one of these goals (or none at all), alleviating
-the performance drop caused by the security measures. For instance, a preceding work of this thesis concerns itself with providing only integrity in
-\glspl{noc} \cite{moriam18activeattackers}.}, resulting in a noticeable performance impact. In order to minimize these effects, several countermeasures
-are implemented:
-\begin{itemize}
-    \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latency in the network interfaces, they
-        threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple cryptographic modules are employed in each network
-        interface. While this does not speed up the cryptographic computations, it allows for multiple flits to be processed in parallel. For
-        instance, each network interface could have three encryption modules, allowing it to encrypt up to three flits simultaneously.
-    \item \textbf{Hardware-optimized ciphers.} In Section \ref{sec:lightweightcrypto}, it was already mentioned that conventional block ciphers, such
-        as \gls{aes}, are not efficient enough for usage in \glspl{noc}, in terms of both latency and chip area. However, there is a plethora of
-        algorithms specifically designed for an efficient hardware implementation. In the work directly preceding this thesis, they were evaluated and
-        compared \cite{harttung17lightweightcrypto}. The most promising algorithm is PRINCE \cite{borghoff12prince}: it encrypts and
-        decrypts the fastest and has a competitive area requirement\footnote{For this thesis, low latency is deemed slightly more important than low chip area
-        usage. Should area become the more important factor, other algorithms (such as PRESENT \cite{bogdanov07present}) might be better suited.}.
-        Furthermore, with a key length of 128 bit, it provides relatively high security\footnote{Similar algorithms often have a key length of 80 or
-        96 bit \cite[5]{harttung17lightweightcrypto}.}. To date, it remains unbroken depite monetary incentives \cite{princechallenge}.
-        More details on PRINCE can be found in Section (insert ref here).
-    \item \textbf{Parallel decryption and verification.} When flits arrive from the network, the \gls{mac} is verified to ensure integrity. When
-        successful, the data are decrypted and passed on. To speed up this process, verification and decryption is performed in parallel. Should the
-        integrity check fail, the decrypted data have to be discarded. In case of success, however, this results in a significant latency reduction.
-        This scheme is illustrated in detail in the step-by-step description of the protocol (Section \ref{sec:theprotocol}).
-\end{itemize}
-
-The ordering of encryption and authentication (i.e., \gls{mac} computation) has a significant impact on both the achievable performance and the
-security of the scheme. There are three general approaches to bring them together:
-\begin{itemize}
-    \item \textbf{Encrypt-and-MAC.}  \cite{bellare00authenc}
-    \item \textbf{MAC-then-encrypt.}
-    \item \textbf{Encrypt-then-MAC.}
-\end{itemize}
-
+\section{Design Aspects}
 \subsection{Unicast And Multicast}
 In Section \ref{sec:assandsig}, it was already hinted that this thesis concerns itself with the unicast communication pattern. In this scenario, each
 flit is sent to a single specified destination. In contast, multicast facilitates the existance of multiple receivers for a single flit.
@@ -67,7 +22,7 @@ evaluation performed here.
 
 \subsection{Flit Structure}\label{subsec:flitstructure}
 As mentioned in Section \ref{sec:flitsfun}, flits are the fundamental unit of transmission for this thesis. They contain several header fields and a
-payload. Their structure differs slightly depending on whether or not network coding is employed. In a network coded environment, one additional
+payload. Their structure differs slightly depending on whether or not network coding is employed. For network coded flits, one additional
 header field is required (the global encoding vector) and the generation ID replaces the flit ID. This structure is depicted in Figure
 \vref{fig:flitstructureuncoded} (uncoded) and Figure \ref{fig:flitstructurenetworkcoded} (network coded).
 % TODO: table comparing the protocol variants, their properties (e.g. lane width)
@@ -118,9 +73,9 @@ transmitted information. Uncoded flits have the following fields:
     \item \textbf{Payload.} The payload carries the actual data that are transmitted with a flit. Its size is 64 bit as this is a common plaintext
         size for block ciphers, such as the one used for this thesis, PRINCE \cite{borghoff12prince}.
 \end{itemize}
+\vspace{0.5\baselineskip}
 
-% TODO: vspace
-When network coding is employed, the following fields are added:
+When network coding is applied to a flit, the following fields are added:
 \begin{itemize}
     \item \textbf{Generation ID.} Replacing the flit ID, the generation ID is also a 24 bit numeric idenfier. As network coding intermingles multiple
         flits, their original IDs become meaningless and are replaced by the generation ID (which is the same for all flits of a generation). Apart
@@ -130,19 +85,122 @@ When network coding is employed, the following fields are added:
         the same ID, it is used to distinguish between those flits. As with flit IDs in an uncoded setting, corresponding flits (like data and
         \gls{mac}) are associated by having the same \gls{gev} in addition to the same generation ID.
 \end{itemize}
+\vspace{0.5\baselineskip}
 
-With a size of 141 or 149 bit, respectively, flits are relatively small. While this entails each one to carry comparatively little
+With a size of 141 or 149 bit, respectively, flits are relatively small. While this entails that each one carries comparatively little
 information\footnote{The combined size of the header fields (77 or 85 bit, respectively) exceeds the size of the payload (64 bit) considerably.}, it
 has the significant advantage that flits can be transferred between directly connected components in a single clock
 cycle. For example, sending a flit from a router to a neighboring one, or sending it from a processing element
 to the attached network interface takes one cycle. In a hardware implementation, this is facilitated by parallel communication channels that are able
 to transmit multiple bits simultaneously. This results in multiple wires (or other electical conductors) at the physical layer, as each one may convey
-precisely one bit of information \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
+precisely one bit of information per cycle \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
 in a network coded setting.
 
+\subsection{Cryptography}
+\begin{itemize}
+    \item Encrypt-then-MAC vs. Encrypt-and-MAC (bei Encrypt-then-MAC encrypt+authenticate sequentiell, aber decrypt+verify parallel.
+        Bei Encrypt-and-MAC encrypt+authenticate parallel, aber decrypt+verify sequentiell). Bei Encrypt-and-MAC: decrypt kann schon
+        beginnen, wenn MAC noch nicht da ist, verringert die Latenz in manchen Fällen.
+\end{itemize}
+
+\subsubsection{Notation}
+This section introduces formal notations and definitions regarding the cryptographic primitives. They will be used throughout this chapter to
+illustrate how flits are processed. They are denoted by variables and functions, where
+\begin{itemize}
+    \item $p$ is a plaintext message (usually the flit payload),
+    \item $c$ is a ciphertext,
+    \item $m$ is a \gls{mac},
+    \item $k$ is a key (with $k_e$ and $k_m$ referring to encryption and \gls{mac} keys),
+    \item $f$ is a complete flit (header and payload),
+    \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$,
+    \item $d_k(c)$ is a decryption function that takes a ciphertext $c$ and produces the plaintext $p$ using key $k$,
+    \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$.
+\end{itemize}
+\vspace{0.5\baselineskip}
+
+While the functions $e_k(p)$ and $d_k(c)$ take a 64 bit long text as their argument (which matches the cipher's block size), the authentication
+function $a_k(f)$ is applied to complete flits, exceeding the block size. Therefore, $a_k(f)$ applies the cipher in conjunction with the \gls{cbcmac}
+mode of operation as explained below.
+
+\subsubsection{Drawbacks}
+The integration of cryptographic operations inevitably entails a degradation of the network performance which manifests itself in higher transmission
+latencies and increased chip area requirements. There usually is a reversely proportional relation between performance and safety: as the level of security
+increases, the communication performance declines. In order to satisfy the protection goals of confidentiality and integrity, both encryption and
+authentication are required\footnote{Depending on the use case, it may be adequate to fulfill only one of these goals (or none at all), alleviating
+the performance drop caused by the security measures. For instance, a preceding work of this thesis concerns itself with providing only integrity in
+\glspl{noc} \cite{moriam18activeattackers}.}, resulting in a noticeable performance impact. In order to minimize these effects, several countermeasures
+are implemented:
+\begin{itemize}
+    \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latency in the network interfaces, they
+        threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple cryptographic modules are employed in each network
+        interface. While this does not speed up the cryptographic computations, it allows for multiple flits to be processed in parallel. For
+        instance, each network interface could have three encryption modules, allowing it to encrypt up to three flits simultaneously. Alas, this
+        approach naturally increases the occupied chip area.
+    \item \textbf{Hardware-optimized ciphers.} In Section \ref{sec:lightweightcrypto}, it was already mentioned that conventional block ciphers, such
+        as \gls{aes}, are not efficient enough for usage in \glspl{noc}, in terms of both latency and chip area. However, there is a plethora of
+        algorithms specifically designed for an efficient hardware implementation. In the work directly preceding this thesis, they were evaluated and
+        compared \cite{harttung17lightweightcrypto}. The most promising algorithm is PRINCE \cite{borghoff12prince}, which is introduced below.
+    \item \textbf{Parallel decryption and verification.} When flits arrive from the network, the \gls{mac} is verified to ensure integrity. When
+        successful, the data are decrypted and passed on. To speed up this process, verification and decryption is performed in parallel. Should the
+        integrity check fail, the decrypted data have to be discarded. In case of success, however, this results in a significant latency reduction.
+        This scheme is illustrated in detail in the step-by-step description of the protocol (Section \ref{sec:theprotocol}).
+\end{itemize}
+
+\subsubsection{Composition Methods}
+The ordering of encryption and authentication (i.e., \gls{mac} computation) has a significant impact on both the achievable performance and the
+security of the scheme. There are three general approaches to bring them together \cite{bellare00authenc}:
+\begin{itemize}
+    \item \textbf{Encrypt-and-MAC.}
+    \item \textbf{MAC-then-encrypt.}
+    \item \textbf{Encrypt-then-MAC.}
+\end{itemize}
+
+\subsubsection{PRINCE}
+The cipher that is used for encryption, decryption, and authentication is \textit{PRINCE} \cite{borghoff12prince}. Among its many competitors, it is
+the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement\footnote{For this thesis, low
+latency is deemed slightly more important than low chip area requirements. Should area become the dominating factor, other algorithms (such as PRESENT
+\cite{bogdanov07present}) might be better suited.} \cite{harttung17lightweightcrypto}. Furthermore, with a key length of 128 bit, it provides
+relatively high security\footnote{Similar algorithms often have a key length of just 80 or 96 bit \cite[5]{harttung17lightweightcrypto}.}. To date, it
+remains unbroken depite monetary incentives to develop attacks \cite{princechallenge}.
+
+PRINCE is a symmetric block cipher with a block size of 64 bit and a key size of 128 bit. It is structured as a \textit{substitution-permutation
+network (\gls{spn})} with 12 rounds.
+
+What sets PRINCE apart from other lightweight ciphers is a design specifically targeted at fully unrolled hardware implementations. With this
+strategy, each round is computed using its own dedicated part of the circuit. These pieces are concatenated to form the full cipher. This approach
+enables the algorithm to be executed within a single clock cycle. In contast, traditional loop-based implementations of round-based ciphers usually
+have a single circuit constituting the round function, which is reused for all rounds. There, one clock cycle per round is required.
+
+Although single-cycle execution suggests a very low latency, the number of cycles cannot be directly mapped to execution speed. The long critical path
+entailed by the chained round functions results in a relatively low maximum clock frequency. Furthermore, the unrolled design entails a comparatively
+higher area requirement than loop-based ones; however, it is still \enquote{considerably lower than fully unrolled versions of \gls{aes} or PRESENT}
+\cite[3]{borghoff12prince}.
+
+In the work leading up to this thesis \cite{harttung17lightweightcrypto}, the maximum clock frequency of PRINCE for an \gls{fpga} implementation was
+examined. % TODO: maybe unnecessary to refer to my paper here
+
+A great asset of PRINCE is the possibility to use almost the exact same algorithm for encryption and decryption. More precisely, the decryption
+function corresponds to the encryption function if the round key\footnote{PRINCE uses the same round key for all rounds.} for the former is slightly
+modified. At the start of PRINCE, three subkeys $(k_0, k_0', k_1)$ are derived from the main key $k$, with $k_1$ being the round key\footnote{The
+other keys, $k_0$ and $k_0'$ are used as whitening keys.}. Now, $d_{(k_0, k_0', k_1)}(c) = e_{(k_0, k_0', k_1 \oplus \alpha)}(c)$. % TODO: this is correct for
+%PRINCEcore
+
+%- FPGA: frequency determined in previous paper
+%- FPGA vs. ASIC, refer to AES comparison
+%- final point: what we view as approximate maximum frequency in ASIC for this thesis
+- prince paper mentions on clock speed, await Sadia's answer
+
+- structure of prince, rounds
+- decryption almost equal to encryption ("alpha reflection")
+- authentication mode of operation ($a_k(f)$)
+
+\subsubsection{A Note On Stream Ciphers}
+While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
+\cite[cf.][]{estream}.
+
 \subsection{Network Coding}\label{sec:designnc}
-As mentioned in Section \ref{sec:networkcodingover}, network coding is employed to counteract performance degradations stemming from the unreliable
-transmissions introduced by compromised routers.
+As mentioned in Section \ref{sec:networkcodingover}, network coding is employed to counteract performance degradations stemming from unreliable
+transmissions.
 
 The coding scheme used in this work slightly differs from the one described above. First, it is applied to unicast transmissions, while traditional
 network coding focuses on multicast scenarios \cites{ahlswede00networkflow}{li03linearnc}. Second, only the sender nodes will compute combinations of
