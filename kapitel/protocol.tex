@@ -97,24 +97,21 @@ precisely one bit of information per cycle \cite{wikiparallelcomm}. Thus, for un
 in a network coded setting.
 
 \subsection{Cryptography}
-\begin{itemize}
-    \item Encrypt-then-MAC vs. Encrypt-and-MAC (bei Encrypt-then-MAC encrypt+authenticate sequentiell, aber decrypt+verify parallel.
-        Bei Encrypt-and-MAC encrypt+authenticate parallel, aber decrypt+verify sequentiell). Bei Encrypt-and-MAC: decrypt kann schon
-        beginnen, wenn MAC noch nicht da ist, verringert die Latenz in manchen Fällen.
-\end{itemize}
-
 \subsubsection{Notation}
 This section introduces formal notations and definitions regarding the cryptographic primitives. They will be used throughout this chapter to
-illustrate how flits are processed. They are denoted by variables and functions, where
+illustrate how flits are processed. They are denoted by variables, functions, and operators, where
 \begin{itemize}
-    \item $p$ is a plaintext message (usually the flit payload),
+    \item $p$ is a plaintext message (which corresponds to the flit payload unless otherwise stated),
     \item $c$ is a ciphertext,
     \item $m$ is a \gls{mac},
     \item $k$ is a key (with $k_e$ and $k_m$ referring to encryption and \gls{mac} keys),
     \item $f$ is a complete flit (header and payload),
+    \item $r$ is an authenticated and encrypted message,
     \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$,
     \item $d_k(c)$ is a decryption function that takes a ciphertext $c$ and produces the plaintext $p$ using key $k$,
-    \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$.
+    \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$,
+    \item $\oplus$ denotes the bitwise XOR operation, and
+    \item $\|$ symbolizes concatenation.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
@@ -133,7 +130,7 @@ are implemented:
 \begin{itemize}
     \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latency in the network interfaces, they
         threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple cryptographic modules are employed in each network
-        interface. While this does not speed up the cryptographic computations, it allows for multiple flits to be processed in parallel. For
+        interface. While this does not speed up the individual cryptographic computations, it allows for multiple flits to be processed in parallel. For
         instance, each network interface could have three encryption modules, allowing it to encrypt up to three flits simultaneously. Alas, this
         approach naturally increases the occupied chip area.
     \item \textbf{Hardware-optimized ciphers.} In Section \ref{sec:lightweightcrypto}, it was already mentioned that conventional block ciphers, such
@@ -150,49 +147,74 @@ are implemented:
 The ordering of encryption and authentication (i.e., \gls{mac} computation) has a significant impact on both the achievable performance and the
 security of the scheme. There are three general approaches to bring them together \cite{bellare00authenc}:
 \begin{itemize}
-    \item \textbf{Encrypt-and-MAC.}
-    \item \textbf{MAC-then-encrypt.}
-    \item \textbf{Encrypt-then-MAC.}
+    \item \textbf{Encrypt-and-MAC (\gls{eam}).} The plaintext is encrypted and the \gls{mac} is computed over the plaintext. Afterwards, the \gls{mac} is
+        appended to the ciphertext. More precisely, $r = e_{k_e}(p)\|a_{k_m}(f)$.
+    \item \textbf{MAC-then-Encrypt (\gls{mte}).} The \gls{mac} is computed over the plaintext and then appended to it. The result is then
+        encrypted. In other words, $r = e_{k_e}(p\|a_{k_m}(f))$.
+    \item \textbf{Encrypt-then-MAC (\gls{etm}).} First, the plaintext is encrypted. Subsequently, the \gls{mac} is computed over the ciphertext and appended to it.
+        Namely, $c = e_{k_e}(p)$ and $r = c\|a_{k_m}(f_c)$ where $f_c$ refers to the flit with encrypted payload.
 \end{itemize}
+\vspace{0.5\baselineskip}
 
-\subsubsection{PRINCE}
+Out of these three methods, \gls{etm} was chosen. It provides integrity on the ciphertext -- and consequently on the plaintext as well --
+instead of just the plaintext. Thus, the integrity of the message can be verified without the need to decrypt it first and the parallel decryption and
+verification mentioned above becomes possible.
+
+On the sender side, \gls{etm} necessitates sequential encryption and authentication since the \gls{mac} is computed over the ciphertext. While
+\gls{mte} forces this as well, it can be parallelized with \gls{eam}. However, both \gls{eam} and \gls{mte} do not provide an overall speed gain over
+\gls{etm}. In addition, they have been subject to security vulnerabilities in the past \cites{bellare00authenc}{bellare04ssheam}{etmtls}. Table
+\ref{tab:compositionmethods} gives a comparison of the methods.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{L|CCC}
+        & \gls{eam} & \gls{mte} & \gls{etm} \\\hline
+        Parallel encryption/authentication & yes & no & no \\
+        Parallel decryption/verification & no & no & yes \\
+        Plaintext integrity & yes & yes & yes \\
+        Ciphertext integrity & no & no & yes \\ % TODO: more aspects?
+    \end{tabulary}
+    \caption[Comparison of authenticated encryption composition methods]{Comparison of the authenticated encryption composition methods
+    Encrypt-and-MAC (\gls{eam}, MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
+    \label{tab:compositionmethods}
+\end{table}
+
+For all methods, the ciphertext and \gls{mac} need to be embedded into one or more flits since they cannot be sent without the header fields. This is
+elucidated in the protocol descriptions (Section \ref{sec:theprotocol}).
+
+\subsubsection{PRINCE}\label{subsubsec:prince}
 The cipher that is used for encryption, decryption, and authentication is \textit{PRINCE} \cite{borghoff12prince}. Among its many competitors, it is
-the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement\footnote{For this thesis, low
-latency is deemed slightly more important than low chip area requirements. Should area become the dominating factor, other algorithms (such as PRESENT
-\cite{bogdanov07present}) might be better suited.} \cite{harttung17lightweightcrypto}. Furthermore, with a key length of 128 bit, it provides
-relatively high security\footnote{Similar algorithms often have a key length of just 80 or 96 bit \cite[5]{harttung17lightweightcrypto}.}. To date, it
-remains unbroken depite monetary incentives to develop attacks \cite{princechallenge}.
+the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement
+\cite{harttung17lightweightcrypto}. Here, low latency is deemed more important than low chip area requirements, rendering it a natural choice. Besides, the
+faster the algorithm runs, the less parallel modules may be required, potentialls reducing the overall area requirement in the end. Furthermore, with a
+key length of 128 bit, it provides relatively high security\footnote{Similar algorithms often have a key length of just 80 or 96 bit
+\cite[5]{harttung17lightweightcrypto}.}. To date, it remains unbroken despite monetary incentives to develop attacks \cite{princechallenge}.
 
 PRINCE is a symmetric block cipher with a block size of 64 bit and a key size of 128 bit. It is structured as a \textit{substitution-permutation
 network (\gls{spn})} with 12 rounds.
 
 What sets PRINCE apart from other lightweight ciphers is a design specifically targeted at fully unrolled hardware implementations. With this
 strategy, each round is computed using its own dedicated part of the circuit. These pieces are concatenated to form the full cipher. This approach
-enables the algorithm to be executed within a single clock cycle. In contast, traditional loop-based implementations of round-based ciphers usually
-have a single circuit constituting the round function, which is reused for all rounds. There, one clock cycle per round is required.
+enables the algorithm to be executed within a single clock cycle. In contast, traditional iterative implementations of round-based ciphers usually
+have a single circuit constituting the round function that is reused for all rounds. There, one clock cycle per round is required.
 
-Although single-cycle execution suggests a very low latency, the number of cycles cannot be directly mapped to execution speed. The long critical path
+Although single-cycle execution suggests a tremendously low latency, the number of cycles cannot be directly mapped to execution speed. The long critical path
 entailed by the chained round functions results in a relatively low maximum clock frequency. Furthermore, the unrolled design entails a comparatively
-higher area requirement than loop-based ones; however, it is still \enquote{considerably lower than fully unrolled versions of \gls{aes} or PRESENT}
+higher area requirement than iterative ones; however, it is still \enquote{considerably lower than fully unrolled versions of \gls{aes} or PRESENT}
 \cite[3]{borghoff12prince}.
 
-In the work leading up to this thesis \cite{harttung17lightweightcrypto}, the maximum clock frequency of PRINCE for an \gls{fpga} implementation was
-examined. % TODO: maybe unnecessary to refer to my paper here
+The authors of PRINCE have investigated the maximum clock frequency of their algorithm under varying conditions. They were able to achieve 212.8 MHz
+using speed-optimizing synthesis strategies and 45 nm technology\footnote{Their other tests include 90 and 130 nm technology or area-optimizing
+synthesis strategies, yielding lower results.}. In other research at the TU Dresden related to this thesis, 28 nm technology is commonly used. Under
+this premise, a frequency of at least 250 MHz is definitely achievable, considering that the switch from 90 to 45 nm already more than doubled
+the maximum frequency in the authors' experiments.
 
 A great asset of PRINCE is the possibility to use almost the exact same algorithm for encryption and decryption. More precisely, the decryption
 function corresponds to the encryption function if the round key\footnote{PRINCE uses the same round key for all rounds.} for the former is slightly
 modified. At the start of PRINCE, three subkeys $(k_0, k_0', k_1)$ are derived from the main key $k$, with $k_1$ being the round key\footnote{The
-other keys, $k_0$ and $k_0'$ are used as whitening keys.}. Now, $d_{(k_0, k_0', k_1)}(c) = e_{(k_0, k_0', k_1 \oplus \alpha)}(c)$. % TODO: this is correct for
-%PRINCEcore
-
-%- FPGA: frequency determined in previous paper
-%- FPGA vs. ASIC, refer to AES comparison
-%- final point: what we view as approximate maximum frequency in ASIC for this thesis
-- prince paper mentions on clock speed, await Sadia's answer
-
-- structure of prince, rounds
-- decryption almost equal to encryption ("alpha reflection")
-- authentication mode of operation ($a_k(f)$)
+other keys, $k_0$ and $k_0'$ are used as whitening keys.}. Now, $d_{(k_0, k_0', k_1)}(c) = e_{(k_0, k_0', k_1 \oplus \alpha)}(c)$, where $\alpha$ is a
+64 bit constant. This property, called \textit{\alpha-reflection}, renders using the same circuit for encryption and decryption possible by simply
+omitting the XOR operation for the encryption case.
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
@@ -239,6 +261,8 @@ restarting at zero.}.
     \caption[Protocol flow: method 1 coded]{Protocol flow: method 1 coded}
     \label{fig:protchartnc1}
 \end{figure}
+
+- authentication mode of operation ($a_k(f)$)
 % uncoded (full explanation), network coded
 
 \subsection{Interwoven Authentication}

@@ -86,14 +86,14 @@ receiver. In addition, a \gls{mac} is computed that is sent together with the en
 The constraints imposed by the \gls{noc} environment (cf. Section \ref{sec:networkonchipfun}) make the implementation of security measures a
 challenging task. To meet them, only symmetric ciphers were investigated, as they allow for fast computations and low-area implementations.
 Furthermore, the produced \glspl{mac} are short enough to fit into a single flit. However, their usage implies that each pair of
-sender and receiver needs to possess a shared secret key. To obtain or renegotiate such a key in a secure manner, a key exchange algorithm is required
+sender and receiver needs to possess two shared secret keys (one for encryption and one for authentication). To obtain or renegotiate
+such keys in a secure manner, a key exchange algorithm is required
 \footnote{One way to realize a secure key exchange in the context of \glspl{noc} is the utilization of central key-keeper cores
 \cite{gebotys03securityframework} (see also Section \ref{subsec:securityzones}). Another option is physical layer key generation, as suggested in the
 \gls{haec} presentation paper \cite[4]{matthiesen17haec}.}.
-As this exceeds the scope of this thesis, each pair of sender and receiver is assumed to have access to a shared secret key. The alternative, asymmetric
+As this exceeds the scope of this thesis, each pair of sender and receiver is assumed to have access to the necessary keys. The alternative, asymmetric
 cryptography, is not considered since it \enquote{implies a high computational effort} \cite[3]{moriam18activeattackers}. Additionally, this class of
 algorithms produces signatures instead of \glspl{mac}, which are \enquote{too long to be included in a flit} \cite[3]{moriam18activeattackers}.
-% TODO: one shared secret key or 2 (different ones for enc+mac)
 
 \section{Network Coding}\label{sec:networkcodingover}
 A promising approach to improve the performance of \glspl{noc} is network coding. \citeauthor{moriam15manycorenc} have shown that it is particularly
