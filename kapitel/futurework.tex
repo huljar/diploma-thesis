@@ -14,4 +14,6 @@
         explore static routes?
     \item Intelligent attackers → modify ARQs or send own ARQs → they are unauthenticated so DoS attack by maximizing retransmissions
     \item Usage of ECC (error correcting codes) to potentially reduce number of ARQs (at least for accidental bit flips)
+    \item Security of the encryption → we kind of use ECB here which is not secure → e.g. a nonce is needed? or the flits need to be chained with some
+        mode of operation like CBC or CTR → CBC requires no residual errors
 \end{itemize}

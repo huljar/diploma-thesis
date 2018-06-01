@@ -218,7 +218,13 @@ omitting the XOR operation for the encryption case.
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
-\cite[cf.][]{estream}.
+\cite[cf.][]{estream}. In terms of speed and size, they sometimes even surpass block ciphers. For example, the cipher \textit{Trivium}
+\cite{decanniere06trivium} is smaller than PRINCE and also able to encrypt up to 64 bit in one clock cycle \cite[8]{harttung17lightweightcrypto}.
+
+The reason stream ciphers were ultimately not considered for this thesis is twofold. First, they require keeping an internal state from which the
+keystream is derived (288 bit for Trivium). As each node pair uses its own shared secret key, all nodes would need to keep such state information for
+every other node in the network, necessitating large buffers. Second, in comparison to block ciphers, stream ciphers have been studied very little,
+potentially increasing the risk of security flaws in this construction technique.
 
 \subsection{Network Coding}\label{sec:designnc}
 As mentioned in Section \ref{sec:networkcodingover}, network coding is employed to counteract performance degradations stemming from unreliable
