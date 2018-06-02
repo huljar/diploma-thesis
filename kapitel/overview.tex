@@ -76,10 +76,10 @@ receiver. In addition, a \gls{mac} is computed that is sent together with the en
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{noc-message-enc-auth}
-    \caption[Flit through NoC with encryption and authentication]{Example of a flit being transmitted through a NoC. After a processing element sends a flit (1),
+    \caption[Flit in the NoC with encryption and authentication]{Example of a flit being transmitted through a NoC. After a processing element sends a flit (1),
     encryption is applied (2) and a MAC is computed (3) in the sender's network interface. The encrypted flit and the MAC are then routed to the
     destination (4). There, the receiver's network interface verifies the MAC (5) and decrypts the flit (6). Finally, the flit is passed to the
-    receiving processing element (7).} % TODO: state that this is "method 1 uncoded"?
+    receiving processing element (7). This scheme corresponds to the uncoded individual authentication protocol variant.}
     \label{fig:nocflitencauth}
 \end{figure}
 
@@ -105,10 +105,6 @@ While network coding provides robustness against sporadic flit loss, it does not
 during the transmission of the coded data are not detected directly, potentially leading to faulty decodings. This deficit is remedied by the cryptographic
 layer described above. To evaluate the consequences of the integration of network coding, uncoded versions of the protocol were implemented and
 examined as well (see Section \ref{sec:protocolvariants}).
-
-Network coding good in error-prone networks → we have errors because of attackers → thus it's good here
-
-% TODO: explain network coding (generations, GEVs)? → how much is explained in fundamentals?
 
 \section{Multipath Routing}
 The exploration of different routing strategies is a central aspect of this thesis. Both static and dynamic strategies were

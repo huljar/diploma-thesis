@@ -109,7 +109,8 @@ illustrate how flits are processed. They are denoted by variables, functions, an
     \item $r$ is an authenticated and encrypted message,
     \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$,
     \item $d_k(c)$ is a decryption function that takes a ciphertext $c$ and produces the plaintext $p$ using key $k$,
-    \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$,
+    \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$\footnote{The whole flit is
+        authenticated, as opposed to just the payload, to provide integrity on the header fields as well.},
     \item $\oplus$ denotes the bitwise XOR operation, and
     \item $\|$ symbolizes concatenation.
 \end{itemize}
@@ -226,22 +227,59 @@ keystream is derived (288 bit for Trivium). As each node pair uses its own share
 every other node in the network, necessitating large buffers. Second, in comparison to block ciphers, stream ciphers have been studied very little,
 potentially increasing the risk of security flaws in this construction technique.
 
-\subsection{Network Coding}\label{sec:designnc}
-As mentioned in Section \ref{sec:networkcodingover}, network coding is employed to counteract performance degradations stemming from unreliable
-transmissions.
+\subsection{Random Linear Network Coding}\label{sec:designnc}
+The coding scheme used in this work is a variant of \textit{Random Linear Network Coding (\gls{rlnc})} and based on the work of
+\citeauthor{moriam15manycorenc} \cite{moriam15manycorenc}. It slightly differs from the traditional idea of network coding
+\cites{ahlswede00networkflow}{li03linearnc}. First, the targeted communication pattern is not multicast, but unicast transmissions, since only the
+latter are investigated in this thesis. Second, only the sender nodes compute combinations of flits (intermediate nodes merely forward them) and only
+flits with the same destination are coalesced (\enquote{intra-session network coding} \cite[1]{moriam15manycorenc}). The rationale behind this are the
+tight performance requirements of the \gls{noc}. If each network node were to buffer incoming flits until enough are present to perform local
+encoding, routing latencies would increase considerably. Furthermore, the implementation of local encoding necessitates additional memory and
+processing logic in each router, making their design more complex and increasing their size. As this directly contradicts the \gls{noc} design goals
+laid out in Section \ref{sec:networkonchipfun}, it is not considered here.
 
-The coding scheme used in this work slightly differs from the one described above. First, it is applied to unicast transmissions, while traditional
-network coding focuses on multicast scenarios \cites{ahlswede00networkflow}{li03linearnc}. Second, only the sender nodes will compute combinations of
-different flits, while intermediate nodes merely forward them. The rationale behind this are the tight performance requirements of \glspl{noc}. If
-each network node waited for enough flits to perform local encoding before forwarding, routing latencies would increase. Furthermore, the
-implementation of local encoding implies additional logic in each router, making their design more complex and entailing a higher chip area
-requirement. However, this directly contradicts the \gls{noc} design goals laid out in Section \ref{sec:networkonchipfun} and is thus not considered.
+In the implemented approach, the sender organizes flits $f_i\ |\ i \in \mathbb{N}, i = 0, …, n$ with the same destination into generations $g_j\ |\ j
+\in \mathbb{N}, j = 0, …, \lfloor\frac{n}{2}\rfloor$ of size $G$. Here, each generation consists of 2 flits (i.e., $G = |g_j| = 2$)\footnote{Larger
+generations, consisting of three or more flits, are also feasible, but have proven to entail higher latencies \cite[2]{moriam18activeattackers}, which
+is not desirable.} and is constructed as $g_j = (f_{2j}, f_{2j+1})$. Furthermore, the flit IDs $i$ are replaced in the flits by the generation IDs $j$
+as described in Section \ref{subsec:flitstructure}. In addition, a \gls{gev} $\beta$ is inserted into each flit, where $\beta_{i} = (\beta_{i_0}, …,
+\beta_{i_{G-1}})$. It is initialized to a unit vector \cite[3]{chou03practicalnc} that signifies the index of the flit inside the generation, i.e.,
+$\beta_{i_k} = 1\ |\ i = k \pmod G$ and $\beta_{i_k} = 0\ |\ i \neq k \pmod G$. Afterwards, $C \geq G$ encoded flits are derived from each generation.
+They are obtained by computing linear combinations with random coefficients \cite[cf.][]{ho03randomcoding} over the \glspl{gev} and payloads of the
+original flits:
+
+\begin{equation}
+    \begin{bmatrix}
+        y_0 \\
+        \vdots \\
+        y_{C-1}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \alpha_{0,\,0} & \cdots & \alpha_{0,\,G-1} \\
+        \vdots & \ddots & \vdots \\
+        \alpha_{C-1,\,0} & \cdots & \alpha_{C-1,\,G-1}
+    \end{bmatrix}
+    \begin{bmatrix}
+        x_0 \\
+        \vdots \\
+        x_{G-1}
+    \end{bmatrix}
+\end{equation}
+
+where $y = (\beta_{encoded} \| p_{encoded})$ denote the encoded \glspl{gev} and payloads, $\alpha$ represents the randomly selected coefficients, and
+$x = (\beta \| p)$ stands for the original \glspl{gev} (i.e., the unit vectors) and payloads. The other header fields for the encoded flits are
+adopted unaltered from the original flits.
+
+For this thesis, variants with $C = 3$ and $C = 4$ combinations per generation are investigated; these schemes are referred to as \textit{G2C3} and
+\textit{G2C4}, respectively.
+
+On the side of the receiver, the combinations are decoded to obtain the original flits. For this process to succeed, at least $G$ of the $C$
+combinations need to arrive at their destination\footnote{In fact, $G$ linearly independent combinations are required. Fortunately, they fulfill this
+condition with very high probability since the coefficients are randomized \cite[3]{chou03practicalnc}.}. The receiver can then decode them by solving
+the linear equation system that is established
 
 \begin{itemize}
-    \item Random Linear Network Coding
-    \item Only intra-session coding, no recoding by intermediate nodes
-    \item Following: NC for one sender-receiver pair
-    \item The flits $f_i | i = 0, …, n$ are divided into generations $g_i | i = 0, …, m$ with size $G$ (here: $G = 2$)
     \item GEV is added to the flits (cf. Section \ref{subsec:flitstructure})
     \item GEV: $\beta_i = (\beta_{i_1}, …, \beta_{i_G})$ where $\beta_{i_i} = 1$ and $\beta_{i_j} = 0 \forall j \neq i$ % TODO: nicht ganz korrekt,
         % nur, wenn i wieder bei 0 beginnt mit einer neuen Generation
