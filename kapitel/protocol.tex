@@ -96,12 +96,12 @@ to transmit multiple bits simultaneously. This results in multiple wires (or oth
 precisely one bit of information per cycle \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
 in a network coded setting.
 
-\subsection{Cryptography}
-\subsubsection{Notation}
+\subsection{Cryptography}\label{subsec:crypto}
+\subsubsection{Notation}\label{subsubsec:cryptonotation}
 This section introduces formal notations and definitions regarding the cryptographic primitives. They will be used throughout this chapter to
 illustrate how flits are processed. They are denoted by variables, functions, and operators, where
 \begin{itemize}
-    \item $p$ is a plaintext message (which corresponds to the flit payload unless otherwise stated),
+    \item $p$ is a plaintext message (which corresponds to the flit payload),
     \item $c$ is a ciphertext,
     \item $m$ is a \gls{mac},
     \item $k$ is a key (with $k_e$ and $k_m$ referring to encryption and \gls{mac} keys),
@@ -238,57 +238,64 @@ encoding, routing latencies would increase considerably. Furthermore, the implem
 processing logic in each router, making their design more complex and increasing their size. As this directly contradicts the \gls{noc} design goals
 laid out in Section \ref{sec:networkonchipfun}, it is not considered here.
 
+\subsubsection{Operation Breakdown}
 In the implemented approach, the sender organizes flits $f_i\ |\ i \in \mathbb{N}, i = 0, …, n$ with the same destination into generations $g_j\ |\ j
 \in \mathbb{N}, j = 0, …, \lfloor\frac{n}{2}\rfloor$ of size $G$. Here, each generation consists of 2 flits (i.e., $G = |g_j| = 2$)\footnote{Larger
-generations, consisting of three or more flits, are also feasible, but have proven to entail higher latencies \cite[2]{moriam18activeattackers}, which
+generations, consisting of three or more flits, are also feasible, but have proven to entail higher transmission latencies \cite[2]{moriam18activeattackers}, which
 is not desirable.} and is constructed as $g_j = (f_{2j}, f_{2j+1})$. Furthermore, the flit IDs $i$ are replaced in the flits by the generation IDs $j$
 as described in Section \ref{subsec:flitstructure}. In addition, a \gls{gev} $\beta$ is inserted into each flit, where $\beta_{i} = (\beta_{i_0}, …,
 \beta_{i_{G-1}})$. It is initialized to a unit vector \cite[3]{chou03practicalnc} that signifies the index of the flit inside the generation, i.e.,
 $\beta_{i_k} = 1\ |\ i = k \pmod G$ and $\beta_{i_k} = 0\ |\ i \neq k \pmod G$. Afterwards, $C \geq G$ encoded flits are derived from each generation.
 They are obtained by computing linear combinations with random coefficients \cite[cf.][]{ho03randomcoding} over the \glspl{gev} and payloads of the
 original flits:
+\begin{equation}
+    \begin{split}
+        \begin{bmatrix}
+            \beta_{0,\,0} & \cdots & \beta_{0,\,G-1} & q_{0,\,0} & \cdots & q_{0,\,P-1} \\
+            \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+            \beta_{C-1,\,0} & \cdots & \beta_{C-1,\,G-1} & q_{C-1,\,0} & \cdots & q_{C-1,\,P-1}
+        \end{bmatrix}\\
+        =
+        \begin{bmatrix}
+            \alpha_{0,\,0} & \cdots & \alpha_{0,\,G-1} \\
+            \vdots & \ddots & \vdots \\
+            \alpha_{C-1,\,0} & \cdots & \alpha_{C-1,\,G-1}
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 & & 0 & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
+            & \ddots & & \vdots & \ddots & \vdots \\
+            0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
+        \end{bmatrix}
+    \end{split}
+\end{equation}
+
+where $\beta_j = (\beta_{j,\,0}, …, \beta_{j,\,G-1})$ are the \glspl{gev}, $q_j = (q_{j,\,0}, …, q_{j,\,P-1})$ denote the encoded payloads,
+$\alpha_{j,\,i}$ represent the randomly selected coefficients, and $p_i = (p_{i,\,0}, …, p_{i,\,P-1})$ stand for the original payloads
+($i \in \left[0,\,G\right), j \in \left[0,\,C\right)$). Furthermore, $P$ is payload size in symbols.%TODO: symbol size?
+The other header fields for the encoded flits are adopted unaltered from the original flits.
+
+For this thesis, variants with $C = 3$ and $C = 4$ combinations per generation are investigated \cite[cf.][2]{moriam18activeattackers}. These schemes
+are referred to as \textit{G2C3} and \textit{G2C4}, respectively.
+
+On the side of the receiver, the combinations are decoded to recover the original flits. If at least $G$ of the $C$
+combinations arrive at their destination\footnote{In fact, $G$ linearly independent combinations are required. Fortunately, they fulfill this
+condition with very high probability since the coefficients are randomized \cite[3]{chou03practicalnc}.}, the receiver can then decode them by solving
+the linear equation system established by the \glspl{gev}:
 
 \begin{equation}
     \begin{bmatrix}
-        y_0 \\
-        \vdots \\
-        y_{C-1}
-    \end{bmatrix}
-    =
-    \begin{bmatrix}
-        \alpha_{0,\,0} & \cdots & \alpha_{0,\,G-1} \\
-        \vdots & \ddots & \vdots \\
-        \alpha_{C-1,\,0} & \cdots & \alpha_{C-1,\,G-1}
-    \end{bmatrix}
-    \begin{bmatrix}
-        x_0 \\
-        \vdots \\
-        x_{G-1}
     \end{bmatrix}
 \end{equation}
 
-where $y = (\beta_{encoded} \| p_{encoded})$ denote the encoded \glspl{gev} and payloads, $\alpha$ represents the randomly selected coefficients, and
-$x = (\beta \| p)$ stands for the original \glspl{gev} (i.e., the unit vectors) and payloads. The other header fields for the encoded flits are
-adopted unaltered from the original flits.
-
-For this thesis, variants with $C = 3$ and $C = 4$ combinations per generation are investigated; these schemes are referred to as \textit{G2C3} and
-\textit{G2C4}, respectively.
-
-On the side of the receiver, the combinations are decoded to obtain the original flits. For this process to succeed, at least $G$ of the $C$
-combinations need to arrive at their destination\footnote{In fact, $G$ linearly independent combinations are required. Fortunately, they fulfill this
-condition with very high probability since the coefficients are randomized \cite[3]{chou03practicalnc}.}. The receiver can then decode them by solving
-the linear equation system that is established
-
-\begin{itemize}
-    \item GEV is added to the flits (cf. Section \ref{subsec:flitstructure})
-    \item GEV: $\beta_i = (\beta_{i_1}, …, \beta_{i_G})$ where $\beta_{i_i} = 1$ and $\beta_{i_j} = 0 \forall j \neq i$ % TODO: nicht ganz korrekt,
-        % nur, wenn i wieder bei 0 beginnt mit einer neuen Generation
-\end{itemize}
 % Only the sender codes
 % TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
 % TODO: a bit of math and formulas on how NC is done (inspired by previous TUD papers)
 % 2 sub-variants: G2C3, G2C4
 % Why G2C3 and G2C4? → refer to previous TUD papers
+
+\subsubsection{Consequences}
+- If $C > G$ then packet loss can be remedied → decoding still possible if $C - G$ packets are lost
+- More flits injected into the network (50\% increase for G2C3, 100\% increase for G2C4)
 
 \section{The Protocol}\label{sec:theprotocol}
 As mentioned in Section \ref{sec:protocolvariants}, three different communication schemes were envisioned, with the first two subdivided into uncoded
