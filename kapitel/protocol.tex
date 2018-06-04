@@ -159,7 +159,8 @@ security of the scheme. There are three general approaches to bring them togethe
 
 Out of these three methods, \gls{etm} was chosen. It provides integrity on the ciphertext -- and consequently on the plaintext as well --
 instead of just the plaintext. Thus, the integrity of the message can be verified without the need to decrypt it first and the parallel decryption and
-verification mentioned above becomes possible.
+verification mentioned above becomes possible. Moreover, in case of an integrity breach, \glspl{arq} can be issued earliest as the verification is
+performed directly after the flits arrive.
 
 On the sender side, \gls{etm} necessitates sequential encryption and authentication since the \gls{mac} is computed over the ciphertext. While
 \gls{mte} forces this as well, it can be parallelized with \gls{eam}. However, both \gls{eam} and \gls{mte} do not provide an overall speed gain over
@@ -174,6 +175,7 @@ On the sender side, \gls{etm} necessitates sequential encryption and authenticat
         Parallel decryption/verification & no & no & yes \\
         Plaintext integrity & yes & yes & yes \\
         Ciphertext integrity & no & no & yes \\ % TODO: more aspects?
+        Verification latency & high & high & low
     \end{tabulary}
     \caption[Comparison of authenticated encryption composition methods]{Comparison of the authenticated encryption composition methods
     Encrypt-and-MAC (\gls{eam}, MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
@@ -231,24 +233,48 @@ potentially increasing the risk of security flaws in this construction technique
 The coding scheme used in this work is a variant of \textit{Random Linear Network Coding (\gls{rlnc})} and based on the work of
 \citeauthor{moriam15manycorenc} \cite{moriam15manycorenc}. It slightly differs from the traditional idea of network coding
 \cites{ahlswede00networkflow}{li03linearnc}. First, the targeted communication pattern is not multicast, but unicast transmissions, since only the
-latter are investigated in this thesis. Second, only the sender nodes compute combinations of flits (intermediate nodes merely forward them) and only
+latter are of interest for this thesis. Second, only the sender nodes compute combinations of flits (intermediate nodes merely forward them) and only
 flits with the same destination are coalesced (\enquote{intra-session network coding} \cite[1]{moriam15manycorenc}). The rationale behind this are the
 tight performance requirements of the \gls{noc}. If each network node were to buffer incoming flits until enough are present to perform local
 encoding, routing latencies would increase considerably. Furthermore, the implementation of local encoding necessitates additional memory and
-processing logic in each router, making their design more complex and increasing their size. As this directly contradicts the \gls{noc} design goals
+processing logic inside each router, making their design more complex and increasing their size. As this directly contradicts the \gls{noc} design goals
 laid out in Section \ref{sec:networkonchipfun}, it is not considered here.
 
 \subsubsection{Operation Breakdown}
 In the implemented approach, the sender organizes flits $f_i\ |\ i \in \mathbb{N}, i = 0, …, n$ with the same destination into generations $g_j\ |\ j
-\in \mathbb{N}, j = 0, …, \lfloor\frac{n}{2}\rfloor$ of size $G$. Here, each generation consists of 2 flits (i.e., $G = |g_j| = 2$)\footnote{Larger
+\in \mathbb{N}, j = 0, …, \lfloor\frac{n}{2}\rfloor$ of size $G$. Here, each generation consists of 2 flits (i.e., $G = 2$)\footnote{Larger
 generations, consisting of three or more flits, are also feasible, but have proven to entail higher transmission latencies \cite[2]{moriam18activeattackers}, which
 is not desirable.} and is constructed as $g_j = (f_{2j}, f_{2j+1})$. Furthermore, the flit IDs $i$ are replaced in the flits by the generation IDs $j$
-as described in Section \ref{subsec:flitstructure}. In addition, a \gls{gev} $\beta$ is inserted into each flit, where $\beta_{i} = (\beta_{i_0}, …,
-\beta_{i_{G-1}})$. It is initialized to a unit vector \cite[3]{chou03practicalnc} that signifies the index of the flit inside the generation, i.e.,
-$\beta_{i_k} = 1\ |\ i = k \pmod G$ and $\beta_{i_k} = 0\ |\ i \neq k \pmod G$. Afterwards, $C \geq G$ encoded flits are derived from each generation.
-They are obtained by computing linear combinations with random coefficients \cite[cf.][]{ho03randomcoding} over the \glspl{gev} and payloads of the
-original flits:
-\begin{equation}
+as described in Section \ref{subsec:flitstructure} (see also Figure \vref{fig:encodingexample}).
+
+The combinations are then computed as follows: first, a unit vector $e_i = (e_{i_0}, …, e_{i_{G-1}})$ that signifies the index of the flit inside the
+generation \cite[3]{chou03practicalnc} is prepended to each flit's payload:
+\[
+    e_{i_k} =
+    \begin{cases}
+        1 & |\ i = k \pmod G \\
+        0 & |\ i \neq k \pmod G
+    \end{cases}
+\]
+These vectors and the payloads are then organized as a matrix for each generation:
+\[
+    \begin{split}
+        \begin{bmatrix}
+            e_{0,\,0} & \cdots & e_{0,\,G-1} & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
+            \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+            e_{G-1,\,0} & \cdots & e_{G-1,\,G-1} & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
+        \end{bmatrix}\\
+        =
+        \begin{bmatrix}
+            1 & & 0 & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
+            & \ddots & & \vdots & \ddots & \vdots \\
+            0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
+        \end{bmatrix}
+    \end{split}
+\]
+where $P$ corresponds to the payload size in symbols. Now, $C \geq G$ combinations are computed with randomly selected coefficients $\beta$
+\cite[cf.][]{ho03randomcoding}:
+\[
     \begin{split}
         \begin{bmatrix}
             \beta_{0,\,0} & \cdots & \beta_{0,\,G-1} & q_{0,\,0} & \cdots & q_{0,\,P-1} \\
@@ -257,9 +283,9 @@ original flits:
         \end{bmatrix}\\
         =
         \begin{bmatrix}
-            \alpha_{0,\,0} & \cdots & \alpha_{0,\,G-1} \\
+            \beta_{0,\,0} & \cdots & \beta_{0,\,G-1}\\
             \vdots & \ddots & \vdots \\
-            \alpha_{C-1,\,0} & \cdots & \alpha_{C-1,\,G-1}
+            \beta_{C-1,\,0} & \cdots & \beta_{C-1,\,G-1}
         \end{bmatrix}
         \begin{bmatrix}
             1 & & 0 & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
@@ -267,31 +293,46 @@ original flits:
             0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
         \end{bmatrix}
     \end{split}
-\end{equation}
+\]
+Each row of the result matrix represents one combination, with $\beta_i = (\beta_{i,\,0}, …, \beta_{i,\,G-1})\ |\ i \in \left[0, C\right)$ standing
+for the \glspl{gev} and $q_i = (q_{i,\,0}, …, q_{i,\,P-1})\ |\ i \in \left[0, C\right)$ corresponding to the encoded payloads. The other header fields
+are adopted unaltered from the original flits\footnote{The header fields of the original flits in the same generation contain the same values by
+design, hence these values can simply be copied to the encoded flits.}. Figure \vref{fig:encodingexample} illustrates the whole process.
 
-where $\beta_j = (\beta_{j,\,0}, …, \beta_{j,\,G-1})$ are the \glspl{gev}, $q_j = (q_{j,\,0}, …, q_{j,\,P-1})$ denote the encoded payloads,
-$\alpha_{j,\,i}$ represent the randomly selected coefficients, and $p_i = (p_{i,\,0}, …, p_{i,\,P-1})$ stand for the original payloads
-($i \in \left[0,\,G\right), j \in \left[0,\,C\right)$). Furthermore, $P$ is payload size in symbols.%TODO: symbol size?
-The other header fields for the encoded flits are adopted unaltered from the original flits.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{encoding-example-mapping}
+    \caption[Application of network coding to flits]{Application of network coding to flits. The generation size is G=2 and the number of computed
+    combinations is C=3 (i.e., the G2C3 scheme). Using randomly selected cofficients $\beta$ as \glspl{gev}, the flits $f_0$ and $f_1$ are encoded,
+    creating the combinations $c_0$, $c_1$, and $c_2$.}
+    \label{fig:encodingexample}
+\end{figure}
 
 For this thesis, variants with $C = 3$ and $C = 4$ combinations per generation are investigated \cite[cf.][2]{moriam18activeattackers}. These schemes
 are referred to as \textit{G2C3} and \textit{G2C4}, respectively.
 
-On the side of the receiver, the combinations are decoded to recover the original flits. If at least $G$ of the $C$
+On the side of the receiver, the combinations are decoded to recover the original flits. If at least $G$ out of the $C$
 combinations arrive at their destination\footnote{In fact, $G$ linearly independent combinations are required. Fortunately, they fulfill this
-condition with very high probability since the coefficients are randomized \cite[3]{chou03practicalnc}.}, the receiver can then decode them by solving
-the linear equation system established by the \glspl{gev}:
-
-\begin{equation}
+condition with very high probability since the coefficients are randomized \cite[3]{chou03practicalnc}.}, the receiver is able to decode them by solving
+the system of linear equations established by the received flits' \glspl{gev} and payloads
+\[
     \begin{bmatrix}
+        \beta_{0,\,0} & \cdots & \beta_{0,\,G-1} & q_{0,\,0} & \cdots & q_{0,\,P-1} \\
+        \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+        \beta_{C-1,\,0} & \cdots & \beta_{C-1,\,G-1} & q_{C-1,\,0} & \cdots & q_{C-1,\,P-1}
     \end{bmatrix}
-\end{equation}
-
-% Only the sender codes
-% TODO: mention PNC paper, that we use RLNC, but only senders encode and create generations ("only intra-session network coding")
-% TODO: a bit of math and formulas on how NC is done (inspired by previous TUD papers)
-% 2 sub-variants: G2C3, G2C4
-% Why G2C3 and G2C4? → refer to previous TUD papers
+\]
+using Gaussian elimination until the matrix is in reduced row echelon form, i.e., of the following structure:
+\[
+    \begin{bmatrix}
+        1 & & 0 & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
+        & \ddots & & \vdots & \ddots & \vdots \\
+        0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
+    \end{bmatrix}
+\]
+Now, the original flits may be recreated. The payloads are the vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in \left[0, G\right)$ obtained from
+the system of linear equations above. The flit IDs are reconstructed from the generation ID $j$: with $G = 2$, they are $2j$ and $2j+1$. The other
+header fields are simply copied over from one of the combinations as they have not changed.
 
 \subsubsection{Consequences}
 - If $C > G$ then packet loss can be remedied → decoding still possible if $C - G$ packets are lost
