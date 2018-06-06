@@ -355,7 +355,8 @@ attacks. Hence, IDs start at zero and are incremented with each newly created fl
 distinct values can be represented by the carrying header field, long-running systems are bound to cause an arithmetic overflow at some point. Prior
 to this thesis, a size of 24 bit was determined as sufficient for the given scenario \cite[5]{franz18authdraft}. With this, $2^{24} = \num{16777216}$
 distinct IDs are at disposal. Should an overflow occur, the IDs simply restart at zero. At this point, is is advisable to negotiate a new shared
-secret key with the affected receiver to further impede replay attacks.
+secret key with the affected receiver to further impede replay attacks. For the remainder of this thesis, IDs are assumed to be unique for a given
+sender-receiver pair.
 % TODO: correct biblatex entry for the draft paper
 
 \subsection{Transmission Units}
@@ -365,23 +366,58 @@ split (interwoven authentication) belong to the same transmission unit. With net
 the set of combinations created from one generation together with any \glspl{mac} flits computed for these combinations.
 
 \subsection{Retransmissions}\label{subsec:arqretransmissions}
-Structure of ARQ: same header fields as uncoded flits in Section \ref{subsec:flitstructure}, mode field set to <arq>. Payload contains information on what
-needs to be retransmitted. For UC: payload contains the missing modes. For NC: FID field contains GID and payload contains the missing modes for each
-GEV of the generation. If not all GEVs are known by the receiver (timeout), then payload contains the GEV/mode pairs of what was received, and the
-sender has the responsibility to look up the missing ones.
+As introduced in Section \ref{sec:reliability}, \glspl{arq} are used to request the retransmission of specific flits in the event of a loss or
+corruption in transit. \Glspl{arq} are special flits that receivers can send back to the originator of the affected transmission unit. Their structure
+is identical to that of normal flits so that the routers do not need to distinguish between \glspl{arq} and other flits. The mode field is always set
+to \textit{\gls{arq}} to differentiate them. However, the following header fields are of no use in \gls{arq} flits and are thus ignored (cf. Section
+\ref{subsec:flitstructure}):
+\begin{itemize}
+    \item \textbf{Burst.} The burst bit is useless for \gls{arq} flits since they are always sent as individual entities and not as part of a stream.
+        For this thesis, this is no different to normal flits as the burst bit is entirely unused anyway; nevertheless, it may be relevant to future
+        experiments.
+    \item \textbf{Global Encoding Vector.} Network coding is never applied to an \gls{arq} flit; it is always uncoded. Hence, there is no \gls{gev}
+        associated with it. For the uncoded protocol variants, this fields does not even exist in the first place.
+\end{itemize}
+\vspace{0.5\baselineskip}
 
-The number of allowed ARQs is limited per transmission unit. If ARQ is required but the limit is already reached → error, transmission failed.
+An \gls{arq} is always associated with the transmission unit that was unsuccessfully communicated. For uncoded protocol versions, the ID field
+matches the flit ID of the affected unit; for network coded variants, it contains the same generation ID. However, it is desirable that the issuer of the
+\gls{arq} can specify the precise flits that need to be retransmitted from this unit. To indicate this, the payload field is used. For uncoded
+protocol versions, it contains a list of modes (i.e., the same values that are used for the mode header field) that specify the required flits. The
+\gls{arq}'s ID together with the mode values suffice to uniquely identify the flits in question\footnote{To be precise, it uniquely identifies the flits
+for the given sender-receiver pair.}. For the network coded protocol variants, the requested flits' \glspl{gev} are needed as well, so the \gls{arq}'s
+payload contains a list of \gls{gev}/mode pairs instead. However, in the network coded case, not all \glspl{gev} are necessarily known to the issuer
+since they are randomly selected by the sender of the original flits. For instance, only one flit from a generation might arrive at its destination
+while the others are lost in transit. Then, the receiver would have to issue an \gls{arq} for all other flits while only knowing one \gls{gev}. In
+such cases, the receiver would issue an \gls{arq} as usual, but include a list of \gls{gev}/mode pairs of those flits that have already arrived (i.e.,
+the inverse of the default method). It is then the original sender's responsibility to retrieve and resend all but the specified flits\footnote{To
+distinguish between \glspl{arq} specifying the missing/corrupted flits and \glspl{arq} specifying the received/intact flits, two different values for
+the mode field exist that indicate an \gls{arq}. Depending on the type of \gls{arq}, the appropriate one is used.}. In the protocol descriptions
+below, clarifying examples are included (Section \ref{sec:theprotocol}).
 
-When handling incoming flits from the network, there are two cases that trigger an \gls{arq} issuance. The first case is an integrity check
-failing as described above. The second case occurs when the temporal gap between the arrival of flits from the same transmission unit becomes too
-large. As the first flit from a particular unit arrives, a countdown timer is started that is associated with this unit. Upon receiving further
-flits belonging to the same unit, the timer is reset. Should it reach zero (i.e., a timeout occurs), the remaining flits from this transmission unit
-are assumed lost and an \gls{arq} is issued requesting their retransmission. 
+The number of allowed \glspl{arq} per transmission unit is limited to prevent network congestion. In the event that an \gls{arq} is required but the limit
+was already reached, the transmission unit is considered a failure and no further attempt to recover is made.
+
+When a particular network interface handles incoming flits from the network, there are two scenarios that trigger an \gls{arq} issuance. The first
+case is an integrity check failing. The second case occurs when the temporal gap between the arrival of flits from the same transmission unit becomes
+too large. As the first flit from a the unit arrives, a countdown timer is started that is associated with this unit. Upon receiving further flits
+belonging to the same unit, the timer is reset. Should it reach zero (i.e., a timeout occurs), the remaining flits from this transmission unit are
+assumed lost and an \gls{arq} is issued requesting their retransmission.
 
 Once an \gls{arq} is issued, the countdown timer for the affected transmission unit is reset. However, it is set to a higher value than the
-inter-arrival timout described above. Furthermore, the value depends on the position of the affected sender node in the network: it increases
-proportinally with the manhattan distance between the communication partners. This is done to account for the round trip time of the \gls{arq} and its
-answer.
+inter-arrival timeout described above. Moreover, the value depends on the Manhattan distance between the sender and receiver nodes in the network,
+with a longer distance resulting in a higher timeout value. This is done to account for the round trip time of the \gls{arq} and its
+answer. The exact timeout values are discussed in Chapter \ref{ch:implementation}.
+
+It is desirable to send out as little \glspl{arq} as necessary to keep the network load as low as possible. Furthermore, with a limited
+amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early. For instance, a timeout may
+occur while a \gls{mac} is currently being computed for another flit from the same transmission unit. On the one hand, if an \gls{arq} is issued for
+the missing flits immediately, but the integrity check for the received flits fails shortly after, an additional \gls{arq} may not be allowed due to
+the limit, causing the whole unit to fail. On the other hand, postponing the \gls{arq} too long may cause unreasonable increases in latency. As a
+middle ground, the issuance of \glspl{arq} is only postponed if other flits from the same transmission unit are currently being verified\footnote{More
+precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
+the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
+\gls{arq} as well, should the integrity check fail.
 
 \section{The Protocol}\label{sec:theprotocol}
 As mentioned in Section \ref{sec:protocolvariants}, three different communication schemes were envisioned, with the first two subdivided into uncoded
@@ -390,8 +426,17 @@ performed in the network interfaces.
 
 \subsection{Individual Authentication}\label{subsec:indauth}
 \subsubsection{Uncoded Variant}
-This protocol variant, uncoded individual authentication, is the simplest of the five schemes. A graphical overview of the steps for both sending to
-and receiving from the network is given in Figure \vref{fig:protchartindauth}.
+This protocol variant, uncoded individual authentication, is the simplest of the five schemes. Like all other variants, it features encryption and
+authentication of the data. Its name is derived from the way this is implemented: each data flit is individually authenticated and the \gls{mac} is
+transmitted in a separate flit. A graphical overview from the outside is shown in Figure \vref{fig:protflitdistindauth}, while the internal steps for
+both sending to and receiving from the network are given in Figure \vref{fig:protchartindauth}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-indauth}
+    \caption[short]{long}
+    \label{fig:protflitdistindauth}
+\end{figure}
 
 \begin{figure}
     \centering
@@ -452,14 +497,21 @@ Arriving flits are processed via the following procedures:
 \vspace{0.5\baselineskip}
 
 \Glspl{arq} are issued if the integrity check fails (as described above) or if the \gls{mac} flit does not arrive promptly after the data flit (or
-vice versa). An examplary sequence of events involving \glspl{arq} is depicted in Figure \vref{fig:singletimeoutindauthuc}. The exact timeout values
-are discussed in Chapter \ref{ch:implementation}.
+vice versa). Examplary sequences of events involving \glspl{arq} are depicted in Figures \vref{fig:singletimeoutindauthuc} and
+\vref{fig:verificationfailindauthuc}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{single-timeout-indauth-uc}
+    \includegraphics[width=0.8\textwidth]{single-timeout-indauth-uc}
     \caption[short]{long}
     \label{fig:singletimeoutindauthuc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{verification-fail-indauth-uc}
+    \caption[short]{long}
+    \label{fig:verificationfailindauthuc}
 \end{figure}
 
 \subsubsection{Network Coded Variant}
@@ -471,15 +523,6 @@ are discussed in Chapter \ref{ch:implementation}.
 \end{figure}
 % TODO: asterisk on coding steps, double asterisk on authenticate step, legend that says how many flits are needed and are output at these steps
 
-It is desirable to send out as little \glspl{arq} as necessary, as pointed out in Section \ref{subsec:arqretransmissions}. Furthermore, with a limited
-amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early. For instance, a timeout may
-occur while a \gls{mac} is currently being computed for another flit from the same transmission unit. On the one hand, if an \gls{arq} is issued for
-the missing flits immediately, but the integrity check for the received flits fails shortly after, an additional \gls{arq} may not be allowed due to
-the limit, causing the whole unit to fail. On the other hand, postponing the \gls{arq} too long may cause unreasonable increases in latency. As a
-middle ground, the issuance of \glspl{arq} is only postponed if another flit from the same transmission unit is currently being verified\footnote{More
-precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
-the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
-\gls{arq} should the integrity check fail.
 
 \subsection{Interwoven Authentication}\label{subsec:intauth}
 \subsubsection{Uncoded Variant}
