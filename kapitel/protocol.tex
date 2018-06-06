@@ -68,10 +68,10 @@ transmitted information. Uncoded flits have the following fields:
         unused for this thesis. Nevertheless, it is included in the flits since it affects their size.
     \item \textbf{Flit ID.} The flit ID is a 24 bit numeric identifier. Starting at zero, the IDs are incremented as more flits are generated.
         Similar to sequence numbers (e.g., as employed in \gls{tcp}), they are used to ensure that all flits arrive at the destined processing
-        elements in order. Furthermore, it is used to associate related flits. For instance, an encrypted data flit and the corresponding \gls{mac}
+        elements in order. Furthermore, the values are used to associate related flits. For instance, an encrypted data flit and the corresponding \gls{mac}
         flit have the same ID to express their correlation.
-    \item \textbf{Payload.} The payload carries the actual data that are transmitted with a flit. Its size is 64 bit as this is a common plaintext
-        size for block ciphers, such as the one used for this thesis, PRINCE \cite{borghoff12prince}.
+    \item \textbf{Payload.} The payload carries the actual data that are transmitted with a flit. Its size is 64 bit as this is a common block size
+        for ciphers, such as the one used for this thesis, PRINCE \cite{borghoff12prince}.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
@@ -120,7 +120,7 @@ While the functions $e_k(p)$ and $d_k(c)$ take a 64 bit long text as their argum
 function $a_k(f)$ is applied to complete flits, exceeding the block size. Therefore, $a_k(f)$ applies the cipher in conjunction with the \gls{cbcmac}
 mode of operation as explained below.
 
-\subsubsection{Drawbacks}
+\subsubsection{Drawbacks}\label{subsubsec:cryptodrawbacks}
 The integration of cryptographic operations inevitably entails a degradation of the network performance which manifests itself in higher transmission
 latencies and increased chip area requirements. There usually is a reversely proportional relation between performance and safety: as the level of security
 increases, the communication performance declines. In order to satisfy the protection goals of confidentiality and integrity, both encryption and
@@ -221,7 +221,7 @@ omitting the XOR operation for the encryption case.
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
-\cite[cf.][]{estream}. In terms of speed and size, they sometimes even surpass block ciphers. For example, the cipher \textit{Trivium}
+\cite[cf.][]{estream}. In terms of speed and size, they sometimes even surpass block ciphers. For example, the stream cipher \textit{Trivium}
 \cite{decanniere06trivium} is smaller than PRINCE and also able to encrypt up to 64 bit in one clock cycle \cite[8]{harttung17lightweightcrypto}.
 
 The reason stream ciphers were ultimately not considered for this thesis is twofold. First, they require keeping an internal state from which the
@@ -316,9 +316,10 @@ On the side of the receiver, the combinations are decoded to recover the origina
 destination to render decoding possible. Furthermore, the $G$ combinations have to be linearly independent. With a symbol size of 4 bit and randomly
 selected coefficients, they fulfill this condition with a probability of $\approx 93\%$ \cite[4]{franz18authdraft}\footnote{A larger symbol size would
 entail higher invertibility probabilities. For example, it is $>99\%$ for a symbol size of 8 bit \cite[4]{franz18authdraft}, but at the cost of the
-\gls{gev} size being doubled. Hence, 4 bit are deemed sufficient for this thesis.}. Should this condition be violated and prevent successful decoding,
-an \gls{arq} has to be issued. Otherwise, the receiver is able to decode the combinations by solving the system of linear equations established by the
-received flits' \glspl{gev} and payloads:
+\gls{gev} size being doubled. Hence, 4 bit are deemed sufficient for this thesis.}. Should this condition be violated, a different set of $G$ out of
+the $C$ combinations is used\footnote{In the rare case that decoding is unsuccessful for any $G$ of the $C$ combinations, this generation cannot be
+recovered. For the remainder of this thesis, it is assumed that the combinations are always linearly independent for simplicity.}. The receiver then
+decodes the combinations by solving the system of linear equations established by the received flits' \glspl{gev} and payloads:
 \[
     \begin{bmatrix}
         \beta_{0,\,0} & \cdots & \beta_{0,\,G-1} & q_{0,\,0} & \cdots & q_{0,\,P-1} \\
@@ -357,12 +358,37 @@ distinct IDs are at disposal. Should an overflow occur, the IDs simply restart a
 secret key with the affected receiver to further impede replay attacks.
 % TODO: correct biblatex entry for the draft paper
 
+\subsection{Transmission Units}
+The concept of transmission units spans all protocol variants. In general, it signifies a group of flits belonging together, which is indicated by
+having the same ID. For uncoded protocol versions, data flit and corresponding \gls{mac} flit (individual authentication) or first and second half of a
+split (interwoven authentication) belong to the same transmission unit. With network coding, it corresponds to the generations; it is used to refer to
+the set of combinations created from one generation together with any \glspl{mac} flits computed for these combinations.
+
+\subsection{Retransmissions}\label{subsec:arqretransmissions}
+Structure of ARQ: same header fields as uncoded flits in Section \ref{subsec:flitstructure}, mode field set to <arq>. Payload contains information on what
+needs to be retransmitted. For UC: payload contains the missing modes. For NC: FID field contains GID and payload contains the missing modes for each
+GEV of the generation. If not all GEVs are known by the receiver (timeout), then payload contains the GEV/mode pairs of what was received, and the
+sender has the responsibility to look up the missing ones.
+
+The number of allowed ARQs is limited per transmission unit. If ARQ is required but the limit is already reached → error, transmission failed.
+
+When handling incoming flits from the network, there are two cases that trigger an \gls{arq} issuance. The first case is an integrity check
+failing as described above. The second case occurs when the temporal gap between the arrival of flits from the same transmission unit becomes too
+large. As the first flit from a particular unit arrives, a countdown timer is started that is associated with this unit. Upon receiving further
+flits belonging to the same unit, the timer is reset. Should it reach zero (i.e., a timeout occurs), the remaining flits from this transmission unit
+are assumed lost and an \gls{arq} is issued requesting their retransmission. 
+
+Once an \gls{arq} is issued, the countdown timer for the affected transmission unit is reset. However, it is set to a higher value than the
+inter-arrival timout described above. Furthermore, the value depends on the position of the affected sender node in the network: it increases
+proportinally with the manhattan distance between the communication partners. This is done to account for the round trip time of the \gls{arq} and its
+answer.
+
 \section{The Protocol}\label{sec:theprotocol}
 As mentioned in Section \ref{sec:protocolvariants}, three different communication schemes were envisioned, with the first two subdivided into uncoded
 and network coded versions. The remainder of this section provides a comprehensive specification of all variants. The steps described are all
 performed in the network interfaces.
 
-\subsection{Individual Authentication}
+\subsection{Individual Authentication}\label{subsec:indauth}
 \subsubsection{Uncoded Variant}
 This protocol variant, uncoded individual authentication, is the simplest of the five schemes. A graphical overview of the steps for both sending to
 and receiving from the network is given in Figure \vref{fig:protchartindauth}.
@@ -374,8 +400,8 @@ and receiving from the network is given in Figure \vref{fig:protchartindauth}.
     \label{fig:protchartindauth}
 \end{figure}
 
-The sequence of actions for sending flits to the network (upper part of Figure \ref{fig:protchartindauth}) is as follows, in order:
-\begin{itemize}
+The sequence of actions for sending flits to the network (upper part of Figure \ref{fig:protchartindauth}) is as follows:
+\begin{enumerate}
     \item \textbf{Encrypt payload.} For each flit arriving from the processing element, the payload is encrypted using the shared secret key of the
         flit's destination node. The employed cipher is PRINCE (see Section \ref{subsubsec:prince}). Since the payload length matches the cipher's
         block size (64 bit), one encryption operation suffices. All header fields remain untouched.
@@ -385,15 +411,16 @@ The sequence of actions for sending flits to the network (upper part of Figure \
         \gls{cbcmac} is not secure for variable-length messages, where existential forgery is possible \cite{wikilengthextattack}. As the flits have a
         fixed length, this is not of concern here. However, an alternative algorithm such as \gls{cmac} could also be used.} because of its low
         complexity, resulting in a total of three required block encryptions. Since the last block would only contain 13 bit, it is
-        padded (e.g., with random bits) to align it with the block boundaries. The computed \gls{mac} has a length of 64 bit. To transmit it, a new, dedicated
+        padded (e.g., with zero-bits) to align it with the block boundaries. The computed \gls{mac} has a length of 64 bit. To transmit it, a new, dedicated
         \gls{mac} flit is created as follows: the mode field is set to \gls{mac}, the other header fields are copied from the data flit, and the
         \gls{mac} itself is inserted into the payload field\footnote{As data and \gls{mac} flit have the same ID, the receiver will be able to
         correctly link them together.}. Both flits are then sent out together. Figure \vref{fig:computeflitmac} elucidates this process.
     \item \textbf{Store copies in retransmission buffer.} Since \glspl{arq} may arrive to request retransmissions of already dispatched flits, the
-        sender stores a copy of each flit in a dedicated retransmission buffer before sending it to the network. Once the buffer is full, old flits
-        are replaced in a \gls{fifo} manner. Naturally, the buffer should be large enough to be able to serve flits for \glspl{arq} arriving within an
-        acceptable time frame after the original flit was dispatched. For simplicity, the buffer is assumed to be large enough here.
-\end{itemize}
+        sender stores a copy of each flit in a dedicated retransmission buffer before sending it to the network. The original flit is sent to the
+        network. Once the buffer is full, old flits are replaced in a \gls{fifo} manner\footnote{Naturally, the buffer should be large enough to be
+        able to serve flits for \glspl{arq} arriving within an acceptable time frame after the original flit was dispatched. For simplicity, the
+        buffer is assumed to be sufficiently large to handle all \glspl{arq}.}.
+\end{enumerate}
 \vspace{0.5\baselineskip}
 
 \begin{figure}
@@ -401,6 +428,38 @@ The sequence of actions for sending flits to the network (upper part of Figure \
     \includegraphics[width=\textwidth]{compute-flit-mac}
     \caption[short]{CBC-MAC. This corresponds to the function $a_k(f)$ in Section \ref{subsec:crypto}.}% TODO
     \label{fig:computeflitmac}
+\end{figure}
+
+Arriving flits are processed via the following procedures:
+\begin{enumerate}
+    \item \textbf{\Gls{arq} handling.} First, the mode field is examined to check whether the incoming flit is an \gls{arq}. If this is the case, its
+        payload contains information on the affected flits. Those are subsequently retrieved from the retransmission buffer to resend them to the
+        origin of the \gls{arq}, surmising that they will arrive safely this time. In the event of an unsuccessful buffer lookup (i.e., one or more of
+        the requested flits were already replaced by more recent ones) the \gls{arq} is discarded unanswered.
+    \item \textbf{Storing \gls{mac} flits.} If the arriving flit contains a \gls{mac} (as indicated by the mode field) the network interface buffers
+        it until the verification process with the corresponding data flit is conducted.
+    \item \textbf{Processing data flits.} The remaining flits (those not caught by the cases above) contain encrypted data. Their processing pipeline
+        divides into two branches here, so the flit is duplicated first. With one copy, a \gls{mac} is computed; this is the same procedure as the
+        authentication step for sending flits (see also Figure \vref{fig:computeflitmac}). The other copy is passed to decryption. The rationale for
+        executing these steps in parallel is outlined in Section \ref{subsubsec:cryptodrawbacks}.
+    \item \textbf{Verification.} Once the \gls{mac} is computed and the corresponding original \gls{mac} from the sender has arrived, they are
+        compared. If they are not identical, the integrity check has failed. Thus, the decrypted data flit has to be discarded as its integrity
+        cannot be guaranteed\footnote{It is possible that the data flit is still intact since the verification failure may have been caused through
+        the submitted \gls{mac} being modified in transit. Nevertheless, the receiver is unable to recognize this case and must assume a corrupted
+        data flit to be on the safe side.}. In the event of their equality, the integrity of the corresponding data is assured and the decrypted flit
+        is sent to the processing element.
+\end{enumerate}
+\vspace{0.5\baselineskip}
+
+\Glspl{arq} are issued if the integrity check fails (as described above) or if the \gls{mac} flit does not arrive promptly after the data flit (or
+vice versa). An examplary sequence of events involving \glspl{arq} is depicted in Figure \vref{fig:singletimeoutindauthuc}. The exact timeout values
+are discussed in Chapter \ref{ch:implementation}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{single-timeout-indauth-uc}
+    \caption[short]{long}
+    \label{fig:singletimeoutindauthuc}
 \end{figure}
 
 \subsubsection{Network Coded Variant}
@@ -412,7 +471,17 @@ The sequence of actions for sending flits to the network (upper part of Figure \
 \end{figure}
 % TODO: asterisk on coding steps, double asterisk on authenticate step, legend that says how many flits are needed and are output at these steps
 
-\subsection{Interwoven Authentication}
+It is desirable to send out as little \glspl{arq} as necessary, as pointed out in Section \ref{subsec:arqretransmissions}. Furthermore, with a limited
+amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early. For instance, a timeout may
+occur while a \gls{mac} is currently being computed for another flit from the same transmission unit. On the one hand, if an \gls{arq} is issued for
+the missing flits immediately, but the integrity check for the received flits fails shortly after, an additional \gls{arq} may not be allowed due to
+the limit, causing the whole unit to fail. On the other hand, postponing the \gls{arq} too long may cause unreasonable increases in latency. As a
+middle ground, the issuance of \glspl{arq} is only postponed if another flit from the same transmission unit is currently being verified\footnote{More
+precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
+the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
+\gls{arq} should the integrity check fail.
+
+\subsection{Interwoven Authentication}\label{subsec:intauth}
 \subsubsection{Uncoded Variant}
 \begin{figure}
     \centering
@@ -429,7 +498,7 @@ The sequence of actions for sending flits to the network (upper part of Figure \
     \label{fig:protchartintauthnc}
 \end{figure}
 
-\subsection{Full-Generation Authentication}
+\subsection{Full-Generation Authentication}\label{subsec:genauth}
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{protocol-chart-genauth-nc}
