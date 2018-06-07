@@ -8,8 +8,9 @@
 
 Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, fundamental
 assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
-mostly in the authentication scheme, the simplest one (uncoded individual authentication) is used to give a step-by-step explanation of the full
-protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual authentication.
+mostly in the authentication scheme and the application of network coding, the simplest one (uncoded individual authentication) is used to give a
+step-by-step explanation of the full protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual
+authentication.
 
 \section{Design Aspects}
 \subsection{Unicast And Multicast}
@@ -312,7 +313,8 @@ design, hence these values can simply be copied to the encoded flits.}. Figure \
 For this thesis, variants with $C = 3$ and $C = 4$ combinations per generation are investigated \cite[cf.][2]{moriam18activeattackers}. These schemes
 are referred to as \textit{G2C3} and \textit{G2C4}, respectively.
 
-On the side of the receiver, the combinations are decoded to recover the original flits. At least $G$ out of the $C$ combinations must arrive at their
+On the side of the receiver, the combinations\footnote{Henceforth, the term \textit{combination} is also used to refer to the flit containing a
+combination.} are decoded to recover the original flits. At least $G$ out of the $C$ combinations must arrive at their
 destination to render decoding possible. Furthermore, the $G$ combinations have to be linearly independent. With a symbol size of 4 bit and randomly
 selected coefficients, they fulfill this condition with a probability of $\approx 93\%$ \cite[4]{franz18authdraft}\footnote{A larger symbol size would
 entail higher invertibility probabilities. For example, it is $>99\%$ for a symbol size of 8 bit \cite[4]{franz18authdraft}, but at the cost of the
@@ -411,7 +413,7 @@ belonging to the same unit, the timer is reset. Should it reach zero (i.e., a ti
 assumed lost and an \gls{arq} is issued requesting their retransmission.
 
 Once an \gls{arq} is issued, the countdown timer for the affected transmission unit is reset. However, it is set to a higher value than the
-inter-arrival timeout described above. Moreover, the value depends on the Manhattan distance between the sender and receiver nodes in the network,
+inter-arrival timeout described above. Moreover, this value depends on the Manhattan distance between the sender and receiver nodes in the network,
 with a longer distance resulting in a higher timeout value. This is done to account for the round trip time of the \gls{arq} and its
 answer. The exact timeout values are discussed in Chapter \ref{ch:implementation}.
 
@@ -432,26 +434,26 @@ performed in the network interfaces.
 
 \subsection{Individual Authentication}\label{subsec:indauth}
 \subsubsection{Uncoded Variant}
-This protocol variant, uncoded individual authentication, is the simplest of the five schemes. Like all other variants, it features encryption and
+This protocol variant, \textit{uncoded individual authentication}, is the simplest of the five schemes. Like all other variants, it features encryption and
 authentication of the data. Its name is derived from the way this is implemented: each data flit is individually authenticated and the \gls{mac} is
-transmitted in a separate flit. A graphical overview from the outside is shown in Figure \vref{fig:protflitdistindauth}, while the internal steps for
-both sending to and receiving from the network are given in Figure \vref{fig:protchartindauth}.
+transmitted in a separate flit. A graphical overview from the outside is shown in Figure \vref{fig:protflitdistindauthuc}, while the internal steps for
+both sending to and receiving from the network are given in Figure \vref{fig:protchartindauthuc}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{protocol-flit-distributions-indauth}
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-indauth-uc}
     \caption[short]{long}
-    \label{fig:protflitdistindauth}
+    \label{fig:protflitdistindauthuc}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{protocol-chart-indauth}
+    \includegraphics[width=\textwidth]{protocol-chart-indauth-uc}
     \caption[short]{long}
-    \label{fig:protchartindauth}
+    \label{fig:protchartindauthuc}
 \end{figure}
 
-The sequence of actions for sending flits to the network (upper part of Figure \ref{fig:protchartindauth}) is as follows:
+The sequence of actions for sending flits to the network (upper part of Figure \ref{fig:protchartindauthuc}) is as follows:
 \begin{enumerate}
     \item \textbf{Encrypt payload.} For each flit arriving from the processing element, the payload is encrypted using the shared secret key of the
         flit's destination node. The employed cipher is PRINCE (see Section \ref{subsubsec:prince}). Since the payload length matches the cipher's
@@ -481,7 +483,7 @@ The sequence of actions for sending flits to the network (upper part of Figure \
     \label{fig:computeflitmac}
 \end{figure}
 
-Arriving flits are processed via the following procedures:
+Arriving flits are processed via the following procedures (lower portion of Figure \ref{fig:protchartindauthuc}):
 \begin{enumerate}
     \item \textbf{\Gls{arq} handling.} First, the mode field is examined to check whether the incoming flit is an \gls{arq}. If this is the case, its
         payload contains information on the affected flits. Those are subsequently retrieved from the retransmission buffer to resend them to the
@@ -503,14 +505,14 @@ Arriving flits are processed via the following procedures:
 \vspace{0.5\baselineskip}
 
 \Glspl{arq} are issued if the integrity check fails (as described above) or if the \gls{mac} flit does not arrive promptly after the data flit (or
-vice versa). Examplary sequences of events involving \glspl{arq} are depicted in Figures \vref{fig:singletimeoutindauthuc} and
+vice versa). Examplary sequences of events involving \glspl{arq} are depicted in Figures \vref{fig:timeoutindauthuc} and
 \vref{fig:verificationfailindauthuc}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{single-timeout-indauth-uc}
+    \includegraphics[width=0.8\textwidth]{timeout-indauth-uc}
     \caption[short]{long}
-    \label{fig:singletimeoutindauthuc}
+    \label{fig:timeoutindauthuc}
 \end{figure}
 
 \begin{figure}
@@ -521,25 +523,104 @@ vice versa). Examplary sequences of events involving \glspl{arq} are depicted in
 \end{figure}
 
 \subsubsection{Network Coded Variant}
+\textit{Network coded individual authentication} is the second of the five investigated protocol versions. As the name suggests, it simply adds a
+network coding layer to the uncoded variant described above. On the sender side, this layer is inserted after encryption and before authentication,
+resulting in the \glspl{mac} being computed over the combinations rather than the uncoded flits. Furthermore, it means that no network coding is
+performed over the \gls{mac} flits themselves. Consequently, on the receiver side, decoding needs to be performed before the data flits can be
+decrypted. For the verification process, no decoding is required. Figure \vref{fig:protflitdistindauthnc} provides an outside view of the network
+interface, while Figure \vref{fig:protchartindauthnc} shows the internal steps.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-indauth-nc}
+    \caption[short]{The processing of a transmission unit for network coded individual authentication (G2C3) from the outside.}
+    \label{fig:protflitdistindauthnc}
+\end{figure}
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{protocol-chart-indauth-nc}
     \caption[short]{long}
     \label{fig:protchartindauthnc}
 \end{figure}
-% TODO: asterisk on coding steps, double asterisk on authenticate step, legend that says how many flits are needed and are output at these steps
+% TODO: say in caption how many flits are needed and are output at coding steps
 
+This amounts to the following procedure for sending flits to the network:
+\begin{enumerate}
+    \item \textbf{Encrypt payload.} This is precisely the same step as in uncoded individual authentication.
+    \item \textbf{Encode generation.} At this stage, the added network coding layer comes in. Incoming flits are buffered in this component until two
+        with the same destination are available. Subsequently, network coding is applied to them, resulting in either three (G2C3) or four (G2C4)
+        combinations. The used \glspl{gev} and a new generation ID\footnote{The same generation ID is assigned to all combinations.} are stored in
+        their designated header fields. The combinations are then passed to the next step; the original flits are not sent out.
+    \item \textbf{Authenticate combinations.} The authentication procedure is virtually same as for uncoded individual authentication. The only
+        difference is that the \glspl{mac} are computed over combinations rather than uncoded flits (see Figure \vref{fig:computecombinationmac}
+        for a visualization of the algorithm)\footnote{Combinations and their \gls{mac} flits are linked by containing the same \gls{gev} value in
+        addition to having the same generation ID.}. Apart from that, each incoming combination is individually authenticated with a dedicated \gls{mac}
+        flit.
+    \item \textbf{Store copies in retransmission buffer.} Unchanged from the uncoded protocol variant, a copy of each flit (combinations and
+        \glspl{mac} alike) is stored in the retransmission buffer to facilitate \gls{arq} answers.
+\end{enumerate}
+\vspace{0.5\baselineskip}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{compute-combination-mac}
+    \caption[short]{CBC-MAC. This corresponds to the function $a_k(f)$ in Section \ref{subsec:crypto}.}% TODO
+    \label{fig:computecombinationmac}
+\end{figure}
+
+The following processing steps are performed for flits arriving from the network:
+\begin{enumerate}
+    \item \textbf{\Gls{arq} handling.} The same procedure as in uncoded individual authentication is performed here.
+    \item \textbf{Storing \gls{mac} flits.} Once more, the same actions as in uncoded individual authentication are executed.
+    \item \textbf{Processing data flits.} At this point, the protocol starts to differ. As before, the data flit is duplicated, with one copy being
+        used to compute its \gls{mac}. The other copy, however, cannot be decrypted yet because the flits are encoded. Hence, it is buffered until two
+        flits from the same generation are available, which are thereupon decoded. Afterwards, the resulting flits are decrypted as usual.
+    \item \textbf{Verification.} This step is similar to its counterpart in uncoded individual authentication, but not exactly the same. As there are
+        multiple verifications required for each transmission unit (one per combination), all of them have to succeed. Otherwise, both of the decoded
+        and decypted flits for the affected generation must be discarded; a corruption in one of the combinations results in an incorrect decoding. If
+        possible, it is retried with a different set of combinations for which the integrity checks have not failed. Once all verifications for the
+        combinations used to decode and decrypt the generation have succeeded, the obtained data flits are sent to the processing element.
+\end{enumerate}
+\vspace{0.5\baselineskip}
+
+\Glspl{arq} are issued for failing integrity checks or when timeouts occur, as illustrated in Figure \vref{fig:timeoutindauthnc}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{timeout-indauth-nc}
+    \caption[short]{long}
+    \label{fig:timeoutindauthnc}
+\end{figure}
 
 \subsection{Interwoven Authentication}\label{subsec:intauth}
 \subsubsection{Uncoded Variant}
+
+
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{protocol-chart-intauth}
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-intauth-uc}
     \caption[short]{long}
-    \label{fig:protchartintauth}
+    \label{fig:protflitdistintauthuc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{protocol-chart-intauth-uc}
+    \caption[short]{long}
+    \label{fig:protchartintauthuc}
 \end{figure}
 
 \subsubsection{Network Coded Variant}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-intauth-nc}
+    \caption[short]{long}
+    \label{fig:protflitdistintauthnc}
+\end{figure}
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{protocol-chart-intauth-nc}
@@ -548,11 +629,20 @@ vice versa). Examplary sequences of events involving \glspl{arq} are depicted in
 \end{figure}
 
 \subsection{Full-Generation Authentication}\label{subsec:genauth}
+
+
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{protocol-chart-genauth-nc}
+    \includegraphics[width=\textwidth]{protocol-flit-distributions-genauth}
     \caption[short]{long}
-    \label{fig:protchartgenauthnc}
+    \label{fig:protflitdistgenauth}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{protocol-chart-genauth}
+    \caption[short]{long}
+    \label{fig:protchartgenauth}
 \end{figure}
 
 \section{Routing Strategies}

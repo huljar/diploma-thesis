@@ -66,8 +66,41 @@ The simulator is implemented in C++ using the \textit{\omnet} framework \cite{om
 \subsection{Network Interface}
 % 1 paragraph per component
 % at the end: table with all components, their delay (cycles)
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{R|L}
+        Component & Delay in cycles \\\hline
+        Encryption/decryption & 2 \\
+        Encoding (G2C3) & 3 (1 per combination) \\
+        Encoding (G2C4) & 4 (1 per combination) \\
+        Authentication (individual) & 6 \\
+        Authentication (interwoven) & 5 \\
+        Authentication (full gen.) & 10 \\
+        Storing flit in \gls{rtb} & 1 \\
+        Decoding & 2 (1 per flit) \\
+        Comparing \glspl{mac} & 1 \\
+        Composing an \gls{arq} & 1 \\
+        \Gls{rtb} lookup & 2 (uncoded), 3 (coded)
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:processinglatencies}
+\end{table}
+
 \subsection{Routers}
 % Only input buffers → single cycle routing
 % Routing is only performed when receiving router's input queue is not full
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{R|L}
+        Transmission & Delay in cycles \\\hline
+        PE ←→ NI & 1 \\
+        NI ←→ Router & 1 \\
+        Router ←→ Router & 1
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:transmissionlatencies}
+\end{table}
 
 \section{Configurable Parameters}

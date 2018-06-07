@@ -16,4 +16,6 @@
     \item Usage of ECC (error correcting codes) to potentially reduce number of ARQs (at least for accidental bit flips)
     \item Security of the encryption → we kind of use ECB here which is not secure → e.g. a nonce is needed? or the flits need to be chained with some
         mode of operation like CBC or CTR → CBC requires no residual errors
+    \item Mixing G2C3 and G2C4 -- e.g. once a network interface detects that it receives an unusually high amount of ARQs, indicating a very
+        unreliable network, network coding could be \enquote{upgraded} from G2C3 to G2C4, so it is not statically one or the other
 \end{itemize}
