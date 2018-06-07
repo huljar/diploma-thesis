@@ -1,11 +1,3 @@
-%To accomplish the goals 
-
-%This chapter will illuminate the details of how encryption, authentication, network coding, and ARQ management are implemented in the network
-%interfaces.
-
-%Recall that the architecture of a \gls{noc} consists of a router grid with each node connected to a local processing element through a network
-%interface (cf. Figure \vref{fig:nocexample}). The 
-
 Over the course of this chapter, the design of the communication protocol in all variants will be thorougly explained. To begin, fundamental
 assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
 mostly in the authentication scheme and the application of network coding, the simplest one (uncoded individual authentication) is used to give a
@@ -434,7 +426,7 @@ performed in the network interfaces.
 
 \subsection{Individual Authentication}\label{subsec:indauth}
 \subsubsection{Uncoded Variant}
-This protocol variant, \textit{uncoded individual authentication}, is the simplest of the five schemes. Like all other variants, it features encryption and
+This protocol variant, \textit{uncoded individual authentication}, is the simplest of the five schemes. Like all variants, it features encryption and
 authentication of the data. Its name is derived from the way this is implemented: each data flit is individually authenticated and the \gls{mac} is
 transmitted in a separate flit. A graphical overview from the outside is shown in Figure \vref{fig:protflitdistindauthuc}, while the internal steps for
 both sending to and receiving from the network are given in Figure \vref{fig:protchartindauthuc}.
@@ -595,7 +587,21 @@ The following processing steps are performed for flits arriving from the network
 
 \subsection{Interwoven Authentication}\label{subsec:intauth}
 \subsubsection{Uncoded Variant}
+The third scheme in the protocol repertoire is \textit{uncoded interwoven authentication}. Just like the first approach presented in the previous
+section (uncoded individual authentication), it facilitates encryption and authentication of the transmitted information. While overall providing the
+same features, the key difference lies in the way that flits are authenticated and how this information is consolidated in the flits for transmission.
+The goal is to have the data and its authentication information within the same flit to allow receivers to immediately begin the verification process
+upon its arrival. However, since the payload size is still limited to 64 bit, a \gls{mac} cannot simply be appended to the data. The implemented
+solution is to split the payload in the middle after encryption and moving the second half to a new flit (with the same header fields). Consequently,
+both flits contain 32 bit of data and have another 32 bit available for the authentication information. Since they both have the same flit ID to link
+them together, the mode field is used to distinguish them (by setting different values for the first and second split, respectively).
 
+A normal \gls{mac}, as used in individual authentication, has a size of 64 bit by design. Thus, the authentication scheme has to be adapted. This is
+where the concept of \textit{authcodes} comes in (cite authcode paper here). The key idea is to first compute a \gls{mac} as before, but then use it
+as a key to create an authcode of half its size (i.e., 32 bit -- precisely the number of available bits).
+% TODO: how are authcodes secure? if an attacker has a chance of 0.5 to flip a bit without this being detected?
+
+to having a dedicated, separate \gls{mac} flit. However, since the payload size is still 64 bit, it cannot hold 
 
 \begin{figure}
     \centering
@@ -629,7 +635,8 @@ The following processing steps are performed for flits arriving from the network
 \end{figure}
 
 \subsection{Full-Generation Authentication}\label{subsec:genauth}
-
+The fifth and final protocol variant is \textit{full-generation authentication}. In contrast to individual and interwoven authentication, it only
+exists in a network form.
 
 \begin{figure}
     \centering
