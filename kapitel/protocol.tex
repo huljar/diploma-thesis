@@ -389,11 +389,17 @@ for the given sender-receiver pair.}. For the network coded protocol variants, t
 payload contains a list of \gls{gev}/mode pairs instead. However, in the network coded case, not all \glspl{gev} are necessarily known to the issuer
 since they are randomly selected by the sender of the original flits. For instance, only one flit from a generation might arrive at its destination
 while the others are lost in transit. Then, the receiver would have to issue an \gls{arq} for all other flits while only knowing one \gls{gev}. In
-such cases, the receiver would issue an \gls{arq} as usual, but include a list of \gls{gev}/mode pairs of those flits that have already arrived (i.e.,
+such cases, the receiver issues an \gls{arq} as usual, but includes a list of \gls{gev}/mode pairs of those flits that have already arrived (i.e.,
 the inverse of the default method). It is then the original sender's responsibility to retrieve and resend all but the specified flits\footnote{To
 distinguish between \glspl{arq} specifying the missing/corrupted flits and \glspl{arq} specifying the received/intact flits, two different values for
 the mode field exist that indicate an \gls{arq}. Depending on the type of \gls{arq}, the appropriate one is used.}. In the protocol descriptions
 below, clarifying examples are included (Section \ref{sec:theprotocol}).
+
+The payload field is not always large enough to carry all the required information. One \gls{gev}/mode pair is $8+4=12$ bit in size, allowing for up to
+5 pairs to fit into the 64 bit payload. For example, with G2C4 and individual authentication, a transmission unit consists of the four combinations
+and their four \gls{mac} flits, which exceeds the number of flits that may be specified within a single \gls{arq}. As a solution, special mode values
+are introduced that represent multiple flits for the same \gls{gev} (e.g., both data and \gls{mac} flit). Thus, for the example above, only four
+\gls{gev}/mode pairs are required at maximum (one for each \gls{gev} of the generation), totaling in $4\cdot(8+4)=48$ bit of information.
 
 The number of allowed \glspl{arq} per transmission unit is limited to prevent network congestion. In the event that an \gls{arq} is required but the limit
 was already reached, the transmission unit is considered a failure and no further attempt to recover is made.
