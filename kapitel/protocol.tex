@@ -100,7 +100,8 @@ illustrate how flits are processed. They are denoted by variables, functions, an
     \item $k$ is a key (with $k_e$ and $k_m$ referring to encryption and \gls{mac} keys),
     \item $f$ is a complete flit (header and payload),
     \item $r$ is an authenticated and encrypted message,
-    \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$,
+    \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$ (sometimes denoted by a lock
+        symbol),
     \item $d_k(c)$ is a decryption function that takes a ciphertext $c$ and produces the plaintext $p$ using key $k$,
     \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$\footnote{The whole flit is
         authenticated, as opposed to just the payload, to provide integrity on the header fields as well.},
@@ -840,6 +841,18 @@ When a failed integrity check triggers an \gls{arq} issuance, both combinations 
 issued on timeouts as per usual.
 
 \section{Routing Strategies}
+A strong emphasis of this thesis lies on the exploration of the usage of multiple paths. Recalling that the topology of the \gls{noc} is a 2D mesh,
+there is a multitude of possible paths to reach a destination from a particular source node.
+
+An overview of the explored routing strategies and their characteristics is given in Figure \vref{fig:routingcharacteristics}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{routing-characteristics}
+    \caption[Routing strategies by category]{Different routing strategies categorized by their characteristics.}
+    \label{fig:routingcharacteristics}
+\end{figure}
+
 Mention the perceived/envisioned advantages of adaptive routing (different paths for each flit within the same sender-receiver pair → thanks
 to NC enough flits will arrive hopefully even if one path contains a corrupted router).
 
