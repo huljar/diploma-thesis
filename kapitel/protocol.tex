@@ -851,8 +851,8 @@ When a failed integrity check triggers an \gls{arq} issuance, both combinations 
 \gls{mac} are requested. This is necessary since the receiver cannot know which one of them was modified in transit. Furthermore, \glspl{arq} are
 issued on timeouts as per usual.
 
-\section{Routing Strategies}
-A core aspect of this thesis is the exploration of the different routing strategies and their effects on the performance and reliability of
+\section{Routing}
+A core aspect of this thesis is the exploration of different routing strategies and their effects on the performance and reliability of
 the network. Several routing strategies with different path selection algorithms are investigated. Recalling that the topology of the
 \gls{noc} is a 2D mesh, there is a multitude of possible paths to reach a destination from a particular source node. Figure \vref{fig:pathexamples}
 illustrates some exemplary ones\footnote{The processing elements and network interfaces are omitted for illustration purposes.}.
@@ -867,32 +867,33 @@ illustrates some exemplary ones\footnote{The processing elements and network int
 
 To narrow down the set of considered paths, only those with a minimal Manhattan distance between source and destination are examined. Consequently, this
 leaves only one viable path when the source and destination nodes lie on the same row or column of the mesh. Else, they still have multiple minimal
-paths at disposal. The path selection methods described in this chapter thus only apply to those source-destination node pairs lying on different
+routes at disposal. The path selection methods described in this section thus only apply to those source-destination node pairs lying on different
 rows and columns of the mesh. As the title of this thesis suggests, making use of the full bandwidth of available paths by selecting them
 independently for each flit is of particular interest here.
 
 \subsection{Characteristics And Classification}
-Routing strategies are classified according to their properties. The following list and Figure \ref{fig:routingcharacteristics} explain the important
+Routing strategies may be classified according to their properties. The following list and Figure \ref{fig:routingcharacteristics} explain the important
 characteristics and the distinctions between them.
 \begin{itemize}
-    \item \textbf{Oblivious vs. adaptive.} When the source or an intermediate node decides on the next hop of the route, it may take the current
-        network state into account. For instance, a congestion detected on the northern port may dissuade the router from forwarding the flit in this
-        direction and instead use a different port, as long as the resulting route is still minimal. With this adaptive behaviour, the path is
-        influenced by the network state and thus a different path may be chosen at a later point in time. In contrast, an oblivious strategy does not
-        take the network state into consideration; in case of a congestion, forwarding of the flit is delayed until it is resolved. The oblivious
-        strategies explored here are \gls{dor} (Section \ref{subsec:dor}) and \gls{romm} (Section \ref{subsec:romm}), while \gls{dm} (Section
-        \ref{subsec:dm}) and \gls{ramm} (Section \ref{subsec:ramm}) are adaptive.
-    \item \textbf{Static vs. dynamic.} Static path selection implies that exactly one fixed, deterministically chosen path exists for each
-        pair of source and destination node. A dynamic strategy entails a path being selected for each flit individually at runtime. Consequently,
-        static strategies are always oblivious and adaptive ones are always dynamic. Since the emphasis lies on the usage of multiple paths, the only
-        investigated static strategy is \gls{dor}, serving as a baseline for comparison with the other ones.
+    \item \textbf{Oblivious vs. adaptive.} When the source or an intermediate node decides on the next hop of a route, it may take the current
+        network state into account. For instance, a congestion detected on the preferred port\footnote{Congestion is detected by inspecting the length
+        of the neighboring router's input queue for the appropriate port; if it is full, the link to this router is viewed as congested. The details
+        of this process are explained in Section (insert ref here).} may dissuade the router from forwarding the flit in this direction and instead
+        use a different port, as long as the resulting route is still minimal. If the network state influences the routing decision, the strategy is
+        adaptive. In contrast, an oblivious one does not take the state into consideration. In case of a congestion, forwarding of the flit is delayed
+        until the path is available again. The oblivious strategies explored here are \gls{dor} and \gls{romm}, while \gls{dm} and \gls{ramm} are
+        adaptive. They are described in Section \ref{subsec:routingstrategies} below.
+    \item \textbf{Static vs. dynamic.} A static strategy implies that exactly one fixed, deterministically chosen path exists for each pair of source
+        and destination node. A dynamic one entails a path being selected for each flit individually at runtime. Consequently, static strategies are
+        always oblivious and adaptive ones are always dynamic. Since the emphasis lies on the usage of multiple paths, the only investigated static
+        strategy is \gls{dor}, serving as a baseline for comparison with the other ones.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{routing-characteristics}
-    \caption[Routing strategies by category]{Various routing strategies categorized by their characteristics.}
+    \caption[Routing strategies by category]{The evaluated routing strategies categorized by their characteristics.}
     \label{fig:routingcharacteristics}
 \end{figure}
 
@@ -900,50 +901,89 @@ The main benefit of dynamic strategies presents itself when used in combination 
 members of the same generation are likely to take diverging paths (as long as source and destination lie on different rows and columns of the
 \gls{noc}). Thus, if malicious routers are situated within the rectangle spanned by source and destination, the variety of paths may enable a portion
 of the flits to circumvent them, allowing for successful decoding even if the others are modified. Figure \vref{fig:circumventattackers} exemplifies
-this scenario with the network coded interwoven authentication protocol (G2C3).
+this scenario with the network coded interwoven authentication protocol.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{circumvent-attackers}
     \caption[Example of dynamic routing dodging malicious routers]{Example of a \gls{noc} with two malicious routers and a generation being
     transmitted via the network coded interwoven authentication protocol (G2C3) and dynamic routing. While flit 1 is modified by a malicious router,
-    the paths of flits 2 and 3 to not include an attacker, enabling the destination node to successfully decode the generation. With \gls{dor}, every
+    the paths of flits 2 and 3 do not include an attacker, enabling the destination node to successfully decode the generation. With \gls{dor}, every
     flit would use path 1, enabling the malicious router to corrupt all of them.}
     \label{fig:circumventattackers}
 \end{figure}
 
-Furthermore, adaptive strategies may enable routers to circumvent congestions and entail a more uniform distribution of the traffic over the network.
+Adaptive strategies enable routers to circumvent congested paths as long as an alternative route is available. Their purpose is to reduce latencies in
+saturated networks and produce a more uniform distribution of the traffic over the network.
 
-Mention the perceived/envisioned advantages of dynamic routing (different paths for each flit within the same sender-receiver pair → thanks
-to NC enough flits will arrive hopefully even if one path contains a corrupted router).
+\subsection{Explored Strategies}\label{subsec:routingstrategies}
+\subsubsection{Dimension Order}\label{subsubsec:dor}
+\textit{Dimension Order Routing (\gls{dor})}, sometimes referred to as \textit{XY Routing}, is an oblivious, static routing strategy. Flits are first
+forwarded along the rows of the mesh (the X dimension) until they arrive at the column that their destination is situated in. Then, they are routed
+along this column (the Y dimension) until reaching their target. This is the simplest of the examined strategies and used as a baseline for the
+evaluation of the other ones. Exemplary paths are depicted in Figure \ref{fig:allstrategiespaths}a.
 
-Adaptive: take network state into account at each intermediate router when deciding the next hop. Mention that routers have input queues which may
-become full → details in Chapter 6. Adaptivity: routers are aware of the neighboring router's input queue status, try to use a path where the queue is
-not full
+Due to its simplicity, this strategy can be implemented in routers without increasing their complexity, and thus their occupied chip area, by a lot.
+However, its performance deteriorates considerably under heavy network loads \cite[3]{nesson95romm}. Furthermore, it does not offer the advantages of
+multipath routing described above.
 
-\subsection{Dimension Ordered}\label{subsec:dor}
-\textit{Dimension Order Routing}
+\subsubsection{Dynamic Minimal}\label{subsubsec:dm}
+The second strategy of interest is \textit{Dynamic Minimal Routing (\gls{dm})}. When a router has multiple options for the next hop of a flit, it checks
+the congestion status of the viable output ports. In a 2D mesh, at most two directions are allowed in order for the path to remain minimal. If both
+are free, one of them is chosen at random. If only one of them is uncongested, it is always selected. In the event of both viable paths being blocked,
+the flit is held back until one of them becomes available. These steps are performed by every router along the flit's path. Figure
+\ref{fig:allstrategiespaths}b shows a few of the possible paths.
 
-The term \enquote{XY routing} stems directly from the behavior of the routers: flits are only routed along the X axis until they arrive in the column
-that the receiver lies in, at which they are routed along the Y axis until reaching the receiver node.
-% TODO: figure with a 2D mesh, X and Y arrows on the sides, example path marked for a transmission
-\subsection{Dynamic Minimal}
-\subsection{Randomized Oblivious Multi-Phase Minimal}
-% Both with XY phases and DSR phases
-This strategy essentially splits the routing problem into two phases: find a path from sender to proxy node and from proxy to receiver. For each
-phase, one of the aforementioned strategies can be applied as is.
+The adaptiveness of this scheme allows for the possibility to dodge saturated areas of the network. Together with the random selections in the
+intermediate routers, it facilitates the use of multiple paths for each pair of source and destination node. However, it requires a random number
+generator to be integrated into the routers, increasing their hardware complexity.
 
-\subsection{Dynamic Minimal}\label{subsec:dm}
+\subsubsection{Randomized Oblivious Multi-Phase Minimal}\label{subsubsec:romm}
+\textit{Randomized Oblivious Multi-Phase Minimal Routing (\gls{romm})} is a class of routing algorithms originally designed as a compromise between
+static, minimal and randomized, non-minimal routing \cite[3]{nesson95romm}. The central idea is to have the source select $n$ nodes at random
+through which the flit must be routed, essentially dividing the path into multiple independent segments (hence the name \enquote{multi-phase}). To
+preserve minimality, each node $i\ |\ i \in [1,n]$ must lie within the rectangle spanned by node $i-1$ and the destination\footnote{For uniformity,
+node $0$ is defined as the source node.}. \Gls{dor} is employed to route the flit from node $i-1$ to $i\ |\ i \in [1,n]$ and from $n$ to the
+destination. Since \gls{dor} is oblivious and the selection of the intermediate nodes is not influenced by the network state, \gls{romm} is oblivious
+as well.
 
-\subsection{Randomized Oblivious Multi-Phase Minimal}\label{subsec:romm}
+For this thesis, the version with $n = 1$ intermediate nodes is employed. The name \textit{\gls{romm}} will henceforth be used to refer to this
+specific algorithm rather than the whole class. In other words, the source chooses one intermediate node from the rectangle spanned by it and
+the destination; then \gls{dor} is used for the path from source to intermediate and from intermediate to destination\footnote{As the intermediate
+node is selected by the source, this information needs to be transmitted along with the flit to render this strategy possible. This increases the flit
+size by 8 bit (4 bit X and 4 bit Y coordinate, see Section \ref{subsec:flitstructure}). To maintain uniformity, the increase is ignored here. The
+number of input blocks for the authentication ciphers is not affected; the padding is simply 8 bit shorter.}. An example is given in Figure
+\ref{fig:allstrategiespaths}c.
 
-\subsection{Randomized Adaptive Multi-Phase Minimal}\label{subsec:ramm}
+\Gls{romm} provides a middle ground between \gls{dor} and \gls{dm}. Random number generation is still required, but only needs to be performed by the
+source instead of every node along the flit's path.
+
+\subsubsection{Randomized Adaptive Multi-Phase Minimal}\label{subsubsec:ramm}
+With \gls{romm} providing dynamic routing, but in an oblivious manner, the creation of an adaptive version suggested itself. Thus, \textit{Randomized
+Adaptive Multi-Phase Minimal Routing (\gls{ramm})} was designed. It is very similar to \gls{romm} and employs the same approach to select an
+intermediate node. However, during the individual phases, \gls{dm} is used instead of \gls{dor} to introduce a certain degree of adaptiveness to the
+algorithm. Note that the selection of the intermediate node is still oblivious to the network state. Figure \ref{fig:allstrategiespaths}d depicts an
+exemplary path for this strategy.
+
+\begin{figure}
+    \includegraphics[width=0.22\textwidth]{routing-example-dor}\hfill
+    \includegraphics[width=0.22\textwidth]{routing-example-dm}\hfill
+    \includegraphics[width=0.22\textwidth]{routing-example-romm}\hfill
+    \includegraphics[width=0.22\textwidth]{routing-example-ramm}\\
+    \vspace{0.5\baselineskip}
+    \begin{footnotesize}
+        \hspace*{0.08\textwidth}\textbf{(a)}\hfill\textbf{(b)}\hfill\textbf{(c)}\hfill\textbf{(d)}\hspace*{0.08\textwidth}
+    \end{footnotesize}
+    \caption[Exemplary paths for the examined routing strategies]{Exemplary paths for each of the examined routing strategies: (a) \gls{dor}, (b)
+    \gls{dm}, (c) \gls{romm}, (d) \gls{ramm}. The nodes labeled with Z represent the randomly selected intermediate nodes for the multi-phase
+    strategies.}
+    \label{fig:allstrategiespaths}
+\end{figure}
 
 \iffalse
 \begin{itemize}
     \item Routing Strategies
         \begin{itemize}
-            \item Mention routing is general, we are special case of 2D mesh with uniform edge weights → much simpler than arbitrary networks
             \item XY/YX
                 \begin{itemize}
                     \item Deterministic path
