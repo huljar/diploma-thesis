@@ -2,7 +2,7 @@ Over the course of this chapter, the design of the communication protocol in all
 assumptions about the environment and basic building blocks of the protocol are presented. Since the protocol variants share many elements and differ
 mostly in the authentication scheme and the application of network coding, the simplest one (uncoded individual authentication) is used to give a
 step-by-step explanation of the full protocol. Following this, the other variants are described by drawing upon the differences to uncoded individual
-authentication.
+authentication. Finally, the routing strategies that are explored in conjunction with the protocol are elaborated.
 
 \section{Design Aspects}
 \subsection{Unicast And Multicast}
@@ -600,7 +600,7 @@ The following processing steps are performed for flits arriving from the network
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{timeout-indauth-nc}
+    \includegraphics[width=0.8\textwidth]{timeout-indauth-nc}
     \caption[Example flow chart for network coded ind. auth. with many losses]{Example flow chart for network coded individual authentication showing
     a sender and a receiver attempting to communicate a single transmission unit. After half the flits are lost in transit, a timeout occurs. Since
     the receiver does not know the \gls{gev} of the third data/\gls{mac} pair, the subsequent \gls{arq} specifies which flits have already arrived.
@@ -762,7 +762,18 @@ The network interface employs the following procedures to handle flits arriving 
 \vspace{0.5\baselineskip}
 
 As in the uncoded variant, \glspl{arq} only need to request one flit in the event of an integrity breach. For timeouts, the same rules as for the
-other variants apply.
+other variants apply. An example is given in Figure \vref{fig:verificationfailintauthnc}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{verification-fail-intauth-nc}
+    \caption[Example flow chart for network coded int. auth. with integrity breach]{Example flow chart for network coded interwoven authentication
+    with a sender and a receiver attempting to communicate a single transmission unit. The second flit is modified in transit, triggering an \gls{arq}
+    to request its retransmission. Furthermore, the already decoded, merged, and decrypted flit has to be discarded and the process is retried with
+    flits 1 and 3. With the integrity check for flit 3 succeeding, flit 2 becomes obsolete and the modification of its retransmission does not
+    matter.}
+    \label{fig:verificationfailintauthnc}
+\end{figure}
 
 \subsection{Full-Generation Authentication}\label{subsec:genauth}
 The fifth and final protocol variant is \textit{full-generation authentication}. In contrast to individual and interwoven authentication, it only
@@ -841,22 +852,76 @@ When a failed integrity check triggers an \gls{arq} issuance, both combinations 
 issued on timeouts as per usual.
 
 \section{Routing Strategies}
-A strong emphasis of this thesis lies on the exploration of the usage of multiple paths. Recalling that the topology of the \gls{noc} is a 2D mesh,
-there is a multitude of possible paths to reach a destination from a particular source node.
-
-An overview of the explored routing strategies and their characteristics is given in Figure \vref{fig:routingcharacteristics}.
+A core aspect of this thesis is the exploration of the different routing strategies and their effects on the performance and reliability of
+the network. Several routing strategies with different path selection algorithms are investigated. Recalling that the topology of the
+\gls{noc} is a 2D mesh, there is a multitude of possible paths to reach a destination from a particular source node. Figure \vref{fig:pathexamples}
+illustrates some exemplary ones\footnote{The processing elements and network interfaces are omitted for illustration purposes.}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{routing-characteristics}
-    \caption[Routing strategies by category]{Different routing strategies categorized by their characteristics.}
+    \includegraphics[width=0.9\textwidth]{path-examples}
+    \caption[Examples of different paths between two nodes]{Example of different possible paths through a 2D mesh \gls{noc} for a particular source
+    and destination node pair. Paths 2 and 3 have the minimal Manhattan distance of 4 hops.}
+    \label{fig:pathexamples}
+\end{figure}
+
+To narrow down the set of considered paths, only those with a minimal Manhattan distance between source and destination are examined. Consequently, this
+leaves only one viable path when the source and destination nodes lie on the same row or column of the mesh. Else, they still have multiple minimal
+paths at disposal. The path selection methods described in this chapter thus only apply to those source-destination node pairs lying on different
+rows and columns of the mesh. As the title of this thesis suggests, making use of the full bandwidth of available paths by selecting them
+independently for each flit is of particular interest here.
+
+\subsection{Characteristics And Classification}
+Routing strategies are classified according to their properties. The following list and Figure \ref{fig:routingcharacteristics} explain the important
+characteristics and the distinctions between them.
+\begin{itemize}
+    \item \textbf{Oblivious vs. adaptive.} When the source or an intermediate node decides on the next hop of the route, it may take the current
+        network state into account. For instance, a congestion detected on the northern port may dissuade the router from forwarding the flit in this
+        direction and instead use a different port, as long as the resulting route is still minimal. With this adaptive behaviour, the path is
+        influenced by the network state and thus a different path may be chosen at a later point in time. In contrast, an oblivious strategy does not
+        take the network state into consideration; in case of a congestion, forwarding of the flit is delayed until it is resolved. The oblivious
+        strategies explored here are \gls{dor} (Section \ref{subsec:dor}) and \gls{romm} (Section \ref{subsec:romm}), while \gls{dm} (Section
+        \ref{subsec:dm}) and \gls{ramm} (Section \ref{subsec:ramm}) are adaptive.
+    \item \textbf{Static vs. dynamic.} Static path selection implies that exactly one fixed, deterministically chosen path exists for each
+        pair of source and destination node. A dynamic strategy entails a path being selected for each flit individually at runtime. Consequently,
+        static strategies are always oblivious and adaptive ones are always dynamic. Since the emphasis lies on the usage of multiple paths, the only
+        investigated static strategy is \gls{dor}, serving as a baseline for comparison with the other ones.
+\end{itemize}
+\vspace{0.5\baselineskip}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{routing-characteristics}
+    \caption[Routing strategies by category]{Various routing strategies categorized by their characteristics.}
     \label{fig:routingcharacteristics}
 \end{figure}
 
-Mention the perceived/envisioned advantages of adaptive routing (different paths for each flit within the same sender-receiver pair → thanks
+The main benefit of dynamic strategies presents itself when used in combination with a network coded protocol. Since each flit is routed individually,
+members of the same generation are likely to take diverging paths (as long as source and destination lie on different rows and columns of the
+\gls{noc}). Thus, if malicious routers are situated within the rectangle spanned by source and destination, the variety of paths may enable a portion
+of the flits to circumvent them, allowing for successful decoding even if the others are modified. Figure \vref{fig:circumventattackers} exemplifies
+this scenario with the network coded interwoven authentication protocol (G2C3).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{circumvent-attackers}
+    \caption[Example of dynamic routing dodging malicious routers]{Example of a \gls{noc} with two malicious routers and a generation being
+    transmitted via the network coded interwoven authentication protocol (G2C3) and dynamic routing. While flit 1 is modified by a malicious router,
+    the paths of flits 2 and 3 to not include an attacker, enabling the destination node to successfully decode the generation. With \gls{dor}, every
+    flit would use path 1, enabling the malicious router to corrupt all of them.}
+    \label{fig:circumventattackers}
+\end{figure}
+
+Furthermore, adaptive strategies may enable routers to circumvent congestions and entail a more uniform distribution of the traffic over the network.
+
+Mention the perceived/envisioned advantages of dynamic routing (different paths for each flit within the same sender-receiver pair → thanks
 to NC enough flits will arrive hopefully even if one path contains a corrupted router).
 
-\subsection{Dimension Order}
+Adaptive: take network state into account at each intermediate router when deciding the next hop. Mention that routers have input queues which may
+become full → details in Chapter 6. Adaptivity: routers are aware of the neighboring router's input queue status, try to use a path where the queue is
+not full
+
+\subsection{Dimension Ordered}\label{subsec:dor}
 \textit{Dimension Order Routing}
 
 The term \enquote{XY routing} stems directly from the behavior of the routers: flits are only routed along the X axis until they arrive in the column
@@ -867,6 +932,12 @@ that the receiver lies in, at which they are routed along the Y axis until reach
 % Both with XY phases and DSR phases
 This strategy essentially splits the routing problem into two phases: find a path from sender to proxy node and from proxy to receiver. For each
 phase, one of the aforementioned strategies can be applied as is.
+
+\subsection{Dynamic Minimal}\label{subsec:dm}
+
+\subsection{Randomized Oblivious Multi-Phase Minimal}\label{subsec:romm}
+
+\subsection{Randomized Adaptive Multi-Phase Minimal}\label{subsec:ramm}
 
 \iffalse
 \begin{itemize}
