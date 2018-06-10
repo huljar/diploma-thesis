@@ -1,71 +1,38 @@
-Following the design phase of the communication protocol (cf. Chapter \ref{ch:protocol}), it is crucial to verify its correctness, i.e. that it works as
-intended. Furthermore, extensive performance evaluations need to be conducted to check the practicality of the devised techniques. Both of these tasks
-are achieved through extensive simulations. For this purpose, a dedicated, cycle-accurate simulator was implemented that supports all aspects of the
-protocol.
+Following the design phase, it is crucial to test the protocol in a practical environment in order to verify that it works as intended. Furthermore,
+extensive performance evaluations need to be conducted to assure the viability of the devised techniques. Both of these tasks are achieved through
+thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was implemented that supports the designed protocol with all its
+features as described in Chapter \ref{ch:protocol}.
 
-The simulator is implemented in C++ using the \textit{\omnet} framework \cite{omnet}.
+The simulator is written in C++ and based on the \textit{\omnet} discrete event simulation framework \cite{omnet}. \omnet provides a general-purpose
+network simulation architecture and promotes a modular design. In general, it allows the programmer to define the components of the network via a
+special scripting language called \textit{NED}. With NED files, modules may be specified as they appear from the outside, by means of parameters,
+gates, and connections. Furthermore, a module is allowed to have any number of submodules, facilitating a hierarchical structure. A C++
+class is assigned to each module that controls the component's internal behavior together with the parameters. The gates define the ports of the
+module through which it sends and receives messages. The connections link the gates of different modules (or submodules) together and thus define the
+message flows and the network's topology.
 
-\section{Design Considerations}
-2D mesh as NoC topology is very common in research (insert many cites here).
-\begin{itemize}
-    \item GALS (Globally Asynchronous, Locally Synchronous)
-        \begin{itemize}
-            \item not relevant for simulations, just for actual hardware (e.g. power spikes on active clock edges, low-power PEs etc.)
-            \item simulation is only inaccurate at the link between routers
-            \item we just do Globally Synchronous because it's easier
-        \end{itemize}
-    \item 24 bit FIDs/GIDs
-        \begin{itemize}
-            \item integer overflow after $2^{24}-1$
-            \item this is the latest time when session keys should be changed, otherwise packet injection (repeat attacks) become
-                possible
-            \item look at work paper for calculations about value ranges considered and why they chose 24 bit
-            \item Continuous flit IDs: advantage of detecting fully lost transmission units, but for the simulation we use globally unique IDs for
-                easier statistics recording → for fully lost units no ARQ is sent
-        \end{itemize}
-    \item Retransmission Buffer structure and lookup times
-        \begin{itemize}
-            \item corresponding flits are stored consecutively (e.g. data/MAC of same FID, flits of same generation etc.)
-            \item lookup time (in clock cycles) is a parameter in the simulation
-            \item UC case: one cycle lookup is fine (just need to find FID, mode field determines offset in the buffer)
-            \item NC case: two cycles for lookup (one to find GID, one to compare GEVs of the generation in parallel, mode determines offset)
-        \end{itemize}
-    \item Priorities
-        \begin{itemize}
-            \item retransmission buffer: ARQs have priority
-            \item crypto units (→ entry guard): arriving flits have priority
-        \end{itemize}
-    \item Lane widths
-        \begin{itemize}
-            \item lanes have as many wires as flits have bits
-            \item one flit can be transmitted per clock cycle per lane
-            \item flit size is fixed (standard header fields + 64 bit payload)
-        \end{itemize}
-    \item Buffers/Queues
-        \begin{itemize}
-            \item App/NI/Routers have only input buffers, no output buffers
-            \item Routers only route flits when the receiving router's input queue is not full
-        \end{itemize}
-    \item Crypto units
-        \begin{itemize}
-            \item Separate units for encryption and authentication
-            \item Encryption units can also decrypt → very easy to see with PRINCE
-            \item Send/receive pipeline share the same set of crypto units
-            \item Talk about auth. method 3: 32 bit block size, what algorithms?
-            \item Latency: assume PRINCE → ~35MHz FPGA, *~4 for ASIC → paper. Look at PRINCE paper and survey paper for numbers
-        \end{itemize}
-    \item Tracking finished IDs: prevent repeat attacks, prevent re-processing a unit due to redundant retransmissions or repeat attacks, but still
-        allow out-of-order arrivals SeemsGood
-    \item Routing strategies: randomness needs hardware RNG → more complex logic, more area!
-\end{itemize}
+The simulator makes extensive use of the hierarchical and modular approach of \omnet. The processing elements, network interfaces, and routers are
+defined as modules and instanced as many times as required, depending on the \gls{noc} dimensions. They are interconnected through their gates and
+arranged in a way mirroring the structure of the \gls{noc}. To create a simulation as realistic as possible, they are made up of a number of
+submodules, such as queues, buffers, and crypto modules, resembling the actual hardware layout. Section \ref{sec:componentstructure} elaborates on
+this matter.
 
-\section{Simulation Framework}
-% Talk about OMNeT++
+\section{General Assumptions}
+\subsection{The GALS Paradigm}
+In Section \ref{sec:networkonchipfun}, it was mentioned that \glspl{noc} lend themselves well to the implementation of the \gls{gals} design paradigm.
+For the simulation, it was not considered for three reasons. First, its usage requires the existance of multiple clock domains: each core runs with the
+frequency best suited for itself and is not synchronized with other cores in the network (\enquote{globally asynchronous}). This, however, is very
+finical to implement correctly. Second, since the cores themselves each operate under a single clock (\enquote{locally synchronous}), \gls{gals} would
+only affect the transmissions from one router to another. Third, the cores are assumed to be identical and hence run with the same frequency anyway.
+On these grounds, a globally synchronous architecture with a single clock driving all components is used in the simulator.
 
-\section{Components}
+\section{Component Structure}\label{sec:componentstructure}
+% screenshot of the Qtenv NoC
 \subsection{Network Interface}
 % 1 paragraph per component
 % at the end: table with all components, their delay (cycles)
+Network interface was modeled as accurately as possible to be able to evaluate internal congestions like competition of multiple flits over the
+available crypto modules.
 
 \begin{table}
     \centering
@@ -104,3 +71,40 @@ The simulator is implemented in C++ using the \textit{\omnet} framework \cite{om
 \end{table}
 
 \section{Configurable Parameters}
+
+\iffalse
+\begin{itemize}
+    \item Retransmission Buffer structure and lookup times
+        \begin{itemize}
+            \item corresponding flits are stored consecutively (e.g. data/MAC of same FID, flits of same generation etc.)
+            \item lookup time (in clock cycles) is a parameter in the simulation
+            \item UC case: one cycle lookup is fine (just need to find FID, mode field determines offset in the buffer)
+            \item NC case: two cycles for lookup (one to find GID, one to compare GEVs of the generation in parallel, mode determines offset)
+        \end{itemize}
+    \item Priorities
+        \begin{itemize}
+            \item retransmission buffer: ARQs have priority
+            \item crypto units (→ entry guard): arriving flits have priority
+        \end{itemize}
+    \item Buffers/Queues
+        \begin{itemize}
+            \item App/NI/Routers have only input buffers, no output buffers
+            \item Routers only route flits when the receiving router's input queue is not full
+        \end{itemize}
+    \item Crypto units
+        \begin{itemize}
+            \item Separate units for encryption and authentication
+            \item Encryption units can also decrypt → very easy to see with PRINCE
+            \item Send/receive pipeline share the same set of crypto units
+            \item Talk about auth. method 3: 32 bit block size, what algorithms?
+            \item Latency: assume PRINCE → ~35MHz FPGA, *~4 for ASIC → paper. Look at PRINCE paper and survey paper for numbers
+        \end{itemize}
+    \item Tracking finished IDs: prevent repeat attacks, prevent re-processing a unit due to redundant retransmissions or repeat attacks, but still
+        allow out-of-order arrivals SeemsGood
+    \item Routing strategies: randomness needs hardware RNG → more complex logic, more area!
+
+    \item Timeout of x (e.g. 8) cycles until first ARQ is sent
+    \item The higher the ARQ timeout/limit, the less likely the flit is still in retransmission buffer
+    \item → ARQ timeout/limit and retransmission buffer size have to correlate
+\end{itemize}
+\fi
