@@ -1,9 +1,9 @@
 Following the design phase, it is crucial to test the protocol in a practical environment in order to verify that it works as intended. Furthermore,
 extensive performance evaluations need to be conducted to assure the viability of the devised techniques. Both of these tasks are achieved through
-thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was implemented that supports the designed protocol with all its
-features as described in Chapter \ref{ch:protocol}.
+thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was implemented that supports the designed protocol with all the
+features described in Chapter \ref{ch:protocol}.
 
-The simulator is written in C++ and based on the \textit{\omnet} discrete event simulation framework \cite{omnet}. \omnet provides a general-purpose
+The simulator is written in C++ and based on the \textit{\omnet{}} discrete event simulation framework \cite{omnet}. \omnet{} provides a general-purpose
 network simulation architecture and promotes a modular design. In general, it allows the programmer to define the components of the network via a
 special scripting language called \textit{NED}. With NED files, modules may be specified as they appear from the outside, by means of parameters,
 gates, and connections. Furthermore, a module is allowed to have any number of submodules, facilitating a hierarchical structure. A C++
@@ -11,13 +11,16 @@ class is assigned to each module that controls the component's internal behavior
 module through which it sends and receives messages. The connections link the gates of different modules (or submodules) together and thus define the
 message flows and the network's topology.
 
-The simulator makes extensive use of the hierarchical and modular approach of \omnet. The processing elements, network interfaces, and routers are
+The simulator makes extensive use of the hierarchical and modular approach of \omnet{}. The processing elements, network interfaces, and routers are
 defined as modules and instanced as many times as required, depending on the \gls{noc} dimensions. They are interconnected through their gates and
 arranged in a way mirroring the structure of the \gls{noc}. To create a simulation as realistic as possible, they are made up of a number of
-submodules, such as queues, buffers, and crypto modules, resembling the actual hardware layout. Section \ref{sec:componentstructure} elaborates on
-this matter.
+submodules, such as queues, buffers, and crypto modules, resembling the actual hardware layout.
 
-\section{General Assumptions}
+In Section \ref{sec:generalass}, fundamental assumptions about the simulation environment are presented. Subsequently, Section
+\ref{sec:componentstructure} elaborates on the hierarchical structure of the components and their layout. Finally, an overview of the various
+configurable parameters of the simulator is given in Section \ref{sec:confparams}.
+
+\section{General Assumptions}\label{sec:generalass}
 \subsection{The GALS Paradigm}
 In Section \ref{sec:networkonchipfun}, it was mentioned that \glspl{noc} lend themselves well to the implementation of the \gls{gals} design paradigm.
 For the simulation, it was not considered for three reasons. First, its usage requires the existance of multiple clock domains: each core runs with the
@@ -26,6 +29,27 @@ finical to implement correctly. Second, since the cores themselves each operate 
 only affect the transmissions from one router to another. Third, the cores are assumed to be identical and hence run with the same frequency anyway.
 On these grounds, a globally synchronous architecture with a single clock driving all components is used in the simulator.
 
+\subsection{Clock Frequency}
+The \gls{noc}'s global clock runs at a frequency of 500 MHz as this is a common speed in \gls{noc}-related research
+\cites{frey15stateobfuscation}{frey17hardenednoc}. Unfortunately, the PRINCE cipher that is employed for all cryptographic operations is unable to run at
+such a high frequency. However, in Section \ref{subsubsec:prince} it was shown that the algorithm runs flawlessly at frequencies of up to 250 MHz.
+Thus, the crypto modules operate can operate at half the frequency of the \gls{noc}, with every two cycles of the global clock corresponding to one
+cycle in the crypto modules. Hence, the processing of a single block is assumed to take two clock cycles in the simulator.
+
+It was mentioned above that the integration of multiple clock domains is very finical. However, when they are not independent and the global clock's
+frequency is evenly divisible by the required frequency, as is the case for the crypto modules, this becomes significantly easier. Here, a new clock
+is derived from the global clock that simply omits every other tick.
+
+\subsection{Single Cycle Routing}
+only input queues instead of in- and output queues
+
+Pros: 1 instead of 2 cycles per hop, less buffers
+Cons: if flit has to wait because target port is congested, then it blocks all further flits in the same queue
+→ we like low latencies and low chip area, thus single cycle routing
+
+\subsection{ARQ Timeouts}
+- Fixed timeout for initial timer, after ARQ: initial timer + 2x distance
+
 \section{Component Structure}\label{sec:componentstructure}
 % screenshot of the Qtenv NoC
 \subsection{Network Interface}
@@ -33,6 +57,19 @@ On these grounds, a globally synchronous architecture with a single clock drivin
 % at the end: table with all components, their delay (cycles)
 Network interface was modeled as accurately as possible to be able to evaluate internal congestions like competition of multiple flits over the
 available crypto modules.
+
+Figure X shows the internal structure of the network interface as rendered by \omnet{}'s graphical interface.
+
+\subsubsection{Crypto Modules}
+- Access Priorities (1. sender in order to not tear apart a generation and provoke timeouts at the receiver, 2. receiver)
+
+Encryption/Decryption:
+1 input block = 2 cycles for all methods
+
+Authentication:
+Ind. Auth 3 input blocks → 6 cycles
+Int. Auth 2 input blocks → 4 cycles + 1 cycle for authcode generation → 5 cycles (2x as many authcodes generated as for ind. auth)
+Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. auth)
 
 \begin{table}
     \centering
@@ -70,7 +107,7 @@ available crypto modules.
     \label{tab:transmissionlatencies}
 \end{table}
 
-\section{Configurable Parameters}
+\section{Configurable Parameters}\label{sec:confparams}
 
 \iffalse
 \begin{itemize}

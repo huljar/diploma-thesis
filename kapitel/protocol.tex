@@ -420,6 +420,11 @@ middle ground, the issuance of \glspl{arq} is only postponed if other flits from
 precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
 the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
 \gls{arq} as well, should the integrity check fail.
+% TODO mention that ARQs are not encrypted because they only contain metadata, not NC'd because there is only one ARQ flit and unknown when the next
+% ARQ with same destination will be issued → infeasible to create a generation, not auth'd to save time → what attack scenarios are feasible then?
+% attackers may flood the network with ARQs and trigger unnecessary retransmissions, but if attacker is able to inject arbitrary ARQs he can flood the
+% network anyway. Modified ARQ may make the RT send out other unrequested flits instead, we simplify this case to simply ignoring the ARQ. In
+% practive, RT doesn't know if ARQ was modified due to no auth
 
 \section{The Protocol}\label{sec:theprotocol}
 As mentioned in Section \ref{sec:protocolvariants}, three different communication schemes were envisioned, with the first two subdivided into uncoded
@@ -901,7 +906,7 @@ The main benefit of dynamic strategies presents itself when used in combination 
 members of the same generation are likely to take diverging paths (as long as source and destination lie on different rows and columns of the
 \gls{noc}). Thus, if malicious routers are situated within the rectangle spanned by source and destination, the variety of paths may enable a portion
 of the flits to circumvent them, allowing for successful decoding even if the others are modified. Figure \vref{fig:circumventattackers} exemplifies
-this scenario with the network coded interwoven authentication protocol.
+this scenario with the network coded interwoven authentication protocol.% TODO: mention out of order arrival with dynamic, not possible with static
 
 \begin{figure}
     \centering

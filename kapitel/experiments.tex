@@ -23,11 +23,25 @@ and retransmissions are required.}
 \section{Environment}
 % 50,000 cycles (why?)
 % Warmup and cooldown times
+% Injection rate of 0.2 into the network
 
 \section{Determining The Hyperparameters}
 \subsection{ARQ Timeouts}
+Yexin: 8 cycles, but this is might be too low here because we consider internal delays and data races for the crypto modules within the network
+interfaces → use as starting point
+
 \subsection{Number Of Crypto Units}
 
 \section{Experiments}
 \subsection{Average time of a flit/transmission unit in ArrivalManager until a verification result is there}
 \subsection{Number of ARQs modified/dropped by routers}
+\subsection{Routing strategies effects}
+% Heatmap of router workload?
+
+\iffalse
+Experiment setup parameter tables:
+- NC mode (UC, G2C3, G2C4)
+- ...
+
+ARQ Limit: 1, at most 2 because more ARQs allowed per transmission unit means larger retransmission buffers everywhere
+\fi
