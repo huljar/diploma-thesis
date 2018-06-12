@@ -18,6 +18,8 @@ and retransmissions are required.}
     \item Variable number of compromised routers (e.g. 8 for an 8x8 grid)
     \item Compromised routers randomly drop or modify packets (no intelligent modifications/drops)
     \item Reasoning for having only some compromised routers (in regard to the 3rd party NoC problem → why would they not make all routers the same?)
+        → HT implies more logic in routers → more area and draws more power → might attract attention if all routers have this and overall NoC
+        parameters diverge considerably from the expectations
 \end{itemize}
 
 \section{Environment}
@@ -26,9 +28,28 @@ and retransmissions are required.}
 % Injection rate of 0.2 into the network
 
 \section{Determining The Hyperparameters}
-\subsection{ARQ Timeouts}
-Yexin: 8 cycles, but this is might be too low here because we consider internal delays and data races for the crypto modules within the network
-interfaces → use as starting point
+\subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
+Receivers issue \glspl{arq} when the temporal gap between the arrival of flits belonging to the same transmission unit becomes too large, i.e. when a
+timeout occurs. Its value is determined through experiments and measured in clock cycles.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{arq-timeouts-calc}
+    \caption[Example of ARQ timeout calculation]{Example for the calculation of \gls{arq} timeouts. With a Manhattan distance of 4 between source $S$ and
+    destination $D$ and a given inter-arrival timeout $t_1$, the \gls{arq} timeout $t_2(S, D)$ is computed as $t_1 + 2 \cdot 4 = t_1 + 8$ cycles.}
+    \label{fig:arqtimeoutscalc}
+\end{figure}
+
+In addition to the inter-arrival timeout, there is another, higher value that is used after an \gls{arq} was issued to await the answer, as explained
+in Section \ref{subsec:arqretransmissions}. The \gls{arq} answer timeout depends on the inter-arrival timeout and the Manhattan distance between the
+two affected communication partners. More precisely, if $t_1$ is the inter-arrival timeout, $t_2(S, D)$ is the \gls{arq} answer timeout for a
+particular source $S$ and destination $D$, and $d$ is the Manhattan distance between the two nodes, then $t_2(S, D) = t_1 + 2 \cdot d$. Figure
+\vref{fig:arqtimeoutscalc} illustrates this calculation.
+
+
+As a starting point, a timeout of 8 cycles is used. It was identified as the optimal value in a previous diploma thesis about \gls{rlnc} for
+\glspl{noc} \cite{yan15rlnc}. However, it may not be optimal for the scenarios investigated here since the protocol differs and a new simulator is
+used with a different network interface structure.
 
 \subsection{Number Of Crypto Units}
 
