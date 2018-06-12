@@ -122,12 +122,21 @@ is described below. Figure \vref{fig:omnetni} shows the internal structure as re
     \label{fig:omnetni}
 \end{figure}
 
-The network interface was modeled as accurately as possible to be able to evaluate internal congestions like competition of multiple flits over the
-available crypto modules.
-
-Figure X shows the internal structure of the network interface as rendered by \omnet{}'s graphical interface.
+The network interface was modeled as accurately as possible to facilitate detailed statistics about the flit flow inside them. This allows the
+evaluation of internal delays that are caused, for instance, by departing and arriving flits competing over the available crypto modules, or a
+retransmission competing with a new flit over the link to the router. Thus, the implementation of the network interfaces consists of a number of
+different submodules, which are explained below.
 
 \subsubsection{Crypto Modules}
+The distribution of flits among the encryption and authentication modules in handled by the \textit{entry guard}. To handle this task, it keeps track
+of the availability status of the crypto modules (i.e., which ones are busy and which ones are free). A total of four queues are connected to it: two
+for flits from the processing element (\textit{app input queue} and \textit{auth crypto queue} and two for flits from the network.
+network onto the free modules accordingly. Thus, it also decides on which flit has the priority to access a crypto module in case . For the simulations, flits
+from the processing element always 
+
+The encryption modules are able to encrypt or decrypt a flit. The authentication modules compute a \gls{mac} (or, for this protocol variant, an
+authcode) for incoming flits.
+
 - Access Priorities (1. sender in order to not tear apart a generation and provoke timeouts at the receiver, 2. receiver)
 
 Encryption/Decryption:
