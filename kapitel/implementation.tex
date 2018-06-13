@@ -112,8 +112,6 @@ modules, network coding components, the retransmission buffer as well as the ver
 slightly differs for each variant. However, all variants resemble the structure of their corresponding flowchart in Section \ref{sec:theprotocol}, so
 explaining the network interface by means of one variant is deemed sufficient. For this purpose, the network coded interwoven authentication version
 is described below. Figure \vref{fig:omnetni} shows the internal structure as rendered by \omnet{}'s graphical interface.
-% 1 paragraph per component
-% at the end: table with all components, their delay (cycles)
 
 \begin{figure}
     \centering
@@ -122,15 +120,62 @@ is described below. Figure \vref{fig:omnetni} shows the internal structure as re
     \label{fig:omnetni}
 \end{figure}
 
-The network interface was modeled as accurately as possible to facilitate detailed statistics about the flit flow inside them. This allows the
+The network interface was modeled as accurately as possible to facilitate detailed statistics about the flit flow inside them. This allows for the
 evaluation of internal delays that are caused, for instance, by departing and arriving flits competing over the available crypto modules, or a
 retransmission competing with a new flit over the link to the router. Thus, the implementation of the network interfaces consists of a number of
-different submodules, and flits take rather intricate paths through them. Below, the progression of an exemplary transmission unit both for departing
-(\gls{pe} $\rightarrow$ router) and arriving (router $\rightarrow$ \gls{pe}) flits is given.
+different submodules, and flits take rather intricate paths through them. In the following sections, the progression of an exemplary transmission unit
+both for departing (\gls{pe} $\rightarrow$ router) and arriving (router $\rightarrow$ \gls{pe}) flits is given.
 
 \subsubsection{Path Of Departing Flits}
+Flits entering the network interface from the processing element are first placed into a queue (\textit{encryptQueue} module on the left side of
+Figure \ref{fig:omnetni}). As the queue name suggests, they wait here for an encryption module to become available. Once this is the case, the front
+flit is fetched from the queue and redirected to the appropriate encryption module.
+
+The network interface's crypto modules are managed by an auxiliary module (named \textit{cryptoEntry} in Figure \ref{fig:omnetni}). It keeps track of
+the availability status of both the encryption and the authentication modules and handles the distribution of flits among them. There are multiple
+queues connected to it; the aforementioned \textit{encryptQueue} and three others whose role will be explained below. It should be noted that only one
+flit can be fetched from each queue per clock cycle. In the current path of the exemplary flit, \textit{cryptoEntry} will fetch it from
+\textit{encryptQueue} once one of the encryption modules (named \textit{encUnit} suffixed with an index in Figure \ref{fig:omnetni}) becomes
+available.
+
+Once the encryption module has finished its task, the flit arrives at another auxiliary module where the paths from all crypto modules converge.
+Aptly named \textit{cryptoExit} in Figure \ref{fig:omnetni}, incoming flits are redirected depending on their arrival gate. For the current case, the
+encrypted flit is sent to the \textit{flitSplitter}.
+
+With the interwoven authentication protocol variant, the next step is to create a new flit that half the payload is moved to. Afterwards, these two
+flits are encoded as a generation by the \textit{encoder}. The resulting three or four flits are subsequently sent back to the \textit{cryptoExit}
+auxiliary module which merely forwards them to the \textit{authenticateQueue}. As the computation of a combination takes one clock cycle, the encoder
+consequently sends out precisely one combination per cycle.
+
+Now, each combination needs to be authenticated. The \textit{authenticateQueue} is one of the four queues connected to the \textit{cryptoEntry}
+auxiliary module. In the same manner as for the encryption process, \textit{cryptoEntry} fetches the front flit from the \textit{authenticateQueue}
+once one of the authentication modules (referred to as \textit{authUnit} suffixed with an index in Figure \ref{fig:omnetni}) is available and forwards
+it appropriately.
+
+Once the authentication process is complete, the flits once again arrive at the \textit{cryptoExit}. This time, however, they are forwarded to the
+\textit{retransmissionBuffer}. Here, each one is copied as specified in the protocol before being sent to the network. The \textit{netStream} is
+another auxiliary module that merely serializes departing flits, retransmissions, and issued \glspl{arq} in case they arrive here at the same clock
+cycle. This is necessary since multiple flits cannot occupy the link to the router at the same time.
 
 \subsubsection{Path Of Arriving Flits}
+When a flit arrives from the network, it is first placed into a queue (named \textit{arrivalQueue} and located at the bottom right of Figure
+\ref{fig:omnetni}). However, flits are only kept here until the next clock tick. The purpose of this procedure is to ensure that the travel time from
+the router was precisely one clock cycle.
+
+The next station is the \textit{arqSplitter} supplementary module. Its only task is to check the incoming flit's mode field. In case of an
+\gls{arq}, it is sent straight to the \textit{retransmissionBuffer} which subsequently performs the appropriate retransmissions. Otherwise, the flit
+is forwarded to the \textit{arrivalManager}.
+
+The \textit{arrivalManager} is the most complex submodule of the network interface. It buffers incoming flits, performs verifications through authcode
+comparisons, and keeps track of the \gls{arq} timeouts for each transmission unit.
+% Each flit is stored here and two copies are made: one for decoding and decryption and one for computing the verification authcode
+% Verification flit is placed into one of the four cryptoEntry queues where it waits until an authentication module is allocated for it
+% Decryption flit is sent to the decoder, where is it buffered until a second flit from the generation comes, then decoded.
+% Then flits are merged by combining the data parts of the payloads, then decrypted.
+% cryptoExit sends both the computed authcodes and the decrypted flit back to the arrivalManager
+% arrivalManager compares authcodes, when successful: send decrypted flit out to the processing element, otherwise: delete and retry if possible.
+% If ARQs are necessary (i.e., on verification fails or timeouts) the arrivalManager generates them and sends them directly to netStream where they
+% will be forwarded toward the network as soon as possible
 
 \subsubsection{Crypto Modules}
 The distribution of flits among the encryption and authentication modules in handled by the \textit{entry guard}. To handle this task, it keeps track
