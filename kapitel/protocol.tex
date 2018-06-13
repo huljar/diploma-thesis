@@ -474,10 +474,11 @@ The sequence of actions for sending flits to the network (upper part of Figure \
         \gls{mac} itself is inserted into the payload field\footnote{As data and \gls{mac} flit have the same ID, the receiver will be able to
         correctly link them together.}. Both flits are then sent out together. Figure \vref{fig:computeflitmac} elucidates this process.
     \item \textbf{Store copies in retransmission buffer.} Since \glspl{arq} may arrive to request retransmissions of already dispatched flits, the
-        sender stores a copy of each flit in a dedicated retransmission buffer before sending it to the network. The original flit is sent to the
-        network. Once the buffer is full, old flits are replaced in a \gls{fifo} manner\footnote{Naturally, the buffer should be large enough to be
+        sender stores a copy of each flit in a dedicated retransmission buffer before sending it to the network. For each possible receiver,
+        there is a separate buffer because the required storage time is proportional to the distance to the receiver. Thus, buffers for nodes far away are
+        larger. Once a buffer is full, old flits are replaced in a \gls{fifo} manner\footnote{Naturally, the buffers should be large enough to be
         able to serve flits for \glspl{arq} arriving within an acceptable time frame after the original flit was dispatched. For simplicity, the
-        buffer is assumed to be sufficiently large to handle all \glspl{arq}.}.
+        buffers are assumed to be sufficiently large to handle all \glspl{arq}.}. The original flits are sent to the network.
 \end{enumerate}
 \vspace{0.5\baselineskip}
 

@@ -1,6 +1,7 @@
 \section{Parameters}
-In the experiments, a base network injection rate of 0.2 is assumed\footnote{The actual injection rate can be higher once \glspl{arq} come into play
-and retransmissions are required.}
+In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
+\cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
+issuance of \glspl{arq} and the resulting retransmissions.
 \begin{itemize}
     \item Injection rate
         \begin{itemize}
@@ -9,6 +10,34 @@ and retransmissions are required.}
         \end{itemize}
     \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
 \end{itemize}
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C}
+        Parameter name & Value \\\hline
+        \Gls{noc} dimensions & 8x8 \\
+        Clock frequency & 500 MHz \\
+        Network base injection rate & 0.2 \\
+        Simulation runtime & \num{50000} cycles \\
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:fixedparams}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C}
+        Parameter name & Value range & Placeholder \\\hline
+        Network coding & $\{\mathit{UC}, \mathit{G2C3}, \mathit{G2C4}\}$ & \pNCMode{} \\
+        No. of encryption modules & $\mathbb{N}^*$ & \pEncMods{} \\
+        No. of authentication modules & $\mathbb{N}^*$ & \pAuthMods{} \\
+        \Gls{arq} limit & $[1, 2]$ & \pARQLimit{} \\
+        \Gls{arq} timeout & $\mathbb{N}^*$ cycles & \pARQTimeout{} \\
+        Routing strategy & $\{\mathit{\gls{dor}}, \mathit{\gls{dm}}, \mathit{\gls{romm}}, \mathit{\gls{ramm}}\}$ & \pRStrat{} \\
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:inputparams}
+\end{table}
 
 \section{Attacker Model}
 \begin{itemize}
@@ -22,6 +51,8 @@ and retransmissions are required.}
         parameters diverge considerably from the expectations
 \end{itemize}
 
+Compromised routers: 6, 8, 23, 36, 46, 52, 59, 61 (8 routers randomly selected from the set of nodes with uniform probability distribution)
+
 \section{Environment}
 % 50,000 cycles (why?)
 % Warmup and cooldown times
@@ -29,8 +60,9 @@ and retransmissions are required.}
 
 \section{Determining The Hyperparameters}
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
-Receivers issue \glspl{arq} when the temporal gap between the arrival of flits belonging to the same transmission unit becomes too large, i.e. when a
-timeout occurs. Its value is determined through experiments and measured in clock cycles.
+In Section \ref{subsec:arqretransmissions}, the concept of \glspl{arq} and timeouts was introduced: receivers issue \glspl{arq} when the temporal gap
+between the arrival of flits belonging to the same transmission unit becomes too large, i.e. when a timeout occurs. Its value is determined through
+experiments and measured in clock cycles.
 
 \begin{figure}
     \centering
@@ -46,10 +78,43 @@ two affected communication partners. More precisely, if $t_1$ is the inter-arriv
 particular source $S$ and destination $D$, and $d$ is the Manhattan distance between the two nodes, then $t_2(S, D) = t_1 + 2 \cdot d$. Figure
 \vref{fig:arqtimeoutscalc} illustrates this calculation.
 
+Hence, only $t_1$ needs to be determined through experiments. Since this is the first parameter to be fixed, the other input values for the simulation
+are estimated. The tests are independent of the protocol variant as the same injection rate is used for all of them. Table \vref{tab:setuparqtimeouts}
+presents how the simulator is set up.
 
-As a starting point, a timeout of 8 cycles is used. It was identified as the optimal value in a previous diploma thesis about \gls{rlnc} for
-\glspl{noc} \cite{yan15rlnc}. However, it may not be optimal for the scenarios investigated here since the protocol differs and a new simulator is
-used with a different network interface structure.
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C}
+        \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} \\\hline
+        G2C3 & 5 & 15 & 1 & varying & \gls{dor} \\
+    \end{tabulary}
+    \caption[Input parameters for ARQ timeouts experiment]{long}
+    \label{tab:setuparqtimeouts}
+\end{table}
+
+To determine the timeout value, an uncompromised \gls{noc} (i.e., with zero malicious routers) is used. Ideally, no \glspl{arq} are issued in this
+scenario. However, due to random deviations from the average flit injection rate, the network load varies over time and congestions in some routers
+may occur. The resulting increased transmission delays may be high enough to trigger timeouts even when an \gls{arq} is not necessary. Sporadic
+occurances of such cases cannot be ruled out, but should rarely happen. However, simply increasing the timeout until these cases vanish is undesirable
+for two reasons. First, a high timeout directly corresponds to high latencies when flit losses necessitate \glspl{arq}. Second, the later an \gls{arq}
+is issued, the larger the \gls{rtb} of the communication partner needs to be so that the flits in question are not already overwritten when the
+\gls{arq} arrives. The goal of this experiment is to find a reasonable middle ground: the smallest timeout that does not entail a significant number of
+unnecessary \glspl{arq} will be used for the subsequent evaluations.
+
+\begin{figure}
+    \centering
+    \input{gnuplot/plots/arqtimeouts}
+    \caption[short]{long}
+    \label{fig:resultsarqtimeouts}
+\end{figure}
+
+Figure \vref{fig:resultsarqtimeouts} shows the results for timeout values ranging from 3 to 15 cycles.
+
+% As a starting point, a timeout of 8 cycles is used. It was identified as the optimal value in a previous thesis about \gls{rlnc} for
+% \glspl{noc} \cite{yan15rlnc}. However, it may not be optimal for the scenarios investigated here since the protocol differs and a new simulator is
+% used with a different network interface structure.
+
+- Use sadias formula for RTB size estimation
 
 \subsection{Number Of Crypto Units}
 

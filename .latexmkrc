@@ -1,8 +1,8 @@
 # make diplom.tex the main tex file
 @default_files = ('diplom.tex');
 
-# lualatex
-$pdflatex = 'lualatex %O %S';
+# lualatex (with --shell-escape for epstopdf package)
+$pdflatex = 'lualatex --shell-escape %O %S';
 $pdf_mode = 1;
 $postscript_mode = $dvi_mode = 0;
 

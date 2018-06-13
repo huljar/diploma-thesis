@@ -42,6 +42,9 @@
 \setcounter{tocdepth}{2} % Show chapters, sections, and subsection in the table of contents
 \interfootnotelinepenalty=10000 % Prevent breaking of footnotes across pages
 
+% % % Import % % %
+%\usepackage{import}
+
 % % % Bookmark % % %
 \usepackage[open,openlevel=1]{bookmark}
 
@@ -51,7 +54,7 @@
 
 % % % GraphicX % % %
 \usepackage{graphicx}
-\graphicspath{{bilder/}{grafiken/}{screenshots/}}
+\graphicspath{{bilder/}{grafiken/}{screenshots/}{gnuplot/plots/}}
 
 % % % SVG % % %
 % Since we use lualatex, some pdftex commands need to be imported first
@@ -94,7 +97,7 @@
 %\counterwithout{footnote}{chapter} % Global footnote indices
 
 % % % EPStoPDF % % %
-%\usepackage{epstopdf}
+\usepackage{epstopdf}
 
 % % % Color % % %
 \usepackage{color}
@@ -114,6 +117,14 @@
 
 % Hilfsmakros
 \newcommand{\omnet}{OMNeT++}
+
+% Platzhalter für Evaluationsparameter
+\newcommand{\pNCMode}{a}
+\newcommand{\pEncMods}{b}
+\newcommand{\pAuthMods}{c}
+\newcommand{\pARQLimit}{d}
+\newcommand{\pARQTimeout}{e}
+\newcommand{\pRStrat}{f}
 
 \begin{document}
     \frenchspacing % Disable double spaces between sentences

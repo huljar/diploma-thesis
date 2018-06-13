@@ -1,0 +1,17 @@
+set terminal epslatex size 5,2.5 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}"
+
+set style data lp
+set style line 1 lc rgb '#0060ad' lt 1 pt 7
+
+set ylabel '\ft ARQs per source flit'
+set yrange [0:0.25]
+
+set xlabel '\ft Timeout in cycles'
+set xrange [3:15]
+
+set key off
+
+set output '../plots/arqtimeouts.tex'
+
+plot '../data/arqtimeouts.dat' ls 1
