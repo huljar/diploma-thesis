@@ -118,14 +118,19 @@ is described below. Figure \vref{fig:omnetni} shows the internal structure as re
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{omnet-ni}
-    \caption[short]{long}
+    \caption[Simulator view of the network interface]{long}
     \label{fig:omnetni}
 \end{figure}
 
 The network interface was modeled as accurately as possible to facilitate detailed statistics about the flit flow inside them. This allows the
 evaluation of internal delays that are caused, for instance, by departing and arriving flits competing over the available crypto modules, or a
 retransmission competing with a new flit over the link to the router. Thus, the implementation of the network interfaces consists of a number of
-different submodules, which are explained below.
+different submodules, and flits take rather intricate paths through them. Below, the progression of an exemplary transmission unit both for departing
+(\gls{pe} $\rightarrow$ router) and arriving (router $\rightarrow$ \gls{pe}) flits is given.
+
+\subsubsection{Path Of Departing Flits}
+
+\subsubsection{Path Of Arriving Flits}
 
 \subsubsection{Crypto Modules}
 The distribution of flits among the encryption and authentication modules in handled by the \textit{entry guard}. To handle this task, it keeps track
@@ -178,9 +183,9 @@ Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. 
     \centering
     \begin{tabulary}{\textwidth}{R|L}
         Transmission & Delay in cycles \\\hline
-        PE ←→ NI & 1 \\
-        NI ←→ Router & 1 \\
-        Router ←→ Router & 1
+        PE $\Leftrightarrow$ NI & 1 \\
+        NI $\Leftrightarrow$ Router & 1 \\
+        Router $\Leftrightarrow$ Router & 1
     \end{tabulary}
     \caption[short]{long}
     \label{tab:transmissionlatencies}
