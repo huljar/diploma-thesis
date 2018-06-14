@@ -59,6 +59,11 @@ In order for the complexity of the simulator to stay within manageable bounds, t
 virtual channels are used for the input buffers mentioned above. This, however, implies that a flit delayed by a congestion of the targeted output
 link also holds back all following flits in the buffer, even if they would be routed to a different link.
 
+\subsection{Retransmission Buffer}
+In Section \ref{subsec:arqretransmissions}, it was mentioned that \glspl{arq} are not authenticated. This implies that there is no method to ensure
+the integrity of \glspl{arq}. However, the worst case scenario is that a modified \gls{arq} causes different flits to be retransmitted than the
+intended ones, entailing unnecessary network load. To simplify this case, a modified \gls{arq} is ignored by the \gls{rtb}.
+
 \section{Component Structure}\label{sec:componentstructure}
 This section provides an in-depth view on the modular structure of the simulator. In a top-down approach, it begins with the outermost layer of the
 hierarchy (i.e., the \gls{noc} itself) and then descends into the individual components. The figures used to support the textual explanations are
@@ -115,8 +120,11 @@ is described below. Figure \vref{fig:omnetni} shows the internal structure as re
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth]{omnet-ni}
-    \caption[Simulator view of the network interface]{long}
+    \includegraphics[width=0.85\textwidth]{omnet-ni}
+    \caption[Simulator view of the network interface]{An instance of a network interface as rendered by \omnet{}. Flits from the processing element
+    arrive on the left side and subsequently traverse a pipeline of encryption, encoding, and authentication modules. The flits from the router enter
+    the interface on the bottom right. After \glspl{arq} are filtered out, the remaining flits are subjected to decoding, decryption, and verification
+    procedures before being forwarded to the processing element.}
     \label{fig:omnetni}
 \end{figure}
 
@@ -128,7 +136,7 @@ both for departing (\gls{pe} $\rightarrow$ router) and arriving (router $\righta
 
 \subsubsection{Path Of Departing Flits}
 Flits entering the network interface from the processing element are first placed into a queue (\textit{encryptQueue} module on the left side of
-Figure \ref{fig:omnetni}). As the queue name suggests, they wait here for an encryption module to become available. Once this is the case, the front
+Figure \ref{fig:omnetni}). As the name suggests, they wait here for an encryption module to become available. Once this is the case, the front
 flit is fetched from the queue and redirected to the appropriate encryption module.
 
 The network interface's crypto modules are managed by an auxiliary module (named \textit{cryptoEntry} in Figure \ref{fig:omnetni}). It keeps track of
@@ -147,12 +155,12 @@ flits are encoded as a generation by the \textit{encoder}. The resulting three o
 auxiliary module which merely forwards them to the \textit{authenticateQueue}. As the computation of a combination takes one clock cycle, the encoder
 consequently sends out precisely one combination per cycle.
 
-Now, each combination needs to be authenticated. The \textit{authenticateQueue} is one of the four queues connected to the \textit{cryptoEntry}
-auxiliary module. In the same manner as for the encryption process, \textit{cryptoEntry} fetches the front flit from the \textit{authenticateQueue}
-once one of the authentication modules (referred to as \textit{authUnit} suffixed with an index in Figure \ref{fig:omnetni}) is available and forwards
-it appropriately.
+Now, each combination needs to be authenticated. The \textit{authenticateQueue} is one of the four queues connected to the \textit{cryptoEntry}. In
+the same manner as for the encryption process, \textit{cryptoEntry} fetches the front flit from the \textit{authenticateQueue} once one of the
+authentication modules (referred to as \textit{authUnit} suffixed with an index in Figure \ref{fig:omnetni}) is available and forwards it
+appropriately.
 
-Once the authentication process is complete, the flits once again arrive at the \textit{cryptoExit}. This time, however, they are forwarded to the
+When the authentication process is complete, the flits once again arrive at the \textit{cryptoExit}. This time, however, they are forwarded to the
 \textit{retransmissionBuffer}. Here, each one is copied as specified in the protocol before being sent to the network. The \textit{netStream} is
 another auxiliary module that merely serializes departing flits, retransmissions, and issued \glspl{arq} in case they arrive here at the same clock
 cycle. This is necessary since multiple flits cannot occupy the link to the router at the same time.
@@ -167,28 +175,48 @@ The next station is the \textit{arqSplitter} supplementary module. Its only task
 is forwarded to the \textit{arrivalManager}.
 
 The \textit{arrivalManager} is the most complex submodule of the network interface. It buffers incoming flits, performs verifications through authcode
-comparisons, and keeps track of the \gls{arq} timeouts for each transmission unit.
-% Each flit is stored here and two copies are made: one for decoding and decryption and one for computing the verification authcode
-% Verification flit is placed into one of the four cryptoEntry queues where it waits until an authentication module is allocated for it
-% Decryption flit is sent to the decoder, where is it buffered until a second flit from the generation comes, then decoded.
-% Then flits are merged by combining the data parts of the payloads, then decrypted.
-% cryptoExit sends both the computed authcodes and the decrypted flit back to the arrivalManager
-% arrivalManager compares authcodes, when successful: send decrypted flit out to the processing element, otherwise: delete and retry if possible.
-% If ARQs are necessary (i.e., on verification fails or timeouts) the arrivalManager generates them and sends them directly to netStream where they
-% will be forwarded toward the network as soon as possible
+comparisons, and keeps track of the \gls{arq} timeouts for all the transmission units. For each arriving flit, two copies are made: one to compute an
+authcode over and one for decoding and decryption.
 
-\subsubsection{Crypto Modules}
-The distribution of flits among the encryption and authentication modules in handled by the \textit{entry guard}. To handle this task, it keeps track
-of the availability status of the crypto modules (i.e., which ones are busy and which ones are free). A total of four queues are connected to it: two
-for flits from the processing element (\textit{app input queue} and \textit{auth crypto queue} and two for flits from the network.
-network onto the free modules accordingly. Thus, it also decides on which flit has the priority to access a crypto module in case . For the simulations, flits
-from the processing element always 
+While the original is stored for the upcoming verification process, the first copy is sent to the
+\textit{verifyQueue}, which is connected to the \textit{cryptoEntry}. Identically to the departing flits waiting for authentication, the
+\textit{cryptoEntry} fetches flits from the queue once an authentication module is available. However, in case there are flits in both the
+\textit{authenticateQueue} and the \textit{verifyQueue}, the former always takes priority\footnote{The rationale for preferring departing flits is to
+not disperse generations that will be sent to the network. If the flits are already spaced out when leaving the interface, the probability for causing
+unnecessary \gls{arq} timeouts increases needlessly.}.
 
-The encryption modules are able to encrypt or decrypt a flit. The authentication modules compute a \gls{mac} (or, for this protocol variant, an
-authcode) for incoming flits.
+The second copy is forwarded to the decoder. It is buffered here until another flit from the
+same transmission unit arrives. Both are subsequently decoded and merged back into a single flit, which is then sent to the \textit{decryptQueue}. As
+the name suggests, the flit stands by until the \textit{cryptoEntry} has allocated an encryption module for it\footnote{As laid out in Section
+\ref{subsubsec:prince}, the encryption modules are able to perform decryptions as well.}. Corresponding to the authentication process, departing flits
+take priority over the encryption module access when both \textit{decryptQueue} and \textit{encryptQueue} are not empty. Both the decrypted flits and
+computed authcodes are redirected back to the \textit{arrivalManager} by the \textit{cryptoExit}. Authcodes are compared with those contained in the
+originally buffered flits; in case of their equality, the decrypted flit is sent directly to the processing element.
 
-- Access Priorities (1. sender in order to not tear apart a generation and provoke timeouts at the receiver, 2. receiver)
+In case an \gls{arq} must be issued, either caused by non-equal authcodes or timeouts, the \textit{arrivalManager} generates and prepares an
+\gls{arq} flit. From there, it is sent to the network via the \textit{netStream} auxiliary serialization module.
 
+\subsection{Router}
+Like the processing elements, the routers' internal structure is straightforward. Presented in Figure \vref{fig:omnetrouter}, it consists of a switch
+and five input buffers (one for the local network interface and four for the neighboring routers).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.55\textwidth]{omnet-router}
+    \caption[Simulator view of the router]{An instance of a router as rendered by \omnet{}. The five input gates are connected to the switch via their
+    input queues. The five respective output connections are not interposed by a buffer. In the renderings of \omnet{}, the spatial layout of the
+    connections sometimes does not match their logical correlations, as is the case here with the outputs being drawn in parallel. However, there is
+    in fact one output connection corresponding to each input gate.}
+    \label{fig:omnetrouter}
+\end{figure}
+
+The routing logic is located within the switch submodule. On every clock tick, it checks the front flits in each queue and computes the most suitable
+output ports for them. This computation (often referred to as \textit{route calculation}) depends on the flit's destination header and the implemented routing
+strategy. If a calculated output port is unavailable due to the link being congested, the affected flits are delayed until the next clock tick.
+Furthermore, in case multiple flits are to be routed through the same output port, one of them is randomly selected while the others are postponed.
+Flits from different queues with differing output ports can be routed simultaneously.
+
+\section{Internal Delays}
 Encryption/Decryption:
 1 input block = 2 cycles for all methods
 
@@ -197,13 +225,10 @@ Ind. Auth 3 input blocks → 6 cycles
 Int. Auth 2 input blocks → 4 cycles + 1 cycle for authcode generation → 5 cycles (2x as many authcodes generated as for ind. auth)
 Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. auth)
 
-\subsubsection{Retransmission Buffer}
-% No auth. for ARQs: RT doesn't know if an ARQ was modified and may send out false retransmission. To simplify, modified ARQs are ignored by the RT.
-
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{R|L}
-        Component & Delay in cycles \\\hline
+        Procedure & Delay in cycles \\\hline
         Encryption/decryption & 2 \\
         Encoding (G2C3) & 3 (1 per combination) \\
         Encoding (G2C4) & 4 (1 per combination) \\
@@ -214,15 +239,11 @@ Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. 
         Decoding & 2 (1 per flit) \\
         Comparing \glspl{mac} & 1 \\
         Composing an \gls{arq} & 1 \\
-        \Gls{rtb} lookup & 2 (uncoded), 3 (coded)
+        \Gls{rtb} lookup & 2 (uncoded), 3 (network coded)
     \end{tabulary}
-    \caption[short]{long}
+    \caption[Internal computation delay in the network interface]{Internal computation delays of various procedures within the network interfaces.}
     \label{tab:processinglatencies}
 \end{table}
-
-\subsection{Routers}
-% Only input buffers → single cycle routing
-% Routing is only performed when receiving router's input queue is not full
 
 \begin{table}
     \centering
@@ -232,12 +253,9 @@ Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. 
         NI $\Leftrightarrow$ Router & 1 \\
         Router $\Leftrightarrow$ Router & 1
     \end{tabulary}
-    \caption[short]{long}
+    \caption[Transmission latencies for the NoC interconnections]{Transmission latencies of the interconnections of the \gls{noc} components.}
     \label{tab:transmissionlatencies}
 \end{table}
-
-\section{Configurable Parameters}\label{sec:confparams}
-- generation probability
 
 \iffalse
 \begin{itemize}
@@ -248,30 +266,5 @@ Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. 
             \item UC case: one cycle lookup is fine (just need to find FID, mode field determines offset in the buffer)
             \item NC case: two cycles for lookup (one to find GID, one to compare GEVs of the generation in parallel, mode determines offset)
         \end{itemize}
-    \item Priorities
-        \begin{itemize}
-            \item retransmission buffer: ARQs have priority
-            \item crypto units (→ entry guard): arriving flits have priority
-        \end{itemize}
-    \item Buffers/Queues
-        \begin{itemize}
-            \item App/NI/Routers have only input buffers, no output buffers
-            \item Routers only route flits when the receiving router's input queue is not full
-        \end{itemize}
-    \item Crypto units
-        \begin{itemize}
-            \item Separate units for encryption and authentication
-            \item Encryption units can also decrypt → very easy to see with PRINCE
-            \item Send/receive pipeline share the same set of crypto units
-            \item Talk about auth. method 3: 32 bit block size, what algorithms?
-            \item Latency: assume PRINCE → ~35MHz FPGA, *~4 for ASIC → paper. Look at PRINCE paper and survey paper for numbers
-        \end{itemize}
-    \item Tracking finished IDs: prevent repeat attacks, prevent re-processing a unit due to redundant retransmissions or repeat attacks, but still
-        allow out-of-order arrivals SeemsGood
-    \item Routing strategies: randomness needs hardware RNG → more complex logic, more area!
-
-    \item Timeout of x (e.g. 8) cycles until first ARQ is sent
-    \item The higher the ARQ timeout/limit, the less likely the flit is still in retransmission buffer
-    \item → ARQ timeout/limit and retransmission buffer size have to correlate
 \end{itemize}
 \fi
