@@ -7,6 +7,8 @@ issuance of \glspl{arq} and the resulting retransmissions.
         \begin{itemize}
             \item Value if 0.2 is realistic
             \item Possibility to generate pairs for fair comparison of UC/NC
+            \item Base network injection rate of 0.2 is used for all experiments. The source flit creation rate is adjusted accordingly for the
+                protocol variants to ensure that they have the same injection rate.
         \end{itemize}
     \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
 \end{itemize}
@@ -84,13 +86,15 @@ presents how the simulator is set up.
 
 \begin{table}
     \centering
-    \begin{tabulary}{\textwidth}{C|C|C|C|C|C}
-        \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} \\\hline
-        G2C3 & 5 & 15 & 1 & varying & \gls{dor} \\
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} \\\hline
+        Ind. Auth. & varying & 5 & 15 & 1 & varying & \gls{dor} \\
     \end{tabulary}
     \caption[Input parameters for ARQ timeouts experiment]{long}
     \label{tab:setuparqtimeouts}
 \end{table}
+% Why Ind. Auth.? Most flits per transmission unit
+% Why this number of enc./auth. units? Large number so there are definitely no internal congestions → area doesn't matter for this experiment
 
 To determine the timeout value, an uncompromised \gls{noc} (i.e., with zero malicious routers) is used. Ideally, no \glspl{arq} are issued in this
 scenario. However, due to random deviations from the average flit injection rate, the network load varies over time and congestions in some routers

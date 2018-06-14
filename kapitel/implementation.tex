@@ -217,13 +217,9 @@ Furthermore, in case multiple flits are to be routed through the same output por
 Flits from different queues with differing output ports can be routed simultaneously.
 
 \section{Internal Delays}
-Encryption/Decryption:
-1 input block = 2 cycles for all methods
-
-Authentication:
-Ind. Auth 3 input blocks → 6 cycles
-Int. Auth 2 input blocks → 4 cycles + 1 cycle for authcode generation → 5 cycles (2x as many authcodes generated as for ind. auth)
-Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. auth)
+To provide a better understanding of the impact of each module on the overall processing latency, their delays are given in a concise, tabular form.
+Table \ref{tab:processinglatencies} presents the processing times for the submodules of the network interface, while Table
+\vref{tab:transmissionlatencies} shows the transmission durations between the \gls{noc}'s components.
 
 \begin{table}
     \centering
@@ -256,6 +252,15 @@ Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. 
     \caption[Transmission latencies for the NoC interconnections]{Transmission latencies of the interconnections of the \gls{noc} components.}
     \label{tab:transmissionlatencies}
 \end{table}
+
+The delay for the encryption and decryption is precisely two clock cycles for all protocol variants because exactly one input block (the flit payload)
+needs to be processed. For authentication, the number of input blocks (and consequently the delay) varies. With individual authentication, three
+blocks
+
+Authentication:
+Ind. Auth 3 input blocks → 6 cycles
+Int. Auth 2 input blocks → 4 cycles + 1 cycle for authcode generation → 5 cycles (2x as many authcodes generated as for ind. auth)
+Gen. Auth 5 input blocks → 10 cycles (half as many MACs generated as for ind. auth)
 
 \iffalse
 \begin{itemize}
