@@ -131,8 +131,9 @@ increase latency and RTB sizes.
 - less modules are better if possible because less chip area
 - workload on crypto modules should be high
 - relatively high attack probabilities because more ARQs means more ver.+dec. retries at receivers, and network should be able to deal with that scenario
-- num of auth. units proportional to num of enc. units (e.g. ind. auth. G2C3 → 2 flits per trans. unit to encrypt/decrypt = 4 cycles of workload → 3
-  combinations to authenticate/verify = 18 cycles of workload → we need 4 to 5 times as many auth. units)
+- max. required enc. units: 4, because max. 2 flits can be drawn from the queues per cycle, so max. 4 flits active at the same time
+- max. required auth. units: 12 (ind. auth), 10 (int. auth), 20 (gen. auth)
+- criterion: max wait time needs to be below 5 cycles
 
 \section{Experiments}
 \subsection{Average time of a flit/transmission unit in ArrivalManager until a verification result is there}

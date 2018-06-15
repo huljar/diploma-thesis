@@ -1,22 +1,39 @@
-# c1: number of encryption units
-# c2: max wait time for encryption unit
-# c3: avg wait time for encryption unit
-# c4: max wait time for authentication unit
-# c5: avg wait time for authentication unit
+# c1: number of enc/auth units
+# c2: max wait time for enc/auth unit
+# c3: avg wait time for enc/auth unit
 #
-# Parameters: Ind. auth. UC, 3 auth units per enc unit, attackers: [6, 8, 20, 33, 35, 46, 52, 59], attack prob. 0.2, ARQ limit 1, DOR routing
+# Parameters: Ind. auth. UC, 12 auth units, attackers: [6, 8, 20, 33, 35, 46, 52, 59], attack prob. 0.2, ARQ limit 1, DOR routing
 # gnuplot index 0
 #
-1   41.0    2.17468597424   38.0    1.50620175465
-2   11.0    1.07387159471   7.0     1.0072161592
-3   3.0     1.00259428036   2.0     1.00001442476
-4   1.0     1.0             1.0     1.0
-5   1.0     1.0             1.0     1.0
+1   50.0    2.18264046325
+2   15.0    1.07509521432
+3   3.0     1.00246643875
+4   1.0     1.0
+
 
 #
-# Parameters: same, but G2C3 and 4 auth units per enc unit
+# Parameters: same, but 3 enc units and varying auth units
 # gnuplot index 1
 #
-1   35.0    2.15202887271   31.0    1.35058021789
-2   9.0     1.06587269181   4.0     1.00136868474
-3   4.0     1.0110077577    1.0     1.0
+1   18594.0 3908.74689278
+2   101.0   4.64781342409
+3   57.0    1.69655121042
+4   23.0    1.16145793362
+5   12.0    1.03984989159
+6   10.0    1.00828603429
+7   7.0     1.00138133553
+8   4.0     1.00019872537
+9   2.0     1.00001442476
+10  1.0     1.0
+11  1.0     1.0
+12  1.0     1.0
+
+
+#
+# Parameters: same as 0, but G2C3
+# gnuplot index 2
+#
+1   32.0    2.15140479342
+2   9.0     1.065099583
+3   4.0     1.0110077577
+4   1.0     1.0
