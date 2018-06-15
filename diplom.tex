@@ -122,13 +122,15 @@
 \newcommand{\omnet}{OMNeT++}
 
 % Platzhalter für Evaluationsparameter
-\newcommand{\pProtVar}{p}
-\newcommand{\pNCMode}{a}
-\newcommand{\pEncMods}{b}
-\newcommand{\pAuthMods}{c}
-\newcommand{\pARQLimit}{d}
-\newcommand{\pARQTimeout}{e}
-\newcommand{\pRStrat}{f}
+\newcommand{\pProtVar}{p} % Protocol variant
+\newcommand{\pNCMode}{a} % Network coding mode
+\newcommand{\pEncMods}{b} % Number of encryption modules
+\newcommand{\pAuthMods}{c} % Number of authentication modules
+\newcommand{\pARQLimit}{d} % ARQ Limit
+\newcommand{\pARQTimeout}{e} % ARQ flit inter-arrival timeout
+\newcommand{\pRStrat}{f} % Routing strategy
+\newcommand{\pNumAttackers}{g} % Number of malicious routers
+\newcommand{\pAttackProb}{h} % Probability of an attack
 
 \begin{document}
     \frenchspacing % Disable double spaces between sentences
@@ -225,9 +227,6 @@
 
     \chapter{Implementation}\label{ch:implementation}
     \input{kapitel/implementation}
-
-    \chapter{Experiments}\label{ch:experiments}
-    \input{kapitel/experiments}
 
     \chapter{Evaluation}\label{ch:evaluation}
     \input{kapitel/evaluation}

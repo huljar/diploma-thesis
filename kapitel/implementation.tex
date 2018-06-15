@@ -1,9 +1,10 @@
 Following the design phase, it is crucial to test the protocol in a practical environment in order to verify that it works as intended. Furthermore,
 extensive performance evaluations need to be conducted to assure the viability of the devised techniques. Both of these tasks are achieved through
-thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was implemented that supports the designed protocol with all the
-features described in Chapter \ref{ch:protocol}.
+thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was developed that supports the designed protocol with all the
+features described in Chapter \ref{ch:protocol}. A very small portion of the codebase was already implemented before this thesis at the TU Dresden
+Chair of Privacy and Data Security. However, most of it was refactored and the vast majority of the source code was written from scratch.
 
-The simulator is written in C++ and based on the \textit{\omnet{}} discrete event simulation framework \cite{omnet}. \omnet{} provides a general-purpose
+The simulator is implemented in C++ and based on the \textit{\omnet{}} discrete event simulation framework \cite{omnet}. \omnet{} provides a general-purpose
 network simulation architecture and promotes a modular design. In general, it allows the programmer to define the components of the network via a
 special scripting language called \textit{NED}. With NED files, modules may be specified as they appear from the outside, by means of parameters,
 gates, and connections. Furthermore, a module is allowed to have any number of submodules, facilitating a hierarchical structure. A C++
