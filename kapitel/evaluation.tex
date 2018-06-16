@@ -132,8 +132,8 @@ increase latency and RTB sizes.
 - workload on crypto modules should be high
 - relatively high attack probabilities because more ARQs means more ver.+dec. retries at receivers, and network should be able to deal with that scenario
 - max. required enc. units: 4, because max. 2 flits can be drawn from the queues per cycle, so max. 4 flits active at the same time
-- max. required auth. units: 12 (ind. auth), 10 (int. auth), 20 (gen. auth)
-- criterion: max wait time needs to be below 5 cycles
+- max. required auth. units: 12 (ind. auth), 10 (int. auth), 11 (gen. auth (2 flits = 11 cycles busy))
+- criterion: max wait time needs to be 5 or less cycles
 
 \section{Experiments}
 \subsection{Average time of a flit/transmission unit in ArrivalManager until a verification result is there}
