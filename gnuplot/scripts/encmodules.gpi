@@ -1,0 +1,77 @@
+set terminal epslatex size 2.5,2.2 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+
+set style data lp
+set style line 1 lc rgb '#dd181f' lt 1 pt 7
+set style line 2 lc rgb '#dd181f' lt 1 pt 5
+set style line 3 lc rgb '#08bd05' lt 1 pt 7
+set style line 4 lc rgb '#08bd05' lt 1 pt 5
+set style line 5 lc rgb '#0030cd' lt 1 pt 7
+set style line 6 lc rgb '#0030cd' lt 1 pt 5
+
+set ylabel '\ft Enqueued time in cycles' offset 3,0
+set yrange [1:100]
+set logscale y
+
+set xlabel '\ft No. of encryption modules' offset 0,0.2
+set xrange [1:4]
+set xtics 1
+
+set format '\ft %g'
+
+set key font ", 15"
+
+# Encryption modules plots
+set output '../plots/encmodules-ida.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 0 ls 1 t '\ty IDA-UC max', \
+     ''                             using 1:3 index 0 ls 2 t '\ty avg', \
+     ''                             using 1:2 index 2 ls 3 t '\ty G2C3 max', \
+     ''                             using 1:3 index 2 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 4 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 4 ls 6 t '\ty avg'
+
+set output '../plots/encmodules-iwa.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 6 ls 1 t '\ty IWA-UC max', \
+     ''                             using 1:3 index 6 ls 2 t '\ty avg', \
+     ''                             using 1:2 index 8 ls 3 t '\ty G2C3 max', \
+     ''                             using 1:3 index 8 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 10 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 10 ls 6 t '\ty avg'
+
+set output '../plots/encmodules-fga.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 12 ls 3 t '\ty FGA-G2C3 max', \
+     ''                             using 1:3 index 12 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 14 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 14 ls 6 t '\ty avg'
+
+# Authentication modules plots
+set terminal epslatex size 3.1,2.2 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+
+set xlabel '\ft No. of authentication modules' offset 0,0.2
+set xrange [1:12]
+#set xtics autofreq
+
+#set ylabel
+
+set output '../plots/authmodules-ida.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 1 ls 1 t '\ty IDA-UC max', \
+     ''                             using 1:3 index 1 ls 2 t '\ty avg', \
+     ''                             using 1:2 index 3 ls 3 t '\ty G2C3 max', \
+     ''                             using 1:3 index 3 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 5 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 5 ls 6 t '\ty avg'
+
+set output '../plots/authmodules-iwa.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 7 ls 1 t '\ty IWA-UC max', \
+     ''                             using 1:3 index 7 ls 2 t '\ty avg', \
+     ''                             using 1:2 index 9 ls 3 t '\ty G2C3 max', \
+     ''                             using 1:3 index 9 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 11 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 11 ls 6 t '\ty avg'
+
+set output '../plots/authmodules-fga.tex'
+plot '../data/numcryptomodules.dat' using 1:2 index 13 ls 3 t '\ty FGA-G2C3 max', \
+     ''                             using 1:3 index 13 ls 4 t '\ty avg', \
+     ''                             using 1:2 index 15 ls 5 t '\ty G2C4 max', \
+     ''                             using 1:3 index 15 ls 6 t '\ty avg'

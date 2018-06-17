@@ -1,6 +1,11 @@
+\section{Notation}
+%Placeholder parameters
+%Prot. variants abbreviations (IDA, IWA, FGA, UC) (G2C3 and G2C4 as before)
+%Term "source flit"
+
 \section{Environment}
 % 50,000 cycles (why?)
-% Warmup and cooldown times
+% Warmup and cooldown times (both 500 cycles)
 % Injection rate of 0.2 into the network
 In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
 \cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
@@ -86,13 +91,14 @@ presents how the simulator is set up.
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
-        Ind. Auth. & varying & 5 & 15 & 1 & varying & \gls{dor} & 0 & 0 \\
+        \gls{ida} & varying & 5 & 15 & 1 & varying & \gls{dor} & 0 & 0 \\
     \end{tabulary}
     \caption[Input parameters for ARQ timeouts experiment]{long}
     \label{tab:setuparqtimeouts}
 \end{table}
 % Why Ind. Auth.? Most flits per transmission unit (8 with G2C4)
 % Why this number of enc./auth. units? Large number so there are definitely no internal congestions → area doesn't matter for this experiment
+% Why ARQs per source flit and not per transmission unit? because size of trans. units varies considerably with prot. variant
 
 To determine the timeout value, an uncompromised \gls{noc} (i.e., with zero malicious routers) is used. Ideally, no \glspl{arq} are issued in this
 scenario. However, due to random deviations from the average flit injection rate, the network load varies over time and congestions in some routers
@@ -106,7 +112,7 @@ unnecessary \glspl{arq} will be used for the subsequent evaluations.
 \begin{figure}
     \centering
     \input{gnuplot/plots/arqtimeouts}
-    \caption[short]{long}
+    \caption[Results for ARQ timeouts experiment]{long}
     \label{fig:resultsarqtimeouts}
 \end{figure}
 
@@ -129,14 +135,30 @@ increase latency and RTB sizes.
 \end{table}
 - congestions in the queues in front of the crypto modules should be minimal
 - less modules are better if possible because less chip area
-- workload on crypto modules should be high
 - relatively high attack probabilities because more ARQs means more ver.+dec. retries at receivers, and network should be able to deal with that scenario
+  "network needs to be equipped to deal with/handle periods of high traffic volumes"
 - max. required enc. units: 4, because max. 2 flits can be drawn from the queues per cycle, so max. 4 flits active at the same time
 - max. required auth. units: 12 (ind. auth), 10 (int. auth), 11 (gen. auth (2 flits = 11 cycles busy))
 - criterion: max wait time needs to be 5 or less cycles
 
+\begin{figure}
+    \centering
+    \begin{tabular}{ll}
+        \input{gnuplot/plots/encmodules-ida} & \input{gnuplot/plots/authmodules-ida.tex} \\
+        \input{gnuplot/plots/encmodules-iwa} & \input{gnuplot/plots/authmodules-iwa.tex} \\
+        \input{gnuplot/plots/encmodules-fga} & \input{gnuplot/plots/authmodules-fga.tex}
+    \end{tabular}
+    \caption[Results for number of crypto modules experiment]{The number of encryption modules (left column) and authentication modules (right column)
+    is shown in relation to the maximum and average wait times of enqueued flits. Each row represents one protocol variant.}
+    \label{fig:resultscryptomodules}
+\end{figure}
+
 \section{Experiments}
-\subsection{Average time of a flit/transmission unit in ArrivalManager until a verification result is there}
+Record:
+- acceptance rate (aka actual injection rate)
+- information rate (source flits / total flits)
+- residual error probability
+- end-to-end latency
 \subsection{Number of ARQs modified/dropped by routers}
 \subsection{Routing strategies effects}
 % Heatmap of router workload?
