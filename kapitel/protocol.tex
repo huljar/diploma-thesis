@@ -7,7 +7,7 @@ authentication. Finally, the routing strategies that are explored in conjunction
 \section{Design Aspects}
 \subsection{Unicast And Multicast}
 In Section \ref{sec:assandsig}, it was already hinted that this thesis concerns itself with the unicast communication pattern. In this scenario, each
-flit is sent to a single specified destination. In contast, multicast facilitates the existance of multiple receivers for a single flit.
+flit is sent to a single specified receiver. In contast, multicast facilitates the existance of multiple receivers for a single flit.
 
 While there has been notable work on \gls{noc} multicast protocols, especially in conjuction with network coding, this thesis builds directly upon
 research in the unicast domain (cf. Section \ref{sec:ncfornoc}). Hence, multicast will not be considered for the implementation, experiments, and
@@ -16,7 +16,7 @@ evaluation performed here.
 \subsection{Flit Structure}\label{subsec:flitstructure}
 As mentioned in Section \ref{sec:flitsfun}, flits are the fundamental unit of transmission for this thesis. They contain several header fields and a
 payload. Their structure differs slightly depending on whether or not network coding is employed. For network coded flits, one additional
-header field is required (the global encoding vector) and the generation ID replaces the flit ID. This structure is depicted in Figure
+header field is required (the global encoding vector) and the generation ID replaces the flit ID. These structures are depicted in Figure
 \vref{fig:flitstructureuncoded} (uncoded) and Figure \ref{fig:flitstructurenetworkcoded} (network coded).
 % TODO: table comparing the protocol variants, their properties (e.g. lane width)
 
@@ -45,8 +45,8 @@ transmitted information. Uncoded flits have the following fields:
         this thesis, however, the burst bit is unused. As there are plans to build upon this work and explore burst configurations, it is included
         nevertheless for documentation purposes.
     \item \textbf{Source X, Source Y.} Recalling that the topology of the \gls{noc} is a 2D mesh, the usage of 2D cartesian coordinates to uniquely
-        identify nodes suggested itself. Here, zero-based X and Y indices indicate the column and row of a node, respectively. Each field is 4 bit long,
-        resulting in at most $16 \cdot 16 = 256$ nodes being addressable. Hence, the maximum \gls{noc} size is \textit{16x16} as well, which is deemed
+        identify and address nodes suggested itself. Here, zero-based X and Y indices indicate the column and row of a node, respectively. Each field is 4 bit long,
+        resulting in at most $16 \cdot 16 = 256$ nodes being addressable. Hence, the maximum \gls{noc} size is 16x16 as well, which is deemed
         sufficient\footnote{It is certainly possible to increase the field sizes to, e.g., 8 bit, allowing for up to $256 \cdot 256 = 65536$ addressable
         nodes, should the need arise. However, as this would increase the flit size, it is not implemented here.}. The source header fields describe
         the address of the flit's sender.% TODO: refer to a figure describing a routing strategy, which shows addresses of a sender and receiver
@@ -56,9 +56,10 @@ transmitted information. Uncoded flits have the following fields:
         data, a \gls{mac}, or an \gls{arq}. There are a few more special modes that are explained in Section \ref{sec:theprotocol}. The
         field size is 4 bit, allowing for 16 different modes. Not all of them are used for this thesis, so it is possible to define additional modes
         in a future work if necessary.
-    \item \textbf{Address.} This field may contain a 32 bit memory address. In case the flit payload needs to be read from or written to memory, it
-        indicates the location of the data. Since this is only relevant to the processing elements and not the network interfaces, the field remains
-        unused for this thesis. Nevertheless, it is included in the flits since it affects their size.
+    \item \textbf{Address.} Not to be confused with the source and destination addresses described above, this field may contain a 32 bit memory
+        address. In case the flit payload needs to be read from or written to memory, it indicates the location of the data. Since this is only
+        relevant to the processing elements and not the network interfaces, the field remains unused for this thesis. Nevertheless, it is included in
+        the flits since it affects their size.
     \item \textbf{Flit ID.} The flit ID is a 24 bit numeric identifier. Starting at zero, the IDs are incremented as more flits are generated.
         Similar to sequence numbers (e.g., as employed in \gls{tcp}), they are used to ensure that all flits arrive at the destined processing
         elements in order. Furthermore, the values are used to associate related flits. For instance, an encrypted data flit and the corresponding \gls{mac}
@@ -87,32 +88,28 @@ cycle. For example, sending a flit from a router to a neighboring one, or sendin
 to the attached network interface takes one cycle. In a hardware implementation, this is facilitated by parallel communication channels that are able
 to transmit multiple bits simultaneously. This results in multiple wires (or other electical conductors) at the physical layer, as each one may convey
 precisely one bit of information per cycle \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
-in a network coded setting.
+in a network coded setting.% TODO: remove/replace this shitty wikipedia reference
 
 \subsection{Cryptography}\label{subsec:crypto}
 \subsubsection{Notation}\label{subsubsec:cryptonotation}
 This section introduces formal notations and definitions regarding the cryptographic primitives. They will be used throughout this chapter to
 illustrate how flits are processed. They are denoted by variables, functions, and operators, where
 \begin{itemize}
-    \item $p$ is a plaintext message (which corresponds to the flit payload),
+    \item $p$ is a plaintext message,
     \item $c$ is a ciphertext,
     \item $m$ is a \gls{mac},
     \item $k$ is a key (with $k_e$ and $k_m$ referring to encryption and \gls{mac} keys),
     \item $f$ is a complete flit (header and payload),
     \item $r$ is an authenticated and encrypted message,
-    \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$ (sometimes denoted by a lock
-        symbol),
+    \item $e_k(p)$ is an encryption function that takes a plaintext $p$ and produces a ciphertext $c$ using key $k$ (denoted by a lock
+        symbol in figures),
     \item $d_k(c)$ is a decryption function that takes a ciphertext $c$ and produces the plaintext $p$ using key $k$,
     \item $a_k(f)$ is an authentication function that takes a flit and produces a \gls{mac} $m$ using key $k$\footnote{The whole flit is
-        authenticated, as opposed to just the payload, to provide integrity on the header fields as well.},
+        authenticated, as opposed to just the payload, to provide integrity for the header fields as well.},
     \item $\oplus$ denotes the bitwise XOR operation, and
     \item $\|$ symbolizes concatenation.
 \end{itemize}
 \vspace{0.5\baselineskip}
-
-While the functions $e_k(p)$ and $d_k(c)$ take a 64 bit long text as their argument (which matches the cipher's block size), the authentication
-function $a_k(f)$ is applied to complete flits, exceeding the block size. Therefore, $a_k(f)$ applies the cipher in conjunction with the \gls{cbcmac}
-mode of operation as explained below.
 
 \subsubsection{Drawbacks}\label{subsubsec:cryptodrawbacks}
 The integration of cryptographic operations inevitably entails a degradation of the network performance which manifests itself in higher transmission
@@ -140,7 +137,8 @@ are implemented:
 
 \subsubsection{Composition Methods}
 The ordering of encryption and authentication (i.e., \gls{mac} computation) has a significant impact on both the achievable performance and the
-security of the scheme. There are three general approaches to bring them together \cite{bellare00authenc}:
+security of the scheme. There are three general approaches to bring them together\footnote{For the illustrations of the three schemes, the plaintext
+$p$ corresponds to the payload of flit $f$.} \cite{bellare00authenc}:
 \begin{itemize}
     \item \textbf{Encrypt-and-MAC (\gls{eam}).} The plaintext is encrypted and the \gls{mac} is computed over the plaintext. Afterwards, the \gls{mac} is
         appended to the ciphertext. More precisely, $r = e_{k_e}(p)\|a_{k_m}(f)$.
@@ -153,13 +151,13 @@ security of the scheme. There are three general approaches to bring them togethe
 
 Out of these three methods, \gls{etm} was chosen. It provides integrity on the ciphertext -- and consequently on the plaintext as well --
 instead of just the plaintext. Thus, the integrity of the message can be verified without the need to decrypt it first and the parallel decryption and
-verification mentioned above becomes possible. Moreover, in case of an integrity breach, \glspl{arq} can be issued earliest as the verification is
-performed directly after the flits arrive.
+verification mentioned above becomes possible. In case of an integrity breach, \glspl{arq} can be issued earliest as the verification is
+performed directly after the flits arrive. Moreover, \gls{eam} and \gls{mte} have been subject to security vulnerabilities in the past
+\cites{bellare00authenc}{bellare04ssheam}{etmtls}.
 
 On the sender side, \gls{etm} necessitates sequential encryption and authentication since the \gls{mac} is computed over the ciphertext. While
 \gls{mte} forces this as well, it can be parallelized with \gls{eam}. However, both \gls{eam} and \gls{mte} do not provide an overall speed gain over
-\gls{etm}. In addition, they have been subject to security vulnerabilities in the past \cites{bellare00authenc}{bellare04ssheam}{etmtls}. Table
-\ref{tab:compositionmethods} gives a comparison of the methods.
+\gls{etm}. Table \ref{tab:compositionmethods} gives a comparison of the three methods.
 
 \begin{table}
     \centering
@@ -168,8 +166,7 @@ On the sender side, \gls{etm} necessitates sequential encryption and authenticat
         Parallel encryption/authentication & yes & no & no \\
         Parallel decryption/verification & no & no & yes \\
         Plaintext integrity & yes & yes & yes \\
-        Ciphertext integrity & no & no & yes \\ % TODO: more aspects?
-        Verification latency & high & high & low
+        Ciphertext integrity & no & no & yes% TODO: more aspects?
     \end{tabulary}
     \caption[Comparison of authenticated encryption composition methods]{Comparison of the authenticated encryption composition methods
     Encrypt-and-MAC (\gls{eam}, MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
@@ -180,15 +177,13 @@ For all methods, the ciphertext and \gls{mac} need to be embedded into one or mo
 elucidated in the protocol descriptions (Section \ref{sec:theprotocol}).
 
 \subsubsection{PRINCE}\label{subsubsec:prince}
-The cipher that is used for encryption, decryption, and authentication is \textit{PRINCE} \cite{borghoff12prince}. Among its many competitors, it is
-the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement
+The cipher that is used for encryption, decryption, and authentication is \textit{PRINCE} \cite{borghoff12prince}. It is a symmetric block cipher with
+a block size of 64 bit and a key size of 128 bit, structured as a \textit{substitution-permutation network (\gls{spn})} with 12 rounds. Among its many
+competitors, it is the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement
 \cite{harttung17lightweightcrypto}. Here, low latency is deemed more important than low chip area requirements, rendering it a natural choice. Besides, the
 faster the algorithm runs, the less parallel modules may be required, potentialls reducing the overall area requirement in the end. Furthermore, with a
 key length of 128 bit, it provides relatively high security\footnote{Similar algorithms often have a key length of just 80 or 96 bit
 \cite[5]{harttung17lightweightcrypto}.}. To date, it remains unbroken despite monetary incentives to develop attacks \cite{princechallenge}.
-
-PRINCE is a symmetric block cipher with a block size of 64 bit and a key size of 128 bit. It is structured as a \textit{substitution-permutation
-network (\gls{spn})} with 12 rounds.
 
 What sets PRINCE apart from other lightweight ciphers is a design specifically targeted at fully unrolled hardware implementations. With this
 strategy, each round is computed using its own dedicated part of the circuit. These pieces are concatenated to form the full cipher. This approach
@@ -202,10 +197,9 @@ higher area requirement than iterative ones; however, it is still \enquote{consi
 
 The authors of PRINCE have investigated the maximum clock frequency of their algorithm under varying conditions. They were able to achieve 212.8 MHz
 using speed-optimizing synthesis strategies and 45 nm technology\footnote{Their other tests include 90 and 130 nm technology or area-optimizing
-synthesis strategies, yielding lower results.}. In other research \glspl{noc} at the TU Dresden, namely the \textit{Tomahawk}
-\gls{mpsoc}, 28 nm technology is commonly used \cite[35]{cfaedreport}. Under
-this premise, a frequency of at least 250 MHz is definitely achievable, considering that the switch from 90 to 45 nm already more than doubled
-the maximum frequency in the authors' experiments.
+synthesis strategies, yielding lower results.}. For this thesis, 28 nm technology is assumed since a related research \gls{noc} at the TU Dresden,
+employed on the \textit{Tomahawk} \gls{mpsoc}, uses it as well \cite[35]{cfaedreport}. Under this premise, a frequency of at least 250 MHz should
+definitely be achievable, considering that the switch from 90 to 45 nm already more than doubled the maximum frequency in the authors' experiments.
 
 A great asset of PRINCE is the possibility to use almost the exact same algorithm for encryption and decryption. More precisely, the decryption
 function corresponds to the encryption function if the round key\footnote{PRINCE uses the same round key for all rounds.} for the former is slightly
@@ -213,6 +207,11 @@ modified. At the start of PRINCE, three subkeys $(k_0, k_0', k_1)$ are derived f
 other keys, $k_0$ and $k_0'$ are used as whitening keys.}. Now, $d_{(k_0, k_0', k_1)}(c) = e_{(k_0, k_0', k_1 \oplus \alpha)}(c)$, where $\alpha$ is a
 64 bit constant. This property, called \textit{\alpha-reflection}, renders using the same circuit for encryption and decryption possible by simply
 omitting the XOR operation for the encryption case.
+
+\subsubsection{Mode Of Operation}
+% TODO: here: ECB is used. This is not secure, e.g. because same plaintexts yield same ciphertexts. One possibility: CTR mode where the flit ID is the
+% counter. As ID is unique per encrypted flit, it can be used as the counter; this way, decryption also works when the flit stream is interrupted (no
+% synchronization between sender and receiver required).
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
@@ -242,8 +241,8 @@ generations, consisting of three or more flits, are also feasible, but have prov
 is not desirable.} and is constructed as $g_j = (f_{2j}, f_{2j+1})$. Furthermore, the flit IDs $i$ are replaced in the flits by the generation IDs $j$
 as described in Section \ref{subsec:flitstructure} (see also Figure \vref{fig:encodingexample}).
 
-The combinations are then computed as follows: first, a unit vector $e_i = (e_{i_0}, …, e_{i_{G-1}})$ that signifies the index of the flit inside the
-generation \cite[cf.][3]{chou03practicalnc} is prepended to each flit's payload:
+The combinations for each generation are then computed as follows: first, a unit vector $e_i = (e_{i_0}, …, e_{i_{G-1}})$ that signifies the index of
+the flit inside the generation \cite[cf.][3]{chou03practicalnc} is prepended to each flit's payload:
 \[
     e_{i_k} =
     \begin{cases}
@@ -290,14 +289,14 @@ $C \geq G$ combinations are computed with randomly selected coefficients $\beta$
         \end{bmatrix}
     \end{split}
 \]
-Each row of the result matrix represents one combination, with $\beta_i = (\beta_{i,\,0}, …, \beta_{i,\,G-1})\ |\ i \in \left[0, C\right)$ standing
-for the \glspl{gev} and $q_i = (q_{i,\,0}, …, q_{i,\,P-1})\ |\ i \in \left[0, C\right)$ corresponding to the encoded payloads. The other header fields
+Each row of the result matrix represents one combination, with $\beta_i = (\beta_{i,\,0}, …, \beta_{i,\,G-1})\ |\ i \in [0, C-1]$ standing
+for the \glspl{gev} and $q_i = (q_{i,\,0}, …, q_{i,\,P-1})\ |\ i \in [0, C-1]$ corresponding to the encoded payloads. The other header fields
 are adopted unaltered from the original flits\footnote{The header fields of the original flits in the same generation contain the same values by
 design, hence these values can simply be copied to the encoded flits.}. Figure \vref{fig:encodingexample} illustrates the whole process.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{encoding-example-mapping}
+    \includegraphics[width=0.9\textwidth]{encoding-example-mapping}
     \caption[Application of network coding to flits]{Application of network coding to flits. The generation size is G=2 and the number of computed
     combinations is C=3 (i.e., the G2C3 scheme). Using randomly selected cofficients $\beta$ as \glspl{gev}, the flits $f_0$ and $f_1$ are encoded,
     creating the combinations $c_0$, $c_1$, and $c_2$.}
@@ -310,12 +309,13 @@ are referred to as \textit{G2C3} and \textit{G2C4}, respectively.
 On the side of the receiver, the combinations\footnote{Henceforth, the term \textit{combination} is also used to refer to the flit containing a
 combination.} are decoded to recover the original flits. At least $G$ out of the $C$ combinations must arrive at their
 destination to render decoding possible. Furthermore, the $G$ combinations have to be linearly independent. With a symbol size of 4 bit and randomly
-selected coefficients, they fulfill this condition with a probability of $\approx 93\%$ \cite[4]{franz18authdraft}\footnote{A larger symbol size would
+selected coefficients, they fulfill this condition with a probability of approximately 93\% \cite[4]{franz18authdraft}\footnote{A larger symbol size would
 entail higher invertibility probabilities. For example, it is $>99\%$ for a symbol size of 8 bit \cite[4]{franz18authdraft}, but at the cost of the
 \gls{gev} size being doubled. Hence, 4 bit are deemed sufficient for this thesis.}. Should this condition be violated, a different set of $G$ out of
 the $C$ combinations is used\footnote{In the rare case that decoding is unsuccessful for any $G$ of the $C$ combinations, this generation cannot be
 recovered. For the remainder of this thesis, it is assumed that the combinations are always linearly independent for simplicity.}. The receiver then
-decodes the combinations by solving the system of linear equations established by the received flits' \glspl{gev} and payloads:
+decodes the combinations by solving the system of linear equations established by the received flits' \glspl{gev} and payloads (given here in matrix
+form):
 \[
     \begin{bmatrix}
         \beta_{0,\,0} & \cdots & \beta_{0,\,G-1} & q_{0,\,0} & \cdots & q_{0,\,P-1} \\
@@ -331,7 +331,7 @@ The solution is obtained by applying Gaussian elimination until the matrix is in
         0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
     \end{bmatrix}
 \]
-Now, the original flits may be recreated. The vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in \left[0, G\right)$ obtained from the system of linear
+Now, the original flits may be recreated. The vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in [0, G-1]$ obtained from the system of linear
 equations above are their payloads. The flit IDs are reconstructed from the generation ID $j$: with $G = 2$, they are $2j$ and $2j+1$. The other
 header fields are simply copied over from one of the combinations as they have not changed during the encoding phase.
 % TODO: vector symbols over p_i, beta_i etc. where appropriate (im Fließtext)
@@ -343,17 +343,17 @@ are lost in transit.
 
 On the other hand, the amount of flits injected into the network increases considerably depending on the coding scheme. For G2C3, 50\% more flits are
 sent out, and 100\% more for G2C4 (compared to uncoded communication). However, the additional resilience to flit loss entails less \glspl{arq} to be
-issued (in an unreliable network), which in turn may reduce the overall load.
+issued (in an unreliable network), which in turn may reduce the overall load and the average transmission latencies.
+% TODO: mention that G2C4 is better than e.g. sending every flit twice (which also results in a 100% flit increase)
 
 \subsection{Flit And Generation IDs}
 For each sender-receiver pair, the IDs of flits and generations should be unique in order to eliminate ambiguities between flits and inhibit replay
-attacks. Hence, IDs start at zero and are incremented with each newly created flit or generation, respectively. However, as only a finite amount of
+attacks. Hence, for each such pair, IDs start at zero and are incremented with every newly created flit or generation, respectively. However, as only a finite amount of
 distinct values can be represented by the carrying header field, long-running systems are bound to cause an arithmetic overflow at some point. Prior
 to this thesis, a size of 24 bit was determined as sufficient for the given scenario \cite[5]{franz18authdraft}. With this, $2^{24} = \num{16777216}$
 distinct IDs are at disposal. Should an overflow occur, the IDs simply restart at zero. At this point, is is advisable to negotiate a new shared
 secret key with the affected receiver to further impede replay attacks. For the remainder of this thesis, IDs are assumed to be unique for a given
 sender-receiver pair.
-% TODO: correct biblatex entry for the draft paper
 
 \subsection{Transmission Units}
 The concept of transmission units spans all protocol variants. In general, it signifies a group of flits belonging together, which is indicated by
@@ -373,6 +373,8 @@ to \textit{\gls{arq}} to differentiate them. However, the following header field
         experiments.
     \item \textbf{Global Encoding Vector.} Network coding is never applied to an \gls{arq} flit; it is always uncoded. Hence, there is no \gls{gev}
         associated with it. For the uncoded protocol variants, this fields does not even exist in the first place.
+    \item \textbf{Address.} \Glspl{arq} do not contain a memory address since their payload does not need to be written to memory. As with the burst
+        bit, this field remains unused both in \glspl{arq} and in normal flits.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
@@ -412,7 +414,8 @@ with a longer distance resulting in a higher timeout value. This is done to acco
 answer. Details are discussed in Section \ref{subsec:arqtimeouts}.
 
 It is desirable to send out as little \glspl{arq} as necessary to keep the network load as low as possible. Furthermore, with a limited
-amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early. For instance, a timeout may
+amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early in the network coded protocol
+variants. For instance, a timeout may
 occur while a \gls{mac} is currently being computed for another flit from the same transmission unit. On the one hand, if an \gls{arq} is issued for
 the missing flits immediately, but the integrity check for the received flits fails shortly after, an additional \gls{arq} may not be allowed due to
 the limit, causing the whole unit to fail. On the other hand, postponing the \gls{arq} too long may cause unreasonable increases in latency. As a
@@ -420,6 +423,9 @@ middle ground, the issuance of \glspl{arq} is only postponed if other flits from
 precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
 the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
 \gls{arq} as well, should the integrity check fail.
+
+% TODO: explain case of complete transmission unit lost; receivers can detect this through the ID stream from this sender not being continuous.
+% full transmission unit loss beyond scope of this thesis though
 
 \Glspl{arq} are not encrypted because they only contain metadata that are not confidential. Furthermore, they are not authenticated in order to save
 time and trigger the retransmissions as quickly as possible. Unfortunately, with the integrity checks missing, malicious routers are able to undetectably
