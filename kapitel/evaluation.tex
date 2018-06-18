@@ -7,6 +7,7 @@
 % 50,000 cycles (why?)
 % Warmup and cooldown times (both 500 cycles)
 % Injection rate of 0.2 into the network
+% TODO: Router queue sizes (no limit for local input queue to avoid flits being discarded for simulation purposes)
 In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
 \cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
 issuance of \glspl{arq} and the resulting retransmissions.

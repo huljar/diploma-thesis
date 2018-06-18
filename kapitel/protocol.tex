@@ -476,15 +476,16 @@ The sequence of actions for sending flits to the network (upper part of Figure \
         fixed length, this is not of concern here. However, an alternative algorithm such as \gls{cmac} could also be used.} because of its low
         complexity, resulting in a total of three required block encryptions. Since the last block would only contain 13 bit, it is
         padded (e.g., with zero-bits) to align it with the block boundaries. The computed \gls{mac} has a length of 64 bit. To transmit it, a new, dedicated
-        \gls{mac} flit is created as follows: the mode field is set to \gls{mac}, the other header fields are copied from the data flit, and the
+        \gls{mac} flit is created as follows: the mode field is set to \textit{MAC}, the other header fields are copied from the data flit, and the
         \gls{mac} itself is inserted into the payload field\footnote{As data and \gls{mac} flit have the same ID, the receiver will be able to
         correctly link them together.}. Both flits are then sent out together. Figure \vref{fig:computeflitmac} elucidates this process.
     \item \textbf{Store copies in retransmission buffer.} Since \glspl{arq} may arrive to request retransmissions of already dispatched flits, the
-        sender stores a copy of each flit in a dedicated retransmission buffer before sending it to the network. For each possible receiver,
+        sender copies each flit before sending it to the network and stores the copy in a dedicated retransmission buffer. For each possible receiver,
+        i.e., each other node in the network,
         there is a separate buffer because the required storage time is proportional to the distance to the receiver. Thus, buffers for nodes far away are
         larger. Once a buffer is full, old flits are replaced in a \gls{fifo} manner\footnote{Naturally, the buffers should be large enough to be
         able to serve flits for \glspl{arq} arriving within an acceptable time frame after the original flit was dispatched. For simplicity, the
-        buffers are assumed to be sufficiently large to handle all \glspl{arq}.}. The original flits are sent to the network.
+        buffers are assumed to be sufficiently large to handle all \glspl{arq}.}.
 \end{enumerate}
 \vspace{0.5\baselineskip}
 
@@ -576,10 +577,10 @@ This amounts to the following procedure for sending flits to the network (upper 
         with the same destination are available. Subsequently, network coding is applied to them, resulting in either three (G2C3) or four (G2C4)
         combinations. The used \glspl{gev} and a new generation ID\footnote{The same generation ID is assigned to all combinations.} are stored in
         their designated header fields. The combinations are then passed to the next step; the original flits are not sent out.
-    \item \textbf{Authenticate combinations.} The authentication procedure is virtually same as for uncoded individual authentication. The only
+    \item \textbf{Authenticate combinations.} The authentication procedure is virtually the same as for uncoded individual authentication. The only
         difference is that the \glspl{mac} are computed over combinations rather than uncoded flits (see Figure \vref{fig:computecombinationmac}
         for a visualization of the algorithm)\footnote{Combinations and their \gls{mac} flits are linked by containing the same \gls{gev} value in
-        addition to having the same generation ID.}. Apart from that, each incoming combination is individually authenticated with a dedicated \gls{mac}
+        addition to having the same generation ID.}. Apart from that, each outgoing combination flit is individually authenticated with a dedicated \gls{mac}
         flit.
     \item \textbf{Store copies in retransmission buffer.} Unchanged from the uncoded protocol variant, a copy of each flit (combinations and
         \glspl{mac} alike) is stored in the retransmission buffer to facilitate \gls{arq} answers.
@@ -609,7 +610,10 @@ The following processing steps are performed for flits arriving from the network
 \end{enumerate}
 \vspace{0.5\baselineskip}
 
-\Glspl{arq} are issued for failing integrity checks or when timeouts occur, as illustrated in Figure \vref{fig:timeoutindauthnc}.
+\Glspl{arq} are issued when the integrity check for a combination fails, in which case the affected combination and its \gls{mac} flit are requested.
+If another combination of the same transmission unit is currently being verified, the \gls{arq} may be postponed according to the rules laid out in
+Section \ref{subsec:arqretransmissions}. Furthermore, in the event of a timeout, an \gls{arq} is issued requesting all missing flits from the affected
+transmission unit. This scenario is illustrated in Figure \vref{fig:timeoutindauthnc}.
 
 \begin{figure}
     \centering
@@ -624,11 +628,11 @@ The following processing steps are performed for flits arriving from the network
 
 \subsection{Interwoven Authentication}\label{subsec:intauth}
 \subsubsection{Uncoded Variant}
-The third scheme in the protocol repertoire is \textit{uncoded interwoven authentication}. Just like the first approach presented in the previous
-section (uncoded individual authentication), it facilitates encryption and authentication of the transmitted information. While overall providing the
-same features, the key difference lies in the way that flits are authenticated and how this information is consolidated in the flits for transmission.
-The goal is to have the data and its authentication information within the same flit to allow receivers to immediately begin the verification process
-upon its arrival. However, since the payload size is still limited to 64 bit, a \gls{mac} cannot simply be appended to the data. The implemented
+The third scheme in the protocol repertoire is \textit{uncoded interwoven authentication}. The key differences to uncoded individual authentication
+lie in the authentication algorithm and how its output is consolidated in the flits for transmission. The goal is to have the data and its
+authentication information within the same flit to allow receivers to immediately invoke the verification procedures
+upon its arrival. In addition, in the event of an integrity breach, only one flit needs to be requested for retransmission. However, since the payload
+size is still limited to 64 bit, a \gls{mac} cannot simply be appended to the data. The implemented
 solution is to split the payload in the middle after encryption and moving the second half to a new flit (with the same header fields). Consequently,
 both flits contain 32 bit of data and have another 32 bit available for the authentication information. Since they both have the same flit ID to link
 them together, the mode field is used to distinguish them (by setting different values for the first and second split, respectively). Figures
@@ -653,13 +657,14 @@ them together, the mode field is used to distinguish them (by setting different 
     \label{fig:protchartintauthuc}
 \end{figure}
 
-A normal \gls{mac}, as used in individual authentication, has a size of 64 bit by design of the cipher. Thus, the authentication scheme has to be
-adapted. A different type of authentication code (called \textit{authcode} in this thesis) provides the solution
-\cites{simmons94cryptology}{moriam18activeattackers}. The key idea is to first compute a \gls{mac} as before, but then use it
-as a key to create an authcode of half its size (i.e., 32 bit -- precisely the number of available bits). Each bit of the authcode is computed
-with two key bits and one bit from the data part of the payload. The pattern is given in Table \vref{tab:authcodes} and the full process
-is elucidated in Figure \vref{fig:computeauthcodeuc}. The interweavement of data and authcodes within the same flit is the eponymous characteristic
-of this protocol variant.
+A \gls{mac}, as used in individual authentication, has a size of 64 bit by design of the cipher. Thus, the authentication scheme has to be
+adapted. A different type of authentication code (called \textit{authcode} in this thesis) provides a solution
+\cites{simmons94cryptology}{moriam18activeattackers}. The idea is to first compute a pseudo-random intermediate key from the metadata (i.e., the
+header fields) of the flit and the shared secret authentication key. Subsequently, this intermediate key is used to authenticate the 32 bit data part
+of the payload, resulting in a 32 bit authcode that fits precisely into the remainder of the payload. Each bit of the authcode is computed with two
+key bits and one bit from the data part of the payload, processed from left to right. The employed bit patterns are given in Table
+\vref{tab:authcodes}, while the full process is elucidated in Figure \vref{fig:computeauthcodeuc}. The interweavement of data and authcodes within the
+same flit is the eponymous characteristic of this protocol variant.
 
 \begin{table}
     \centering
@@ -677,8 +682,8 @@ of this protocol variant.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{compute-authcode-uc}
-    \caption[Computation of authcodes with CBC-MAC]{Computation of an authcode with \gls{cbcmac}. To compute the intermediate key, \gls{cbcmac} is
-    applied to the header fields and the data part of the payload. With a size of 109 bit (or 117 for network coded flits), the input fits into two
+    \caption[Computation of an authcode]{Computation of an authcode. To obtain the intermediate key, \gls{cbcmac} is
+    applied to the header fields of the payload. With a size of 77 bit (or 85 for network coded flits), the input fits into two
     blocks. The padding added to fill the second block is not part of the flit. The intermediate key is then used to compute the actual authcode: the
     cogwheel corresponds to the function defined by Table \ref{tab:authcodes}. The result is stored in the rightmost 32 bit of the flit.}
     \label{fig:computeauthcodeuc}
@@ -720,7 +725,7 @@ The fourth variation of the protocol adds a network coding layer to interwoven a
 authentication}. After an encrypted flit has been split, the two resulting flits form the generation required for network coding. Since their payloads
 each contain only 32 bit, the combinations' payloads also just hold 32 bit of encoded data. This leaves the remaining 32 bit for the authcode, which is
 computed for each combination using the same algorithm as in uncoded interwoven authentication\footnote{Although network coding introduces the
-additional \gls{gev} header field to the flits, the input for the \gls{cbcmac} part of the algorithm, being 117 bit in size, still fits into two
+additional \gls{gev} header field to the flits, the input for the \gls{cbcmac} part of the algorithm, being 85 bit in size, still fits into two
 blocks.}. On the receiver side, the network coding layer introduces an additional decoding step before the flits are merged and decrypted. As before,
 an outside view of the network interface is given in Figure \vref{fig:protflitdistintauthnc}, while the internal procedures are outlined in Figure
 \vref{fig:protchartintauthnc}.
@@ -749,7 +754,9 @@ The following steps are implemented on the sender side (upper part of Figure \re
     \item \textbf{Encrypt payload.} As per usual, this is the first piece of the sending process and does not differ from the other protocol variants.
     \item \textbf{Split flit.} The same procedure as in uncoded interwoven authentication is applied here.
     \item \textbf{Encode generation.} As described above, the flits resulting from the split form a generation for network coding. The encoding
-        algorithm is the same as in network coded individual authentication.
+        algorithm is the virtually the same as in network coded individual authentication, the only difference being that is is applied to a shorter
+        payload\footnote{Recalling the operation breakdown from Section \ref{sec:designnc}, the shorter payload is expressed by setting $P=8$ instead
+        of $P=16$.}.
     \item \textbf{Authenticate combinations.} For each combination, an authcode is computed in the same manner as in uncoded interwoven
         authentication. It is inserted into the last 32 bit of the payload, which are not occupied by encoded data.
     \item \textbf{Store copies in retransmission buffer.} As in all protocol variants, a copy of each flit that is leaving for the network is retained
@@ -868,7 +875,8 @@ issued on timeouts as per usual.
 A core aspect of this thesis is the exploration of different routing strategies and their effects on the performance and reliability of
 the network. Several routing strategies with different path selection algorithms are investigated. Recalling that the topology of the
 \gls{noc} is a 2D mesh, there is a multitude of possible paths to reach a destination from a particular source node. Figure \vref{fig:pathexamples}
-illustrates some exemplary ones\footnote{The processing elements and network interfaces are omitted for illustration purposes.}.
+illustrates some exemplary ones\footnote{For this figure and subsequent figures in this section, the processing elements and network interfaces are
+omitted for illustration purposes.}.
 
 \begin{figure}
     \centering
@@ -889,13 +897,12 @@ Routing strategies may be classified according to their properties. The followin
 characteristics and the distinctions between them.
 \begin{itemize}
     \item \textbf{Oblivious vs. adaptive.} When the source or an intermediate node decides on the next hop of a route, it may take the current
-        network state into account. For instance, a congestion detected on the preferred port\footnote{Congestion is detected by inspecting the length
+        network state into account. For instance, a congestion detected on the preferred output port\footnote{Congestion is detected by inspecting the status
         of the neighboring router's input queue for the appropriate port; if it is full, the link to this router is viewed as congested. The details
-        of this process are explained in Section (insert ref here).} may dissuade the router from forwarding the flit in this direction and instead
+        of this process are explained in Section \ref{subsec:routerimpl}.} may dissuade the router from forwarding the flit in this direction and instead
         use a different port, as long as the resulting route is still minimal. If the network state influences the routing decision, the strategy is
         adaptive. In contrast, an oblivious one does not take the state into consideration. In case of a congestion, forwarding of the flit is delayed
-        until the path is available again. The oblivious strategies explored here are \gls{dor} and \gls{romm}, while \gls{dm} and \gls{ramm} are
-        adaptive. They are described in Section \ref{subsec:routingstrategies} below.
+        until the path is available again.
     \item \textbf{Static vs. dynamic.} A static strategy implies that exactly one fixed, deterministically chosen path exists for each pair of source
         and destination node. A dynamic one entails a path being selected for each flit individually at runtime. Consequently, static strategies are
         always oblivious and adaptive ones are always dynamic. Since the emphasis lies on the usage of multiple paths, the only investigated static
@@ -956,7 +963,7 @@ generator to be integrated into the routers, increasing their hardware complexit
 static, minimal and randomized, non-minimal routing \cite[3]{nesson95romm}. The central idea is to have the source select $n$ nodes at random
 through which the flit must be routed, essentially dividing the path into multiple independent segments (hence the name \enquote{multi-phase}). To
 preserve minimality, each node $i\ |\ i \in [1,n]$ must lie within the rectangle spanned by node $i-1$ and the destination\footnote{For uniformity,
-node $0$ is defined as the source node.}. \Gls{dor} is employed to route the flit from node $i-1$ to $i\ |\ i \in [1,n]$ and from $n$ to the
+node $0$ is defined as the source node.}. \Gls{dor} is employed to route the flit from node $i-1$ to $i$ and from $n$ to the
 destination. Since \gls{dor} is oblivious and the selection of the intermediate nodes is not influenced by the network state, \gls{romm} is oblivious
 as well.
 
@@ -988,9 +995,11 @@ exemplary path for this strategy.
         \hspace*{0.08\textwidth}\textbf{(a)}\hfill\textbf{(b)}\hfill\textbf{(c)}\hfill\textbf{(d)}\hspace*{0.08\textwidth}
     \end{footnotesize}
     \caption[Exemplary paths for the examined routing strategies]{Exemplary paths for each of the examined routing strategies: (a) \gls{dor}, (b)
-    \gls{dm}, (c) \gls{romm}, (d) \gls{ramm}. The nodes labeled with Z represent the randomly selected intermediate nodes for the multi-phase
-    strategies.}
+    \gls{dm}, (c) \gls{romm}, (d) \gls{ramm}. The nodes labeled with S and D denote the source and destination, respectively, while the nodes labeled
+    with Z represent the randomly selected intermediate nodes for the multi-phase strategies.}
     \label{fig:allstrategiespaths}
 \end{figure}
-
-% TODO: table comparing the routing strategies (adaptive yes/no, static yes/no, out-of-order arrival possible yes/no, ...)
+% TODO: explain the envisioned advantages of RAMM a bit more (having an intermediate node may enable circumvention of larger congested ares, which DM
+% by itself may be unable to do)
+% TODO: table comparing the routing strategies (adaptive yes/no, static yes/no, out-of-order arrival possible yes/no, ...) (maybe no table but mention
+% out-of-order arrivals

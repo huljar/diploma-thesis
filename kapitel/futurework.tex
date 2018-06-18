@@ -18,6 +18,8 @@
         mode of operation like CBC or CTR → CBC requires no residual errors
     \item Mixing G2C3 and G2C4 -- e.g. once a network interface detects that it receives an unusually high amount of ARQs, indicating a very
         unreliable network, network coding could be \enquote{upgraded} from G2C3 to G2C4, so it is not statically one or the other
+    \item Int. auth: adapt the scheme to compute MAC over the data part as well as just use the first 32 bit of the result as the "authcode". Saves a
+        clock cycle because the cogwheel lookup function is omitted and input still fits into two blocks, but maybe security implications?
     \item Encryption (and encoding) of the address field → it may convey information useful to an attacker since the memory layout of the PEs is probably not random
         (→ ASLR?)
     \item Application of NC to ARQs (interwoven variant)

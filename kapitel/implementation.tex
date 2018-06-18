@@ -198,7 +198,7 @@ originally buffered flits; in case of their equality, the decrypted flit is sent
 In case an \gls{arq} must be issued, either caused by non-equal authcodes or timeouts, the \textit{arrivalManager} generates and prepares an
 \gls{arq} flit. From there, it is sent to the network via the \textit{netStream} auxiliary serialization module.
 
-\subsection{Router}
+\subsection{Router}\label{subsec:routerimpl}
 Like the processing elements, the routers' internal structure is straightforward. Presented in Figure \vref{fig:omnetrouter}, it consists of a switch
 and five input buffers (one for the local network interface and four for the neighboring routers).
 
@@ -207,7 +207,7 @@ and five input buffers (one for the local network interface and four for the nei
     \includegraphics[width=0.55\textwidth]{omnet-router}
     \caption[Simulator view of the router]{An instance of a router as rendered by \omnet{}. The five input gates are connected to the switch via their
     input queues. The five respective output connections are not interposed by a buffer. In the renderings of \omnet{}, the spatial layout of the
-    connections sometimes does not match their logical correlations, as is the case here with the outputs being drawn in parallel. However, there is
+    connections sometimes does not match their logical correlations, as is the case here with the output lines being drawn in parallel. However, there is
     in fact one output connection corresponding to each input gate.}
     \label{fig:omnetrouter}
 \end{figure}
@@ -217,6 +217,13 @@ output ports for them. This computation (often referred to as \textit{route calc
 strategy. If a calculated output port is unavailable due to the link being congested, the affected flits are delayed until the next clock tick.
 Furthermore, in case multiple flits are to be routed through the same output port, one of them is randomly selected while the others are postponed.
 Flits from different queues with differing output ports can be routed simultaneously.
+
+Routers are able to inform neighboring ones of congestions of their input queues. Once a queue is full, the router sends a congestion signal to the
+neighbor connected to this queue\footnote{For instance, these notifications can be realized through dedicated signaling lines on the router
+interconnections. This would increase the channel width from 141 to 142 wires or from 149 to 150 wires for uncoded and network coded protocols,
+respectively (cf. Section \ref{subsec:flitstructure}).}, thereby instructing it to delay all flits that are supposed to be routed towards the
+signaling router. Once the congestion has subsided, the affected neighbor is informed of this event through a similar signal and may resume the
+routing of flits in the affected direction normally.
 
 \section{Internal Delays}\label{sec:internaldelays}
 To provide a better understanding of the impact of each module on the overall processing latency, their delays are given in a concise, tabular form.
