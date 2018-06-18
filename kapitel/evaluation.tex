@@ -1,13 +1,13 @@
 \section{Notation}
 %Placeholder parameters
 %Prot. variants abbreviations (IDA, IWA, FGA, UC) (G2C3 and G2C4 as before)
-%Term "source flit"
+%Terms "source flit", router "port queues", "local queues"
 
 \section{Environment}
 % 50,000 cycles (why?)
 % Warmup and cooldown times (both 500 cycles)
 % Injection rate of 0.2 into the network
-% TODO: Router queue sizes (no limit for local input queue to avoid flits being discarded for simulation purposes)
+% Pair generation for fair comparisons of UC/NC
 In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
 \cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
 issuance of \glspl{arq} and the resulting retransmissions.
@@ -169,6 +169,7 @@ increase latency and RTB sizes.
 - goal: as usual: as small as possible (→ less chip area) but not increase latencies too much
 - explored as last hyperparameter because with static DOR it only shifts where flits wait to be routed, congestions do not affect route
   - will be crucial for the adaptive strategies though
+- chosen value: 6 (increasing it does not substantially lower max/avg times and all avgs are below 1 or just very slightly above it)
 
 \begin{figure}
     \centering
@@ -180,8 +181,8 @@ increase latency and RTB sizes.
 \end{figure}
 \section{Experiments}
 Record:
-- acceptance rate (aka actual injection rate)
-- information rate (source flits / total flits)
+- acceptance rate (aka actual injection rate) check
+- information rate (source flits / total flits) check
 - residual error probability
 - end-to-end latency
 \subsection{Number of ARQs modified/dropped by routers}
