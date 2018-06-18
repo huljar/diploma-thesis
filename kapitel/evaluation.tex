@@ -48,7 +48,7 @@ issuance of \glspl{arq} and the resulting retransmissions.
     \end{tabulary}
     \caption[short]{long}
     \label{tab:inputparams}
-\end{table}
+\end{table}% TODO: finish table
 
 \section{Attacker Model}
 \begin{itemize}
@@ -90,9 +90,9 @@ presents how the simulator is set up.
 
 \begin{table}
     \centering
-    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
-        \gls{ida} & varying & 5 & 15 & 1 & varying & \gls{dor} & 0 & 0 \\
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & 0                & 0 \\
     \end{tabulary}
     \caption[Input parameters for ARQ timeouts experiment]{long}
     \label{tab:setuparqtimeouts}
@@ -127,9 +127,9 @@ increase latency and RTB sizes.
 \subsection{Number Of Crypto Modules}
 \begin{table}
     \centering
-    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
-        varying & varying & varying & varying & 1 & 12 & \gls{dor} & 8 & 0.2 \\
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        varying     & varying    & varying     & varying      & unlimited  & 1            & 12             & \gls{dor}  & 8                & 0.2 \\
     \end{tabulary}
     \caption[Input parameters for number of crypto modules experiment]{long}
     \label{tab:setupnumcrypto}
@@ -154,6 +154,30 @@ increase latency and RTB sizes.
     \label{fig:resultscryptomodules}
 \end{figure}
 
+\subsection{Router Input Queue Sizes}
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 8 & 0.2 \\
+    \end{tabulary}
+    \caption[Input parameters for router queue sizes experiment]{long}
+    \label{tab:setupqueuesizes}
+\end{table}
+- only node input queues; local input queues are left unlimited for simulation purposes to avoid any potential flit drops due to such a queue being full
+- why IDA? largest transmission units (G2C4) and one of the smallest (UC)
+- goal: as usual: as small as possible (→ less chip area) but not increase latencies too much
+- explored as last hyperparameter because with static DOR it only shifts where flits wait to be routed, congestions do not affect route
+  - will be crucial for the adaptive strategies though
+
+\begin{figure}
+    \centering
+    \begin{tabular}{ll}
+        \input{gnuplot/plots/queuelengths-ports} & \input{gnuplot/plots/queuelengths-local}
+    \end{tabular}
+    \caption[Results for router queue lengths experiment]{long}
+    \label{fig:resultsqueuelengths}
+\end{figure}
 \section{Experiments}
 Record:
 - acceptance rate (aka actual injection rate)

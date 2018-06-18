@@ -2,7 +2,7 @@
 # c2: max wait time for enc/auth unit
 # c3: avg wait time for enc/auth unit
 #
-# Parameters: Ind. auth. UC, 12 auth units, attackers: [6, 8, 20, 33, 35, 46, 52, 59], attack prob. 0.2, ARQ limit 1, DOR routing
+# Parameters: Ind. auth. UC, 12 auth units, attackers: [6, 8, 20, 33, 35, 46, 52, 59], attack prob. 0.2, ARQ limit 1, DOR routing, no router queue length limits
 # gnuplot index 0
 #
 1   50.0    2.18264046325

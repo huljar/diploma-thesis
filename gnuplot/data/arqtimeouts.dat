@@ -1,7 +1,7 @@
 # first column: ARQ timeout in cycles (X coordinate)
 # second column: number of issued ARQs per source flit (Y coordinate)
 #
-# Parameters: Ind. auth. UC, no attackers, ARQ limit 1, 5/15 enc/auth units, DOR routing
+# Parameters: Ind. auth. UC, no attackers, ARQ limit 1, 5/15 enc/auth units, DOR routing, no router queue length limits
 # gnuplot index 0
 #
 3   0.23636931339182565

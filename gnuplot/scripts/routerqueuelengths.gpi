@@ -1,0 +1,42 @@
+set terminal epslatex size 2.8,2.5 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+
+set style data lp
+set style line 1 lc rgb '#dd181f' lt 1 pt 7
+set style line 2 lc rgb '#dd181f' lt 1 pt 5
+set style line 3 lc rgb '#08bd05' lt 1 pt 7
+set style line 4 lc rgb '#08bd05' lt 1 pt 5
+set style line 5 lc rgb '#0030cd' lt 1 pt 7
+set style line 6 lc rgb '#0030cd' lt 1 pt 5
+
+set ylabel '\ft Port queue lengths in flits' offset 3,0
+set yrange [0.1:1000]
+set logscale y
+
+set xlabel '\ft Maximum port queue size' offset 0,0.2
+set xrange [1:11]
+set xtics 1
+set xtics add ('$\infty$' 11)
+
+set format '\ft %g'
+
+set key font ", 15"
+set key above
+
+set output '../plots/queuelengths-ports.tex'
+plot '../data/routerqueuelengths.dat' using 1:2 index 0 ls 1 t '\ty IDA-UC max', \
+     ''                               using 1:2 index 1 ls 3 t '\ty G2C3 max', \
+     ''                               using 1:2 index 2 ls 5 t '\ty G2C4 max', \
+     ''                               using 1:3 index 0 ls 2 t '\ty avg', \
+     ''                               using 1:3 index 1 ls 4 t '\ty avg', \
+     ''                               using 1:3 index 2 ls 6 t '\ty avg', \
+
+set ylabel '\ft Local queue lengths in flits' offset 3,0
+
+set output '../plots/queuelengths-local.tex'
+plot '../data/routerqueuelengths.dat' using 1:4 index 0 ls 1 t '\ty IDA-UC max', \
+     ''                               using 1:4 index 1 ls 3 t '\ty G2C3 max', \
+     ''                               using 1:4 index 2 ls 5 t '\ty G2C4 max', \
+     ''                               using 1:5 index 0 ls 2 t '\ty avg', \
+     ''                               using 1:5 index 1 ls 4 t '\ty avg', \
+     ''                               using 1:5 index 2 ls 6 t '\ty avg', \
