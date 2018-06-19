@@ -1,16 +1,28 @@
 \section{Notation}
 %Placeholder parameters
 %Prot. variants abbreviations (IDA, IWA, FGA, UC) (G2C3 and G2C4 as before)
-%Terms "source flit", router "port queues", "local queues"
+%Terms "source flit", router "port queues", "local queues", "creation rate"
 
 \section{Environment}
 % 50,000 cycles (why?)
 % Warmup and cooldown times (both 500 cycles)
 % Injection rate of 0.2 into the network
+% Uniform random destination selection
 % Pair generation for fair comparisons of UC/NC
 In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
 \cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
 issuance of \glspl{arq} and the resulting retransmissions.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C}
+        Protocol & Ratio & Creation rate \\\hline
+        \gls{ida}-UC & 1:2 & \\
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:creationrates}
+\end{table}
+
 \begin{itemize}
     \item Injection rate
         \begin{itemize}
@@ -179,12 +191,33 @@ increase latency and RTB sizes.
     \caption[Results for router queue lengths experiment]{long}
     \label{fig:resultsqueuelengths}
 \end{figure}
+
 \section{Experiments}
+\subsection{Quality Of The Schemes}
 Record:
 - acceptance rate (aka actual injection rate) check
 - information rate (source flits / total flits) check
 - residual error probability
 - end-to-end latency
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        varying & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
+    \end{tabulary}
+    \caption[Input parameters for main experiment]{long}
+    \label{tab:setupmainexperiment}
+\end{table}
+
+Observations:
+- NC does not improve (=decrease) residual error. why? might be because you have 1 ARQ per generation (=0.5ARQs per source flit) for NC, but 1 ARQ per
+source flit for UC (IDA protocol)
+  - how to confirm? UC with ARQ limit 1 vs. NC with ARQ limit 2 (then same amount of ARQs per source flit)
+  - ARQ flit itself is not coded → hence when it gets attacked, all retransmissions fail → for NC, on average a larger number of flits is affected by
+    this → how to confirm? set routers to not attack ARQ flits
+  - may be exciting to see if this is the case as well for IWA because there you have 1 ARQ per source flit for both UC and NC
+
 \subsection{Number of ARQs modified/dropped by routers}
 \subsection{Routing strategies effects}
 % Heatmap of router workload?
@@ -195,6 +228,10 @@ Experiment setup parameter tables:
 - ...
 
 ARQ Limit: 1, at most 2 because more ARQs allowed per transmission unit means larger retransmission buffers everywhere
+
+Do one experiment with the 8 routers with attack probability one and compare the routing strategies
+
+"Results for IWA-NC confirm the alleged positive effect of NC in unreliable networks"
 
 \section{Statistics}
 \begin{itemize}
