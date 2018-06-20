@@ -74,7 +74,15 @@ issuance of \glspl{arq} and the resulting retransmissions.
         parameters diverge considerably from the expectations
 \end{itemize}
 
-Compromised routers: 6, 8, 23, 36, 46, 52, 59, 61 (8 routers randomly selected from the set of nodes with uniform probability distribution)
+Compromised routers: 8 randomly selected routers (uniform distribution), 3 different sets, average over them
+
+\begin{figure}
+    \includegraphics[width=0.3\textwidth]{attacker-positions-1}\hfill
+    \includegraphics[width=0.3\textwidth]{attacker-positions-2}\hfill
+    \includegraphics[width=0.3\textwidth]{attacker-positions-3}
+    \caption[Malicious router distributions]{The three distributions of 8 malicious routers over the 8x8 \gls{noc} that were used in experiments.}
+    \label{fig:attackerpositions}
+\end{figure}
 
 \section{Determining The Hyperparameters}
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
@@ -193,10 +201,10 @@ increase latency and RTB sizes.
 \end{figure}
 
 \section{Experiments}
-\subsection{Quality Of The Schemes}
+\subsection{Performances Of The Protocol Variants}
 Record:
-- acceptance rate (aka actual injection rate) check
-- information rate (source flits / total flits) check
+- acceptance rate (aka actual injection rate)
+- information rate (source flits / total flits)
 - residual error probability
 - end-to-end latency
 
@@ -204,11 +212,21 @@ Record:
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
-        varying & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
+        varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & 8 & varying \\
     \end{tabulary}
-    \caption[Input parameters for main experiment]{long}
-    \label{tab:setupmainexperiment}
+    \caption[Input parameters for protocol variant experiment]{long}
+    \label{tab:setupprotvarexperiment}
 \end{table}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{ll}
+        \input{gnuplot/plots/main-acceptancerate} & \input{gnuplot/plots/main-informationrate} \\
+        \input{gnuplot/plots/main-residualerror} & \input{gnuplot/plots/main-endtoendlatency}
+    \end{tabular}
+    \caption[Results for protocol variant experiment]{long}
+    \label{fig:resultsprotvarexperiment}
+\end{figure}
 
 Observations:
 - NC does not improve (=decrease) residual error. why? might be because you have 1 ARQ per generation (=0.5ARQs per source flit) for NC, but 1 ARQ per
@@ -218,9 +236,26 @@ source flit for UC (IDA protocol)
     this → how to confirm? set routers to not attack ARQ flits
   - may be exciting to see if this is the case as well for IWA because there you have 1 ARQ per source flit for both UC and NC
 
-\subsection{Number of ARQs modified/dropped by routers}
-\subsection{Routing strategies effects}
+\subsection{Performances Of The Routing Strategies}
+Take: best protocol variant (IWA), use it to find the best routing strategy
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
+    \end{tabulary}
+    \caption[Input parameters for main experiment]{long}
+    \label{tab:setuproutingstratexperiment}
+\end{table}
+
+
 % Heatmap of router workload?
+\begin{figure}
+    \input{gnuplot/plots/heatmap-dor}
+    \caption[short]{Heatmaps}
+    \label{fig:resultsroutingstratheatmaps}
+\end{figure}
 
 \iffalse
 Experiment setup parameter tables:
@@ -232,6 +267,13 @@ ARQ Limit: 1, at most 2 because more ARQs allowed per transmission unit means la
 Do one experiment with the 8 routers with attack probability one and compare the routing strategies
 
 "Results for IWA-NC confirm the alleged positive effect of NC in unreliable networks"
+
+"Creation rate adjustment to keep the base injection rate constant is reflected in the differing information rates"
+
+"IDA: 4 flits need to arrive unharmed for successful transmission unit, 3 for FGA, and 2 for IWA"
+
+"NC proves to provide a performance improvement, although more in the sense of less residual errors than a decrease in latency since ARQs are still
+limited to 1 per transmission unit across all variants."
 
 \section{Statistics}
 \begin{itemize}

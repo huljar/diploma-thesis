@@ -1,0 +1,22 @@
+set terminal epslatex size 2.8,2.5 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+
+set ylabel '\ft Y coordinate'
+set yrange [0:7]
+
+set xlabel '\ft X coordinate'
+set xrange [0:7]
+
+set palette defined (0 "blue",17 "#00ffff",33 "white",50 "yellow", 66 "red",100 "#990000",101 "grey")
+set cblabel '\ft Flits forwarded'
+set cbrange [0:120000]
+
+unset xtics
+unset ytics
+
+unset key
+
+set view map
+
+set output '../plots/heatmap-dor.tex'
+splot '../data/heatmap.dat' index 0 matrix with image
