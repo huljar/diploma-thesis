@@ -44,7 +44,7 @@ It was mentioned above that the integration of multiple clock domains is very fi
 frequency is evenly divisible by the required frequency, as is the case for the crypto modules, this becomes significantly easier. Here, a new clock
 is derived from the global clock that simply omits every other tick.
 
-\subsection{Single Cycle Routing}
+\subsection{Single Cycle Routing}\label{subsec:singlecyclerouting}
 The number of cycles required for routing\footnote{Routing refers to the whole process from receiving a flit on an input port to forwarding it on the
 appropriate output port, including route calculation, switch allocation, and switch traversal \cite[see][2]{routinglectureutah}.} is a key factor to the
 overall performance of the \gls{noc}. While four cycle \cite[e.g.][]{routinglectureutah} and two cycle routing \cite[e.g.][]{lu11nocrouter} are
@@ -200,7 +200,8 @@ In case an \gls{arq} must be issued, either caused by non-equal authcodes or tim
 
 \subsection{Router}\label{subsec:routerimpl}
 Like the processing elements, the routers' internal structure is straightforward. Presented in Figure \vref{fig:omnetrouter}, it consists of a switch
-and five input buffers (one for the local network interface and four for the neighboring routers).
+and five input buffers (one for the local network interface and four for the neighboring routers). These buffers are referred to as the \textit{local
+queue} and the \textit{port queues}, respectively.
 
 \begin{figure}
     \centering
@@ -218,12 +219,12 @@ strategy. If a calculated output port is unavailable due to the link being conge
 Furthermore, in case multiple flits are to be routed through the same output port, one of them is randomly selected while the others are postponed.
 Flits from different queues with differing output ports can be routed simultaneously.
 
-Routers are able to inform neighboring ones of congestions of their input queues. Once a queue is full, the router sends a congestion signal to the
+Routers are able to inform neighboring ones of congestions of their input queues. Once a queue has reached a certain size, the router sends a congestion signal to the
 neighbor connected to this queue\footnote{For instance, these notifications can be realized through dedicated signaling lines on the router
 interconnections. This would increase the channel width from 141 to 142 wires or from 149 to 150 wires for uncoded and network coded protocols,
 respectively (cf. Section \ref{subsec:flitstructure}).}, thereby instructing it to delay all flits that are supposed to be routed towards the
-signaling router. Once the congestion has subsided, the affected neighbor is informed of this event through a similar signal and may resume the
-routing of flits in the affected direction normally.
+signaling router, if possible. Once the congestion has subsided, the affected neighbor is informed of this event through a similar signal and may
+resume normal routing of flits in the affected direction.
 
 \section{Internal Delays}\label{sec:internaldelays}
 To provide a better understanding of the impact of each module on the overall processing latency, their delays are given in a concise, tabular form.

@@ -411,7 +411,8 @@ assumed lost and an \gls{arq} is issued requesting their retransmission.
 Once an \gls{arq} is issued, the countdown timer for the affected transmission unit is reset. However, it is set to a higher value than the
 inter-arrival timeout described above. Moreover, this value depends on the Manhattan distance between the sender and receiver nodes in the network,
 with a longer distance resulting in a higher timeout value. This is done to account for the round trip time of the \gls{arq} and its
-answer. Details are discussed in Section \ref{subsec:arqtimeouts}.
+answer. Details are discussed in Section \ref{subsec:arqtimeouts}. The variables $t_1$ and $t_2$ are used in the remainder of this thesis to indicate
+the inter-arrival timeout and the post-\gls{arq} timeout, respectively.
 
 It is desirable to send out as little \glspl{arq} as necessary to keep the network load as low as possible. Furthermore, with a limited
 amount of \glspl{arq} available per transmission unit, care needs to be taken to not \enquote{waste} them too early in the network coded protocol
@@ -897,16 +898,15 @@ Routing strategies may be classified according to their properties. The followin
 characteristics and the distinctions between them.
 \begin{itemize}
     \item \textbf{Oblivious vs. adaptive.} When the source or an intermediate node decides on the next hop of a route, it may take the current
-        network state into account. For instance, a congestion detected on the preferred output port\footnote{Congestion is detected by inspecting the status
-        of the neighboring router's input queue for the appropriate port; if it is full, the link to this router is viewed as congested. The details
+        network state into account. For instance, a congestion detected on the preferred output port\footnote{Congestion is detected by inspecting the
+        length of the neighboring router's input queue for the appropriate port; if it has reached a certain size, the link to this router is viewed as congested. The details
         of this process are explained in Section \ref{subsec:routerimpl}.} may dissuade the router from forwarding the flit in this direction and instead
         use a different port, as long as the resulting route is still minimal. If the network state influences the routing decision, the strategy is
-        adaptive. In contrast, an oblivious one does not take the state into consideration. In case of a congestion, forwarding of the flit is delayed
-        until the path is available again.
+        adaptive. In contrast, an oblivious one does not take the state into consideration.
     \item \textbf{Static vs. dynamic.} A static strategy implies that exactly one fixed, deterministically chosen path exists for each pair of source
         and destination node. A dynamic one entails a path being selected for each flit individually at runtime. Consequently, static strategies are
-        always oblivious and adaptive ones are always dynamic. Since the emphasis lies on the usage of multiple paths, the only investigated static
-        strategy is \gls{dor}, serving as a baseline for comparison with the other ones.
+        always oblivious and adaptive ones are always dynamic. Since one objective of this thesis is to investigate the usage of multiple paths, the
+        only static strategy employed is \gls{dor}, serving as a baseline for comparison with the other ones.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
@@ -950,9 +950,8 @@ multipath routing described above.
 \subsubsection{Dynamic Minimal}\label{subsubsec:dm}
 The second strategy of interest is \textit{Dynamic Minimal Routing (\gls{dm})}. When a router has multiple options for the next hop of a flit, it checks
 the congestion status of the viable output ports. In a 2D mesh, at most two directions are allowed in order for the path to remain minimal. If both
-are free, one of them is chosen at random. If only one of them is uncongested, it is always selected. In the event of both viable paths being blocked,
-the flit is held back until one of them becomes available. These steps are performed by every router along the flit's path. Figure
-\ref{fig:allstrategiespaths}b shows a few of the possible paths.
+are free or both are congested, one of them is chosen at random. However, if exactly one of them is uncongested, it is always selected.
+These steps are performed by every router along the flit's path. Figure \ref{fig:allstrategiespaths}b shows a few of the possible paths.
 
 The adaptiveness of this scheme allows for the possibility to dodge saturated areas of the network. Together with the random selections in the
 intermediate routers, it facilitates the use of multiple paths for each pair of source and destination node. However, it requires a random number
@@ -984,6 +983,9 @@ Adaptive Multi-Phase Minimal Routing (\gls{ramm})} was designed. It is very simi
 intermediate node. However, during the individual phases, \gls{dm} is used instead of \gls{dor} to introduce a certain degree of adaptiveness to the
 algorithm. Note that the selection of the intermediate node is still oblivious to the network state. Figure \ref{fig:allstrategiespaths}d depicts an
 exemplary path for this strategy.
+
+The presumed advantage of this strategy over pure \gls{dm} routing is that the presence of an intermediate node may enable the circumvention of larger
+congested areas.
 
 \begin{figure}
     \includegraphics[width=0.22\textwidth]{routing-example-dor}\hfill

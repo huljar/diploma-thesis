@@ -1,11 +1,13 @@
 After the protocol design phase (Chapter \ref{ch:protocol}) and the implementation with the simulator (Chapter \ref{ch:implementation}), the next step
 is to evaluate the different approaches. As the primary goal of this thesis is to provide protection and resilience against malicious routers within
-the \gls{noc}, the protocol variants were tested for varying attacker positions, attack probabilities, and routing strategies. The quality of a scheme
+the \gls{noc}, the protocols were tested with varying attacker positions, attack probabilities, and routing strategies. The quality of a scheme
 is determined through several metrics that indicate its performance for a given scenario, which are explained below.
 
 The next section establishes notations and key terms that are used throughout this chapter. Afterwards, the environment and frame conditions for the
 simulations are delineated (Section \ref{sec:environmenteval}). Following this, the employed attacker model is discussed (Section
-\ref{sec:attackermodeleval}). Subsequently, the hyperparameters are fixed through a series of representative experiments (Section
+\ref{sec:attackermodeleval}) and the configurable parameters for the simulations are explained (Section \ref{sec:configurations}). Subsequently,
+the hyperparameters\footnote{The term \textit{hyperparameters} refers to those parameters whose value is determined through a number of preliminary
+experiments and remains static for the main experiments.} are fixed through a series of representative experiments (Section
 \ref{sec:hyperparamseval}), followed by the main evaluation where the different protocol variants and routing strategies are compared (Section
 \ref{sec:perfcompeval}).
 
@@ -13,28 +15,31 @@ simulations are delineated (Section \ref{sec:environmenteval}). Following this, 
 To improve readability, abbreviations are introduced for the protocol variants and network coding modes. This facilitates their representation within
 charts, diagrams, and tables.
 \begin{itemize}
-    \item \textbf{\Gls{ida}} stands for the \textit{individual authentication} protocol version
-    \item \textbf{\Gls{iwa}} represents the \textit{interwoven authentication} approach
-    \item \textbf{\Gls{fga}} denotes the \textit{full-generation authentication} variant
-    \item \textbf{UC} is short for \textit{uncoded}, i.e., the lack of network coding
+    \item \textbf{\Gls{ida}} stands for the \textit{individual authentication} protocol version,
+    \item \textbf{\Gls{iwa}} represents the \textit{interwoven authentication} approach,
+    \item \textbf{\Gls{fga}} denotes the \textit{full-generation authentication} variant,
+    \item \textbf{UC} is short for \textit{uncoded}, i.e., the lack of network coding, and
     \item \textbf{G2C3} and \textbf{G2C4} are used for the two network coding variants that were explained in Section \ref{sec:designnc}.
 \end{itemize}
-\vspace{0.5\baselineskip}
 
-These terms are often combined with a routing strategy when the setup of an experiment is described. For instance, \gls{ida}-UC-\gls{dor} stands for uncoded
+These short forms are often combined with a routing strategy when the setup of an experiment is described. For instance, \gls{ida}-UC-\gls{dor} stands for uncoded
 individual authentication using dimension order routing.
 
-%Terms "source flit", router "port queues", "local queues", "creation rate"
+The term \textit{source flit} is used to refer to flits created by the processing elements before they are handled by the sender's network interface.
+Consequently, the combinations obtained by network coding or \gls{mac} flits are not encompassed by this term. In the receiver's network interface,
+the source flits are reconstructed by decoding, decrypting and verifying the incoming flits. Network interfaces only forward source flits towards
+their local processing elements.
 
 \section{Environment}\label{sec:environmenteval}
-In this section, the general setup for all conducted simulations is elaborated, such as flit generation patterns and simulation runtime. Table
-\vref{tab:fixedparams} provides a concise overview of these invariant parameters and their values.
+The simulator has a variety of input parameters that can be altered to influence its behavior and consequently the outcome of the simulations.
+In this section, the parameters that are fixed for all conducted simulations are elaborated, such as flit generation patterns and simulation runtime. Table
+\vref{tab:fixedparams} provides a concise overview of these parameters and their values.
 
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{L|L}
         Parameter name & Value \\\hline
-        \Gls{noc} dimensions & 8x8 \\
+        \Gls{noc} dimensions & 8x8 (2D mesh) \\
         Clock frequency & 500 MHz \\
         Simulation runtime & \num{50000} cycles \\
         Warmup/cooldown time & 500 cycles \\
@@ -42,93 +47,83 @@ In this section, the general setup for all conducted simulations is elaborated, 
         Flit destination selection & uniform random \\
         Pair generation & yes \\
     \end{tabulary}
-    \caption[short]{long}
+    \caption[Static input parameters for all simulations]{The static, invariant input parameters of the simulator that are used across all
+    experiments.}
     \label{tab:fixedparams}
 \end{table}
 
 When a simulation is executed, the first 500 cycles are considered warmup time. During this period, no statistics are recorded. This ensures that the
 network is in a steady state and already saturated with flits once the recording starts. It is followed by the main simulation of \num{50000}
-cycles where statistics are recorded normally. Finally, there is another 500 cooldown cycles at the end. This was added to ensure that those flits
-generated near the end of the main simulation are not classified as lost flits simply because they were not granted enough time to reach their
-destination. Thus, flits arriving at processing elements during the cooldown period are considered successfully transmitted, while flits generated
-during this period are not included in the statistics.
+cycles where statistics are recorded normally. Finally, there are another 500 cooldown cycles at the end. They were appended to ensure that source flits
+generated shortly before the end of the main simulation are not classified as lost flits simply because they were not granted enough time to reach their
+destination. Thus, source flits generated during the main simulation and arriving at processing elements during the cooldown period are considered
+successfully transmitted, while those generated during cooldown are not included in the statistics.
 
 The network base injection rate describes the average number of flits injected into the network per clock cycle at each node, excluding \gls{arq}
 flits and retransmissions. The creation rate of flits at the processing elements is adjusted accordingly for each protocol variant to keep the
-injection rate constant. For instance, with \gls{ida}-G2C3, every flit created at a particular processing element results in three flits injected
-into the network due to network coding and the additional \gls{mac} flits. Hence, the creation rate would be $\frac{0.2}{3}$ for this scenario.
+injection rate constant. For instance, with \gls{ida}-G2C3, every source flit created at a particular processing element results in three flits
+injected into the network due to network coding and the additional \gls{mac} flits.
 
-The processing elements create flits independently from each other. All processing elements use the same creation rate. The selection of the flits'
-destinations is performed randomly with a uniform probability distibution over all network nodes (excluding the sender's own node).
+The processing elements create source flits independently from each other. Furthermore, all processing elements use the same creation rate. The
+selection of the flits' destinations is performed randomly over all network nodes (excluding the sender's own node). This ensures a uniform
+distribution of sources and destinations across the \gls{noc}.
 
 To allow for a fair comparison of the protocol versions, flits are always generated in pairs. This means that when a particular processing
 element creates a flit, another one with the same destination is guaranteed to be created on the next clock cycle. This prevents long periods of
-buffering for network coded \gls{ida} and \gls{fga} in the sender's network interface: with a pair of flits, a generation can be formed immediately. This creation
-pattern is a realistic assumption as in practical applications, flits are usually generated from breaking a data packet down into smaller parts. These
-flits would then enter the network consecutively and have the same destination. The creation rate of flits is adjusted accordingly to reflect this
-pattern: for example, with \gls{ida}-G2C3, the probability to create a pair would be set to $\frac{0.2}{6}$ to keep the base network injection rate at
-0.2.
+buffering for network coded \gls{ida} and \gls{fga} in the sender's network interface: with a pair of flits, a generation can be formed immediately.
+This creation pattern is a realistic assumption as in practical applications, flits are usually generated from breaking a data packet down into
+smaller parts (cf. Section \ref{sec:flitsfun}). These flits would then depart from the processing element consecutively and have the same
+destination. The creation rate of flits is adjusted accordingly to reflect this pattern: for example, with \gls{ida}-G2C3, the probability to create a
+pair would be set to $\frac{0.2}{6}$ to preserve the desired base network injection rate of 0.2. Table \vref{tab:creationrates} summarizes the
+creation rates for all protocol variants.
+
+\begin{table}
+    \centering
+    \bgroup
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabulary}{\textwidth}{C|C|C}
+        Protocol       & Ratio pair : injected & Pair creation rate            \\\hline
+        \gls{ida}-UC   & 1:4                   & $\frac{0.2}{4} = 0.05$        \\
+        \gls{ida}-G2C3 & 1:6                   & $\frac{0.2}{6} \approx 0.033$ \\
+        \gls{ida}-G2C4 & 1:8                   & $\frac{0.2}{8} = 0.025$       \\
+        \gls{iwa}-UC   & 1:4                   & $\frac{0.2}{4} = 0.05$        \\
+        \gls{iwa}-G2C3 & 1:6                   & $\frac{0.2}{6} \approx 0.033$ \\
+        \gls{iwa}-G2C4 & 1:8                   & $\frac{0.2}{8} = 0.025$       \\
+        \gls{fga}-G2C3 & 1:4                   & $\frac{0.2}{4} = 0.05$        \\
+        \gls{fga}-G2C4 & 1:5                   & $\frac{0.2}{5} = 0.04$
+    \end{tabulary}
+    \egroup
+    \caption[Creation rates of all protocol variants]{The source flit pair creation rates for all protocol variants. The second column displays the
+    ratio of one generated source flit pair to the number of flits injected into the network resulting from this pair (excluding potential
+    \glspl{arq} and retransmissions). The third column depicts the creation rates as they are adjusted to keep the base network injection rate
+    at 0.2 across all variants.}
+    \label{tab:creationrates}
+\end{table}
 
 Some of the parameters were adopted from the simulation setup that \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} have employed
 in their experiments to render results comparable with their evaluations. These parameters include the \gls{noc} dimensions, the base network
 injection rate, and the simulation runtime. The rationale for a clock speed of 500 MHz was outlined in Section \ref{subsec:clockfrequency}.
 
-In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
-\cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
-issuance of \glspl{arq} and the resulting retransmissions.
-
-\begin{table}
-    \centering
-    \begin{tabulary}{\textwidth}{C|C|C}
-        Protocol & Ratio & Creation rate \\\hline
-        \gls{ida}-UC & 1:2 & \\
-    \end{tabulary}
-    \caption[short]{long}
-    \label{tab:creationrates}
-\end{table}
-
-\begin{itemize}
-    \item Injection rate
-        \begin{itemize}
-            \item Value if 0.2 is realistic
-            \item Possibility to generate pairs for fair comparison of UC/NC
-            \item Base network injection rate of 0.2 is used for all experiments. The source flit creation rate is adjusted accordingly for the
-                protocol variants to ensure that they have the same injection rate.
-        \end{itemize}
-    \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
-\end{itemize}
-
-The simulator has a variety of parameters that can be altered to influence its behavior and consequently the outcome of the simulations.
-
-
-\begin{table}
-    \centering
-    \begin{tabulary}{\textwidth}{C|C|C}
-        Parameter name & Value range & Placeholder \\\hline
-        Network coding & $\{\mathit{UC}, \mathit{G2C3}, \mathit{G2C4}\}$ & \pNCMode{} \\
-        No. of encryption modules & $\mathbb{N}^*$ & \pEncMods{} \\
-        No. of authentication modules & $\mathbb{N}^*$ & \pAuthMods{} \\
-        \Gls{arq} limit & $[1, 2]$ & \pARQLimit{} \\
-        \Gls{arq} timeout & $\mathbb{N}^*$ cycles & \pARQTimeout{} \\
-        Routing strategy & $\{\mathit{\gls{dor}}, \mathit{\gls{dm}}, \mathit{\gls{romm}}, \mathit{\gls{ramm}}\}$ & \pRStrat{} \\
-    \end{tabulary}
-    \caption[short]{long}
-    \label{tab:inputparams}
-\end{table}% TODO: finish table
-
 \section{Attacker Model}\label{sec:attackermodeleval}
-\begin{itemize}
-    \item Focuses on malicious modifications rather than DoS attacks
-    \item Assumption: compromised routers → rely on NIs for security
-    \item No protection against bandwidth depletion, but this is not the goal here
-    \item Variable number of compromised routers (e.g. 8 for an 8x8 grid)
-    \item Compromised routers randomly drop or modify packets (no intelligent modifications/drops)
-    \item Reasoning for having only some compromised routers (in regard to the 3rd party NoC problem → why would they not make all routers the same?)
-        → HT implies more logic in routers → more area and draws more power → might attract attention if all routers have this and overall NoC
-        parameters diverge considerably from the expectations
-\end{itemize}
+As outlined in Section \ref{sec:attackermodelover}, the routers of the \gls{noc} are untrusted components that may be infected by a hardware trojan.
+Such a compromised router has the capability to eavesdrop on the communication passing through it (passive attacker) and to maliciously drop or modify
+flits (active attacker)\footnote{Routers are also able to inject arbitrary flits into the network to attempt a \gls{dos} attack through bandwidth
+depletion. However, this is beyond the scope of this thesis and thus not considered here.}. Protection against an eavesdropper obtaining confidential
+information is achieved through the employed encryption, so the remainder of this chapter focuses on the effects of active attacks.
 
-Compromised routers: 8 randomly selected routers (uniform distribution), 3 different sets, average over them
+For this thesis, eight of the routers are assumed to be infected, while the remaining ones operate normally. The rationale for not considering all
+routers to be infected is that the presence of a hardware trojan entails a higher area occupation of the router due to the additional logic. If all
+routers were malicious, it might drive the overall area requirement of the \gls{noc} to suspiciously high values, undermining the adversary's desire
+to stay concealed (cf. Section \ref{sec:hardwaretrojans}).
+
+The infected routers are assumed to not mount intelligent attacks, such as only compromising flits from a specific source. Rather, they have a
+probability $\pAttackProb{}$ to attack a passing flit. In the event of an attack, the flit is either modified or completely dropped, with both cases
+being equiprobable.
+
+For the experiments, the eight infected routers were randomly selected from the 64 network nodes. To obviate large deviations of the recorded
+statistics from the average due to their particular distribution, the main experiments were conducted for three different sets of attackers with the
+results averaged over them\footnote{This is denoted by \enquote{all} in Table \ref{tab:inputparams} and subsequent experiment setup descriptions.}.
+Figure \vref{fig:attackerpositions} illustrates the three selected distributions.
 
 \begin{figure}
     \includegraphics[width=0.3\textwidth]{attacker-positions-1}\hfill
@@ -138,11 +133,69 @@ Compromised routers: 8 randomly selected routers (uniform distribution), 3 diffe
     \label{fig:attackerpositions}
 \end{figure}
 
+\section{Configurations}\label{sec:configurations}
+In addition to the static input parameters presented in Section \ref{sec:environmenteval}, there are several variable ones that constitute the setup
+of an experiment. Naturally, they include the protocol variant and the routing strategy, but are not limited to those. Table \vref{tab:inputparams}
+lists all the variable input parameters.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C}
+        Parameter name & Value range & Placeholder \\\hline
+        Protocol variant & $\{\text{\gls{ida}}, \text{\gls{iwa}}, \text{\gls{fga}}\}$ & \pProtVar{} \\
+        Network coding & $\{\text{UC}, \text{G2C3}, \text{G2C4}\}$ & \pNCMode{} \\
+        Routing strategy & $\{\text{\gls{dor}}, \text{\gls{dm}}, \text{\gls{romm}}, \text{\gls{ramm}}\}$ & \pRStrat{} \\
+        No. of encryption modules & $\mathbb{N}^*$ & \pEncMods{} \\
+        No. of authentication modules & $\mathbb{N}^*$ & \pAuthMods{} \\
+        \Gls{arq} limit & $\{1, 2\}$ & \pARQLimit{} \\
+        \Gls{arq} timeout in cycles & $\mathbb{N}^*$ & \pARQTimeout{} \\
+        Port queue size in flits & $\mathbb{N}^* \cup \infty$ & \pRQSize{} \\
+        Set of attackers & $\{1, 2, 3, \text{all}, \text{none}\}$ & \pAttackerSet{} \\
+        Attack probability & $[0, 0.5]$ & \pAttackProb{} \\
+    \end{tabulary}
+    \caption[Variable input parameters for the simulations]{The variable input parameters for the simulations. The third column shows the placeholders
+    that are used in subsequent experiment setups to represent the corresponding parameters.}
+    \label{tab:inputparams}
+\end{table}
+
+Each network interface contains a number of encryption and authentication modules. On the one hand, there need to be enough modules to process both
+departing and arriving flits quickly without incurring congestions. On the other hand, each additional module entails a higher area requirement for
+the network interfaces. Thus, a reasonable trade-off between latency and area needs to be determined. This hyperparameter is examined in Section
+\ref{subsec:numcryptomodules}.
+
+The \gls{arq} limit is the number of \glspl{arq} that are allowed to be issued per transmission unit (see Section \ref{subsec:arqretransmissions}).
+Only the values 1 and 2 are considered here for multiple reasons. First, the more \glspl{arq} are allowed, the larger the \glspl{rtb} need to be:
+since additional \glspl{arq} are only sent if the preceding ones did not yield successful retransmissions, senders need to retain flits in their
+\glspl{rtb} over a longer period. Second, if more \glspl{arq} and consequently more retransmissions are injected into the network, congestions become
+more likely, which in turn may induce timeouts for other transmissions.
+
+The value of the \gls{arq} timeout is the first hyperparameter that is fixed through an experiment (Section \ref{subsec:arqtimeouts}). As explained in
+Section \ref{subsec:arqretransmissions}, it represents the amount of clock cycles after receiving a flit from a particular transmission unit until the
+remainder of this unit is considered lost.
+
+The sizes of the port queues of the routers are another hyperparameter. Unfortunately, it could only be determined for \gls{dor}. The absence of
+virtual channels in the routers (cf. Section \ref{subsec:singlecyclerouting}) incurs deadlocks for the other routing strategies if a limited queue
+size is enforced. For instance, \gls{romm} routing necessitates two virtual channels (one for each phase) to guarantee deadlock freedom
+\cite[4]{nesson95romm}. \Gls{dor}, however, is not affected by deadlocks, even without virtual channels \cite[9]{ni93routingsurvey}. Thus, as a
+workaround, a hard queue size limit is only implemented for \gls{dor}. For the other strategies, congestion signals are still sent out once a queue
+has reached the given size, but it will continue to accept incoming flits. While \gls{romm}, being oblivious, ignores these signals, \gls{dm} and
+\gls{ramm} attempt to avoid congested links as much as possible. In Section \ref{subsec:portqueuesizes}, the experiment to determine the size limit
+for \gls{dor} is described.
+
+Finally, the properties of the attacking routers may be configured via the set of attackers and their attack probability. The set of attackers refers
+to one of the three sets described in Figure \ref{fig:attackerpositions}. A value of \textit{all} indicates that the experiments were conducted for
+each of the sets independently and the results are averaged across the three settings. If no attackers are present, \textit{none} is used. The attack
+probability parameter defines the likelihood for a malicious router to attack a flit as described above (Section \ref{sec:attackermodeleval}).
+
 \section{Determining The Hyperparameters}\label{sec:hyperparamseval}
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
-In Section \ref{subsec:arqretransmissions}, the concept of \glspl{arq} and timeouts was introduced: receivers issue \glspl{arq} when the temporal gap
-between the arrival of flits belonging to the same transmission unit becomes too large, i.e. when a timeout occurs. Its value is determined through
-experiments and measured in clock cycles.
+The first hyperparameter that is fixed through an experiment is the number of cycles for an \gls{arq} timeout. In Section
+\ref{subsec:arqretransmissions}, it was mentioned that two different timeout values exist: in addition to the inter-arrival timeout, there is another,
+higher value that is used after an \gls{arq} was issued to await the answer (the post-\gls{arq} timeout). As they are interdependent, only the former
+is empirically determined. The latter is calculated from the inter-arrival timeout and the Manhattan distance between the
+two affected communication partners. More precisely, if $t_1$ is the inter-arrival timeout, $t_2(S, D)$ is the post-\gls{arq} timeout for a
+particular source $S$ and destination $D$, and $d$ is the Manhattan distance between the two nodes, then $t_2(S, D) = t_1 + 2 \cdot d$. Figure
+\vref{fig:arqtimeoutscalc} illustrates this calculation.
 
 \begin{figure}
     \centering
@@ -152,12 +205,6 @@ experiments and measured in clock cycles.
     \label{fig:arqtimeoutscalc}
 \end{figure}
 
-In addition to the inter-arrival timeout, there is another, higher value that is used after an \gls{arq} was issued to await the answer, as explained
-in Section \ref{subsec:arqretransmissions}. The \gls{arq} answer timeout depends on the inter-arrival timeout and the Manhattan distance between the
-two affected communication partners. More precisely, if $t_1$ is the inter-arrival timeout, $t_2(S, D)$ is the \gls{arq} answer timeout for a
-particular source $S$ and destination $D$, and $d$ is the Manhattan distance between the two nodes, then $t_2(S, D) = t_1 + 2 \cdot d$. Figure
-\vref{fig:arqtimeoutscalc} illustrates this calculation.
-
 Hence, only $t_1$ needs to be determined through experiments. Since this is the first parameter to be fixed, the other input values for the simulation
 are estimated. The tests are independent of the protocol variant as the same injection rate is used for all of them. Table \vref{tab:setuparqtimeouts}
 presents how the simulator is set up.
@@ -165,7 +212,7 @@ presents how the simulator is set up.
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & 0                & 0 \\
     \end{tabulary}
     \caption[Input parameters for ARQ timeouts experiment]{long}
@@ -198,11 +245,11 @@ Figure \vref{fig:resultsarqtimeouts} shows the results for timeout values rangin
 We choose value of 12 because then for all NC variants, it is less than 1 ARQ per 100 source flits. Higher timeout would entail even less ARQs, but
 increase latency and RTB sizes.
 
-\subsection{Number Of Crypto Modules}
+\subsection{Number Of Crypto Modules}\label{subsec:numcryptomodules}
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         varying     & varying    & varying     & varying      & unlimited  & 1            & 12             & \gls{dor}  & 8                & 0.2 \\
     \end{tabulary}
     \caption[Input parameters for number of crypto modules experiment]{long}
@@ -228,11 +275,13 @@ increase latency and RTB sizes.
     \label{fig:resultscryptomodules}
 \end{figure}
 
-\subsection{Router Input Queue Sizes}
+This also means that the sizes of the queues in front of the crypto modules (cf. Figure \ref{fig:omnetni}) do not need to exceed around 10 flits.
+
+\subsection{Port Queue Sizes}\label{subsec:portqueuesizes}
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 8 & 0.2 \\
     \end{tabulary}
     \caption[Input parameters for router queue sizes experiment]{long}
@@ -256,6 +305,8 @@ increase latency and RTB sizes.
 
 \section{Performance Comparisons}\label{sec:perfcompeval}
 \subsection{Performances Of The Protocol Variants}
+\Gls{arq} flits and retransmissions are not encompassed in the base network injection rate (see Section \ref{sec:environmenteval}). However, the total injection rate including 
+
 Record:
 - acceptance rate (aka actual injection rate)
 - information rate (source flits / total flits)
@@ -265,7 +316,7 @@ Record:
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & 8 & varying \\
     \end{tabulary}
     \caption[Input parameters for protocol variant experiment]{long}
@@ -296,7 +347,7 @@ Take: best protocol variant (IWA), use it to find the best routing strategy
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
-        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pNumAttackers{} & \pAttackProb{} \\\hline
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
     \end{tabulary}
     \caption[Input parameters for main experiment]{long}
