@@ -1,22 +1,33 @@
-set terminal epslatex size 2.8,2.5 color colortext header \
-    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+set terminal epslatex size 2.6,2.5 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\st}[0]{\\scriptsize}"
 
-set ylabel '\ft Y coordinate'
-set yrange [0:7]
+#set ylabel '\ft Y coordinate'
+set yrange [-0.5:7.5]
 
-set xlabel '\ft X coordinate'
-set xrange [0:7]
+#set xlabel '\ft X coordinate'
+set xrange [-0.5:7.5]
 
-set palette defined (0 "blue",17 "#00ffff",33 "white",50 "yellow", 66 "red",100 "#990000",101 "grey")
-set cblabel '\ft Flits forwarded'
-set cbrange [0:120000]
+set palette defined (0 '#ffffff', 40 '#ffff00', 80 '#ff0000', 100 '#990000')
+#set cblabel '\ft Flits forwarded'
+set cbrange [20000:120000]
 
 unset xtics
 unset ytics
 
 unset key
 
+set format '\st %g'
+
 set view map
 
-set output '../plots/heatmap-dor.tex'
-splot '../data/heatmap.dat' index 0 matrix with image
+set output '../plots/heatmap-iwa-g2c3-dor.tex'
+splot '../data/heatmap.dat' index 1 matrix with image
+
+set output '../plots/heatmap-iwa-g2c3-dm.tex'
+splot '../data/heatmap.dat' index 4 matrix with image
+
+set output '../plots/heatmap-iwa-g2c3-romm.tex'
+splot '../data/heatmap.dat' index 7 matrix with image
+
+set output '../plots/heatmap-iwa-g2c3-ramm.tex'
+splot '../data/heatmap.dat' index 10 matrix with image

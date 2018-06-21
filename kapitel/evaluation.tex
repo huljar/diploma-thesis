@@ -205,15 +205,15 @@ particular source $S$ and destination $D$, and $d$ is the Manhattan distance bet
     \label{fig:arqtimeoutscalc}
 \end{figure}
 
-Hence, only $t_1$ needs to be determined through experiments. Since this is the first parameter to be fixed, the other input values for the simulation
-are estimated. The tests are independent of the protocol variant as the same injection rate is used for all of them. Table \vref{tab:setuparqtimeouts}
-presents how the simulator is set up.
+Hence, $t_1$ needs to be determined through experiments. Since this is the first parameter to be fixed, the other input values for the simulation
+are estimated. The tests are for the most part independent of the protocol variant as the same injection rate is used for all of them. Table
+\vref{tab:setuparqtimeouts} presents how the simulator is set up.
 
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
-        \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & 0                & 0 \\
+        \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & none            & 0              \\
     \end{tabulary}
     \caption[Input parameters for ARQ timeouts experiment]{long}
     \label{tab:setuparqtimeouts}
@@ -355,10 +355,15 @@ Take: best protocol variant (IWA), use it to find the best routing strategy
 \end{table}
 
 
-% Heatmap of router workload?
+% Heatmap of router workload
 \begin{figure}
-    \input{gnuplot/plots/heatmap-dor}
-    \caption[short]{Heatmaps}
+    \begin{tabular}{cc}
+        \input{gnuplot/plots/heatmap-iwa-g2c3-dor} & \input{gnuplot/plots/heatmap-iwa-g2c3-dm} \\
+        (a) & (b) \\
+        \input{gnuplot/plots/heatmap-iwa-g2c3-romm} & \input{gnuplot/plots/heatmap-iwa-g2c3-ramm} \\
+        (c) & (d) \\
+    \end{tabular}
+    \caption[Heatmaps of the routers for different routing strategies]{Heatmaps of the routers for different routing strategies.}
     \label{fig:resultsroutingstratheatmaps}
 \end{figure}
 
