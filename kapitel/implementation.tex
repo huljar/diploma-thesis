@@ -33,7 +33,7 @@ finical to implement correctly. Second, since the cores themselves each operate 
 only affect the transmissions from one router to another. Third, the cores are assumed to be identical and hence run with the same frequency anyway.
 On these grounds, a globally synchronous architecture with a single clock driving all components is used in the simulator.
 
-\subsection{Clock Frequency}
+\subsection{Clock Frequency}\label{subsec:clockfrequency}
 The \gls{noc}'s global clock runs at a frequency of 500 MHz as this is a common speed in \gls{noc}-related research
 \cites{frey15stateobfuscation}{frey17hardenednoc}. Unfortunately, the PRINCE cipher that is employed for all cryptographic operations is unable to run at
 such a high frequency. However, in Section \ref{subsubsec:prince} it was shown that the algorithm runs flawlessly at frequencies of up to 250 MHz.

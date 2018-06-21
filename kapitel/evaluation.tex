@@ -1,14 +1,78 @@
-\section{Notation}
-%Placeholder parameters
-%Prot. variants abbreviations (IDA, IWA, FGA, UC) (G2C3 and G2C4 as before)
+After the protocol design phase (Chapter \ref{ch:protocol}) and the implementation with the simulator (Chapter \ref{ch:implementation}), the next step
+is to evaluate the different approaches. As the primary goal of this thesis is to provide protection and resilience against malicious routers within
+the \gls{noc}, the protocol variants were tested for varying attacker positions, attack probabilities, and routing strategies. The quality of a scheme
+is determined through several metrics that indicate its performance for a given scenario, which are explained below.
+
+The next section establishes notations and key terms that are used throughout this chapter. Afterwards, the environment and frame conditions for the
+simulations are delineated (Section \ref{sec:environmenteval}). Following this, the employed attacker model is discussed (Section
+\ref{sec:attackermodeleval}). Subsequently, the hyperparameters are fixed through a series of representative experiments (Section
+\ref{sec:hyperparamseval}), followed by the main evaluation where the different protocol variants and routing strategies are compared (Section
+\ref{sec:perfcompeval}).
+
+\section{Notation}\label{sec:notationeval}
+To improve readability, abbreviations are introduced for the protocol variants and network coding modes. This facilitates their representation within
+charts, diagrams, and tables.
+\begin{itemize}
+    \item \textbf{\Gls{ida}} stands for the \textit{individual authentication} protocol version
+    \item \textbf{\Gls{iwa}} represents the \textit{interwoven authentication} approach
+    \item \textbf{\Gls{fga}} denotes the \textit{full-generation authentication} variant
+    \item \textbf{UC} is short for \textit{uncoded}, i.e., the lack of network coding
+    \item \textbf{G2C3} and \textbf{G2C4} are used for the two network coding variants that were explained in Section \ref{sec:designnc}.
+\end{itemize}
+\vspace{0.5\baselineskip}
+
+These terms are often combined with a routing strategy when the setup of an experiment is described. For instance, \gls{ida}-UC-\gls{dor} stands for uncoded
+individual authentication using dimension order routing.
+
 %Terms "source flit", router "port queues", "local queues", "creation rate"
 
-\section{Environment}
-% 50,000 cycles (why?)
-% Warmup and cooldown times (both 500 cycles)
-% Injection rate of 0.2 into the network
-% Uniform random destination selection
-% Pair generation for fair comparisons of UC/NC
+\section{Environment}\label{sec:environmenteval}
+In this section, the general setup for all conducted simulations is elaborated, such as flit generation patterns and simulation runtime. Table
+\vref{tab:fixedparams} provides a concise overview of these invariant parameters and their values.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{L|L}
+        Parameter name & Value \\\hline
+        \Gls{noc} dimensions & 8x8 \\
+        Clock frequency & 500 MHz \\
+        Simulation runtime & \num{50000} cycles \\
+        Warmup/cooldown time & 500 cycles \\
+        Network base injection rate & 0.2 \\
+        Flit destination selection & uniform random \\
+        Pair generation & yes \\
+    \end{tabulary}
+    \caption[short]{long}
+    \label{tab:fixedparams}
+\end{table}
+
+When a simulation is executed, the first 500 cycles are considered warmup time. During this period, no statistics are recorded. This ensures that the
+network is in a steady state and already saturated with flits once the recording starts. It is followed by the main simulation of \num{50000}
+cycles where statistics are recorded normally. Finally, there is another 500 cooldown cycles at the end. This was added to ensure that those flits
+generated near the end of the main simulation are not classified as lost flits simply because they were not granted enough time to reach their
+destination. Thus, flits arriving at processing elements during the cooldown period are considered successfully transmitted, while flits generated
+during this period are not included in the statistics.
+
+The network base injection rate describes the average number of flits injected into the network per clock cycle at each node, excluding \gls{arq}
+flits and retransmissions. The creation rate of flits at the processing elements is adjusted accordingly for each protocol variant to keep the
+injection rate constant. For instance, with \gls{ida}-G2C3, every flit created at a particular processing element results in three flits injected
+into the network due to network coding and the additional \gls{mac} flits. Hence, the creation rate would be $\frac{0.2}{3}$ for this scenario.
+
+The processing elements create flits independently from each other. All processing elements use the same creation rate. The selection of the flits'
+destinations is performed randomly with a uniform probability distibution over all network nodes (excluding the sender's own node).
+
+To allow for a fair comparison of the protocol versions, flits are always generated in pairs. This means that when a particular processing
+element creates a flit, another one with the same destination is guaranteed to be created on the next clock cycle. This prevents long periods of
+buffering for network coded \gls{ida} and \gls{fga} in the sender's network interface: with a pair of flits, a generation can be formed immediately. This creation
+pattern is a realistic assumption as in practical applications, flits are usually generated from breaking a data packet down into smaller parts. These
+flits would then enter the network consecutively and have the same destination. The creation rate of flits is adjusted accordingly to reflect this
+pattern: for example, with \gls{ida}-G2C3, the probability to create a pair would be set to $\frac{0.2}{6}$ to keep the base network injection rate at
+0.2.
+
+Some of the parameters were adopted from the simulation setup that \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} have employed
+in their experiments to render results comparable with their evaluations. These parameters include the \gls{noc} dimensions, the base network
+injection rate, and the simulation runtime. The rationale for a clock speed of 500 MHz was outlined in Section \ref{subsec:clockfrequency}.
+
 In the experiments, a base network injection rate of 0.2 is assumed. This is the same value that \citeauthor{moriam18activeattackers} have chosen
 \cite[2]{moriam18activeattackers} in order for the results to be comparable with their analyses. The actual injection rate may be higher as the base rate does not include the
 issuance of \glspl{arq} and the resulting retransmissions.
@@ -34,18 +98,8 @@ issuance of \glspl{arq} and the resulting retransmissions.
     \item Overhead von Verschlüsselung+Auth vs. nur Auth vs keins von beiden (sowohl Latenz als auch Chipfläche)
 \end{itemize}
 
-\begin{table}
-    \centering
-    \begin{tabulary}{\textwidth}{C|C}
-        Parameter name & Value \\\hline
-        \Gls{noc} dimensions & 8x8 \\
-        Clock frequency & 500 MHz \\
-        Network base injection rate & 0.2 \\
-        Simulation runtime & \num{50000} cycles \\
-    \end{tabulary}
-    \caption[short]{long}
-    \label{tab:fixedparams}
-\end{table}
+The simulator has a variety of parameters that can be altered to influence its behavior and consequently the outcome of the simulations.
+
 
 \begin{table}
     \centering
@@ -62,7 +116,7 @@ issuance of \glspl{arq} and the resulting retransmissions.
     \label{tab:inputparams}
 \end{table}% TODO: finish table
 
-\section{Attacker Model}
+\section{Attacker Model}\label{sec:attackermodeleval}
 \begin{itemize}
     \item Focuses on malicious modifications rather than DoS attacks
     \item Assumption: compromised routers → rely on NIs for security
@@ -84,7 +138,7 @@ Compromised routers: 8 randomly selected routers (uniform distribution), 3 diffe
     \label{fig:attackerpositions}
 \end{figure}
 
-\section{Determining The Hyperparameters}
+\section{Determining The Hyperparameters}\label{sec:hyperparamseval}
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
 In Section \ref{subsec:arqretransmissions}, the concept of \glspl{arq} and timeouts was introduced: receivers issue \glspl{arq} when the temporal gap
 between the arrival of flits belonging to the same transmission unit becomes too large, i.e. when a timeout occurs. Its value is determined through
@@ -200,7 +254,7 @@ increase latency and RTB sizes.
     \label{fig:resultsqueuelengths}
 \end{figure}
 
-\section{Experiments}
+\section{Performance Comparisons}\label{sec:perfcompeval}
 \subsection{Performances Of The Protocol Variants}
 Record:
 - acceptance rate (aka actual injection rate)
