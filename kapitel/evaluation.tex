@@ -432,15 +432,19 @@ Take: best protocol variant (IWA), use it to find the best routing strategy
     \label{fig:resultsroutingstratheatmaps}
 \end{figure}
 
+\subsection{Increased ARQ limit}
+
+\section{Area Overhead}
+Encryption units: 3x PRINCE (8260 GE each\footnote{For Nangate 45 nm Generic technology with a unit delay of 1000. Both lower and higher values were
+obtained with other technologies.} \cite[16]{borghoff12prince})
+
+Authentication units: 9x PRINCE (8260 GE each)
+
+Network coding lookup tables: 7080 GEs (G2C3) or 16992 GEs (G2C4) \cite[5]{moriam18activeattackers}
+
+compare with the area overhead estimated by moriam et al., also reference the state-of-the-art MPSoC [14]
+
 \iffalse
-Experiment setup parameter tables:
-- NC mode (UC, G2C3, G2C4)
-- ...
-
-ARQ Limit: 1, at most 2 because more ARQs allowed per transmission unit means larger retransmission buffers everywhere
-
-Do one experiment with the 8 routers with attack probability one and compare the routing strategies
-
 "Results for IWA-NC confirm the alleged positive effect of NC in unreliable networks"
 
 "Creation rate adjustment to keep the base injection rate constant is reflected in the differing information rates"
@@ -449,15 +453,4 @@ Do one experiment with the 8 routers with attack probability one and compare the
 
 "NC proves to provide a performance improvement, although more in the sense of less residual errors than a decrease in latency since ARQs are still
 limited to 1 per transmission unit across all variants."
-
-\section{Statistics}
-\begin{itemize}
-    \item Injection/acceptance rate: [0, 1] (at processing element and at network interface)
-    \item Queue lengths and buffer sizes
-    \item Workload of crypto units
-    \item Average/max flit waiting time at entry guard
-    \item Average/max hop count
-\end{itemize}
-
-\section{Area Overhead}
 \fi
