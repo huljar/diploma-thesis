@@ -43,7 +43,7 @@ In this section, the parameters that are fixed for all conducted simulations are
         Clock frequency & 500 MHz \\
         Simulation runtime & \num{50000} cycles \\
         Warmup/cooldown time & 500 cycles \\
-        Network base injection rate & 0.2 \\
+        Base network injection rate & 0.2 \\
         Flit destination selection & uniform random \\
         Pair generation & yes \\
     \end{tabulary}
@@ -59,7 +59,7 @@ generated shortly before the end of the main simulation are not classified as lo
 destination. Thus, source flits generated during the main simulation and arriving at processing elements during the cooldown period are considered
 successfully transmitted, while those generated during cooldown are not included in the statistics.
 
-The network base injection rate describes the average number of flits injected into the network per clock cycle at each node, excluding \gls{arq}
+The base network injection rate describes the average number of flits injected into the network per clock cycle at each node, excluding \gls{arq}
 flits and retransmissions. The creation rate of flits at the processing elements is adjusted accordingly for each protocol variant to keep the
 injection rate constant. For instance, with \gls{ida}-G2C3, every source flit created at a particular processing element results in three flits
 injected into the network due to network coding and the additional \gls{mac} flits.
@@ -349,15 +349,35 @@ sporadic accumulations (the highest being 75 flits for G2C4) are dispelled relat
 average and maximum local queue lengths and is thus not considered worth the additional required chip area.
 
 \section{Performance Comparisons}\label{sec:perfcompeval}
+After the preliminary experiments to determine the hyperparameters for the simulations were finished, the main performance evaluations of the protocol
+variants and routing strategies are tackled. In the next section, various criteria are established and explained that indicate the performance aspects
+of a given configuration. Then, the protocol variants are compared under these criteria for varying attack probabilities of the malicious routers.
+Afterwards, the most promising variant is evaluated for each of the presented routing strategies to examine their effects on the performance. Finally,
+the consequences of increasing the \gls{arq} limit to 2 are investigated.
+
+\subsection{Criteria}
+To facilitate comparisons of the obtained results with previous research at the Chair of Privacy and Data Security of the TU Dresden, the metrics of
+\citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} are all adopted for the evaluation here. Those are the acceptance rate, the
+information rate, and the residual error probability. As an additional metric, the average end-to-end latency of source flits is employed. The following list elaborates on the
+details of these metrics:
+\begin{itemize}
+    \item \textbf{Acceptance rate.} The base network injection rate specifies the number of flits that are injected into the network per clock cycle
+        per node. However, it excludes \glspl{arq} and retransmissions (cf. Section \ref{sec:environmenteval}), whose number rises with increasing
+        attack probabilities. By including them, the total network injection rate is obtained, which is called acceptance rate here. It provides an
+        indicator for both the frequency of \glspl{arq} and retransmissions as well as the network load.
+    \item \textbf{Information rate.} The information rate is the quotient of the amount of created source flits and the total number of flits injected
+        into the network. Thus, it illustrates the overhead of authentication, network coding, \glspl{arq}, and retransmissions that the protocol
+        imposes for transmitting information from one processing element to another.
+    \item \textbf{Residual error probability.} This represents the portion of source flits that were not transmitted successfully to their destination
+        processing elements despite exhausting the allowed number of \glspl{arq}. Thus, it serves as a crucial indicator of the reliability and
+        resilience that the protocol aims to add to the communications.
+    \item \textbf{Average end-to-end latency.} As introduced in Section \ref{sec:networkonchipfun} and mentioned numerous times throughout this
+        thesis, low transmission latencies are an essential performance criterion for \glspl{noc}. The average end-to-end latency captures the mean
+        transmission time of source flits from their generation at the sending processing elements to their arrival at the receiving ones in clock
+        cycles.
+\end{itemize}
+
 \subsection{Protocol Variants}
-\Gls{arq} flits and retransmissions are not encompassed in the base network injection rate (see Section \ref{sec:environmenteval}). However, the total injection rate including 
-
-Record:
-- acceptance rate (aka actual injection rate)
-- information rate (source flits / total flits)
-- residual error probability
-- end-to-end latency
-
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
