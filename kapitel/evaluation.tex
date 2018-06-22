@@ -177,7 +177,8 @@ The sizes of the port queues of the routers are another hyperparameter. Unfortun
 virtual channels in the routers (cf. Section \ref{subsec:singlecyclerouting}) incurs deadlocks for the other routing strategies if a limited queue
 size is enforced. For instance, \gls{romm} routing necessitates two virtual channels (one for each phase) to guarantee deadlock freedom
 \cite[4]{nesson95romm}. \Gls{dor}, however, is not affected by deadlocks, even without virtual channels \cite[9]{ni93routingsurvey}. Thus, as a
-workaround, a hard queue size limit is only implemented for \gls{dor}. For the other strategies, congestion signals are still sent out once a queue
+workaround, a hard queue size limit is only implemented for \gls{dor}\footnote{With a hard queue size limit, routers must delay flits that are
+to be sent via a congested link, as they would be discarded otherwise.}. For the other strategies, congestion signals are still sent out once a queue
 has reached the given size, but it will continue to accept incoming flits. While \gls{romm}, being oblivious, ignores these signals, \gls{dm} and
 \gls{ramm} attempt to avoid congested links as much as possible. In Section \ref{subsec:portqueuesizes}, the experiment to determine the size limit
 for \gls{dor} is described.
@@ -191,11 +192,11 @@ probability parameter defines the likelihood for a malicious router to attack a 
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
 The first hyperparameter that is fixed through an experiment is the number of cycles for an \gls{arq} timeout. In Section
 \ref{subsec:arqretransmissions}, it was mentioned that two different timeout values exist: in addition to the inter-arrival timeout, there is another,
-higher value that is used after an \gls{arq} was issued to await the answer (the post-\gls{arq} timeout). As they are interdependent, only the former
-is empirically determined. The latter is calculated from the inter-arrival timeout and the Manhattan distance between the
-two affected communication partners. More precisely, if $t_1$ is the inter-arrival timeout, $t_2(S, D)$ is the post-\gls{arq} timeout for a
-particular source $S$ and destination $D$, and $d$ is the Manhattan distance between the two nodes, then $t_2(S, D) = t_1 + 2 \cdot d$. Figure
-\vref{fig:arqtimeoutscalc} illustrates this calculation.
+higher value that is used after an \gls{arq} was issued to await the answer (the post-\gls{arq} timeout). However, only the former
+is empirically determined, while the latter is calculated from the inter-arrival timeout, the Manhattan distance between the
+two affected communication partners, and the \gls{rtb} lookup time. More precisely, if $t_1$ is the inter-arrival timeout, $t_2(S, D)$ is the post-\gls{arq} timeout for a
+particular source $S$ and destination $D$, $d$ is the Manhattan distance between the two nodes, and $l$ is the \gls{rtb} lookup time, then $t_2(S, D)
+= t_1 + 2d + l$. Figure \vref{fig:arqtimeoutscalc} illustrates this calculation. 
 
 \begin{figure}
     \centering
@@ -205,9 +206,15 @@ particular source $S$ and destination $D$, and $d$ is the Manhattan distance bet
     \label{fig:arqtimeoutscalc}
 \end{figure}
 
-Hence, $t_1$ needs to be determined through experiments. Since this is the first parameter to be fixed, the other input values for the simulation
-are estimated. The tests are for the most part independent of the protocol variant as the same injection rate is used for all of them. Table
-\vref{tab:setuparqtimeouts} presents how the simulator is set up.
+Thus, the purpose of this experiment is to determine a suitable value for $t_1$. The idea is that in a network devoid of attackers, ideally no
+\glspl{arq} are issued since no flits are lost. However, due to random deviations from the average flit injection rate, the network load varies over
+time and congestions in some routers
+may occur. The resulting increased transmission delays may be high enough to trigger timeouts even when an \gls{arq} is not necessary. Sporadic
+occurances of such cases cannot be ruled out, but should rarely happen. However, simply increasing the timeout until these cases vanish is undesirable
+for two reasons. First, a high timeout directly corresponds to high latencies when flit losses necessitate \glspl{arq}. Second, the later an \gls{arq}
+is issued, the larger the \gls{rtb} of the communication partner needs to be so that the flits in question are not already overwritten when the
+\gls{arq} arrives. The goal of this experiment is to find a reasonable middle ground: the smallest timeout that does not entail a significant number of
+unnecessary \glspl{arq} will be used for the subsequent evaluations.
 
 \begin{table}
     \centering
@@ -215,21 +222,16 @@ are estimated. The tests are for the most part independent of the protocol varia
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & none            & 0              \\
     \end{tabulary}
-    \caption[Input parameters for ARQ timeouts experiment]{long}
+    \caption[Input parameters for ARQ timeouts experiment]{The input parameters for the simulator in the \gls{arq} timeouts experiment.}
     \label{tab:setuparqtimeouts}
 \end{table}
-% Why Ind. Auth.? Most flits per transmission unit (8 with G2C4)
-% Why this number of enc./auth. units? Large number so there are definitely no internal congestions → area doesn't matter for this experiment
-% Why ARQs per source flit and not per transmission unit? because size of trans. units varies considerably with prot. variant
 
-To determine the timeout value, an uncompromised \gls{noc} (i.e., with zero malicious routers) is used. Ideally, no \glspl{arq} are issued in this
-scenario. However, due to random deviations from the average flit injection rate, the network load varies over time and congestions in some routers
-may occur. The resulting increased transmission delays may be high enough to trigger timeouts even when an \gls{arq} is not necessary. Sporadic
-occurances of such cases cannot be ruled out, but should rarely happen. However, simply increasing the timeout until these cases vanish is undesirable
-for two reasons. First, a high timeout directly corresponds to high latencies when flit losses necessitate \glspl{arq}. Second, the later an \gls{arq}
-is issued, the larger the \gls{rtb} of the communication partner needs to be so that the flits in question are not already overwritten when the
-\gls{arq} arrives. The goal of this experiment is to find a reasonable middle ground: the smallest timeout that does not entail a significant number of
-unnecessary \glspl{arq} will be used for the subsequent evaluations.
+Since $t_1$ is the first parameter to be fixed, the other input values for the simulation are estimates. They are summarized in Table
+\vref{tab:setuparqtimeouts}. The tests are for the most part independent of the protocol variant as the same injection rate is used for all of them.
+Hence, \gls{ida} was selected as it features the largest variety of transmission unit sizes (from 2 for UC up to 8 for G2C4) and all \glspl{arq} are
+issued per transmission unit. The number of crypto modules was set to a sufficiently high value to ensure that no congestions occur inside the network
+interfaces. Similarly, the router port queue sizes are not limited as no fitting value was determined yet. \Gls{dor} is employed since it is used as
+the baseline for all experiments before evaluating the effects of other routing strategies.
 
 \begin{figure}
     \centering
@@ -238,30 +240,50 @@ unnecessary \glspl{arq} will be used for the subsequent evaluations.
     \label{fig:resultsarqtimeouts}
 \end{figure}
 
-Figure \vref{fig:resultsarqtimeouts} shows the results for timeout values ranging from 3 to 15 cycles.
+Figure \vref{fig:resultsarqtimeouts} presents the number of \glspl{arq} issued for $t_1 \in [3, 15]$ clock cycles. The values are shown in relation to
+the number of created source flits instead of the number of transmission units as the size of the latter varies significantly depending on the network
+coding scheme. For timeout values of 12 or greater, less than 1 \gls{arq} per 100 source flits is sent, which is considered sufficiently small here.
+Hence, $t_1 = 12$ is chosen and used in all future experiments.
 
-- Use sadias formula for RTB size estimation
-
-We choose value of 12 because then for all NC variants, it is less than 1 ARQ per 100 source flits. Higher timeout would entail even less ARQs, but
-increase latency and RTB sizes.
+% TODO: Use sadias formula for RTB size estimation
 
 \subsection{Number Of Crypto Modules}\label{subsec:numcryptomodules}
+The second experiment concerns itself with the number of required encryption and authentication modules in the network interfaces. Here, a
+reasonable trade-off between occupied chip area and performance needs to be determined: there should be just enough modules to keep the waiting time
+of flits for a free module low.
+
+In Figure \ref{fig:omnetni}, it was shown that the flits from four queues compete for access: two for encryption modules and two for authentication
+modules. The idea of this experiment is to measure the time (in clock cycles) that flits are enqueued before they are granted access to a crypto
+module. In addition to the average, the maximum queue time was investigated as well to take periods of increased network traffic into account. Even
+during such periods, the flits should not suffer unreasonably high delays.
+
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
-        varying     & varying    & varying     & varying      & unlimited  & 1            & 12             & \gls{dor}  & 8                & 0.2 \\
+        varying     & varying    & varying     & varying      & unlimited  & 1            & 12             & \gls{dor}  & 1               & 0.2            \\
     \end{tabulary}
-    \caption[Input parameters for number of crypto modules experiment]{long}
+    \caption[Input parameters for number of crypto modules experiment]{The input parameters for the simulator in the experiment to determine the
+    number of required crypto modules.}
     \label{tab:setupnumcrypto}
 \end{table}
-- congestions in the queues in front of the crypto modules should be minimal
-- less modules are better if possible because less chip area
-- relatively high attack probabilities because more ARQs means more ver.+dec. retries at receivers, and network should be able to deal with that scenario
-  "network needs to be equipped to deal with/handle periods of high traffic volumes"
-- max. required enc. units: 4, because max. 2 flits can be drawn from the queues per cycle, so max. 4 flits active at the same time
-- max. required auth. units: 12 (ind. auth), 10 (int. auth), 11 (gen. auth (2 flits = 11 cycles busy))
-- criterion: max wait time needs to be 5 or less cycles
+
+Table \vref{tab:setupnumcrypto} shows the input parameters used for this experiment. Since the internal structure of the network interfaces and the
+number of cycles for authentication vary considerably depending on the protocol variant, all of them were investigated and compared. The rationale for
+unlimited router port queue sizes is the same as in the \gls{arq} timeout experiment (see above). The \gls{arq} limit is set to 1 for the same reason
+that \gls{dor} is used as the routing strategy: they are baseline values for all experiments until the effects of varying them are investigated later
+on. The \gls{arq} timeout is set to 12, which is the value identified in the previous experiment (Section \ref{subsec:arqtimeouts}). Attackers
+with a medium attack probability are added as their presence entails an increase in required decryptions and \gls{mac} computations: if an integrity
+breach is detected, both these actions need to be executed for the subsequent retransmissions as well.
+
+The minimum waiting time of a flit is one cycle: as the queues provide synchronization with the global clock, even flits that arrive at an empty queue
+can be sent out at the earliest on the next clock tick. Furthermore, the fact that at most one flit can be sent out from a queue per cycle induces an
+upper bound on the number of required crypto modules. For encryption, four modules always suffice as processing a flit takes two cycles and at most two
+flits can be distributed among the modules per cycle (one from the encryption and one from the decryption queue). The upper bound for authentication
+modules is calculated in the same manner, but depends on the protocol variant. For \gls{ida} and \gls{iwa}, it is 12 and 10 modules, respectively, as
+the authentication process requires six and five cycles, respectively. \Gls{fga} operates slightly differently because two flits are required for a
+single authentication procedure. Thus, an authentication module is busy for 11 cycles (one to wait for the second flit, then 10 for the \gls{mac}
+computation). Hence, at most 11 modules are required for this variant.
 
 \begin{figure}
     \centering
@@ -270,29 +292,44 @@ increase latency and RTB sizes.
         \input{gnuplot/plots/encmodules-iwa} & \input{gnuplot/plots/authmodules-iwa.tex} \\
         \input{gnuplot/plots/encmodules-fga} & \input{gnuplot/plots/authmodules-fga.tex}
     \end{tabular}
-    \caption[Results for number of crypto modules experiment]{The number of encryption modules (left column) and authentication modules (right column)
-    is shown in relation to the maximum and average wait times of enqueued flits. Each row represents one protocol variant.}
+    \caption[Results for number of crypto modules experiment]{Results for the experiment to determine the number of required crypto modules. The
+    number of encryption modules (left column) and authentication modules (right column) is shown in relation to the maximum and average wait times of
+    enqueued flits. Each row represents one protocol variant.}
     \label{fig:resultscryptomodules}
 \end{figure}
 
-This also means that the sizes of the queues in front of the crypto modules (cf. Figure \ref{fig:omnetni}) do not need to exceed around 10 flits.
+Figure \vref{fig:resultscryptomodules} presents the results of the experiment. For each protocol variant and all viable numbers of encryption and
+authentication modules, the maximum and average wait times of flits are depicted. The criterion for having enough modules is that the maximum wait
+time should not exceed 10 cycles, while the average should be very close to the minimum of a single cycle. Thus, three encryption and nine
+authentication modules are chosen for all subsequent experiments\footnote{This also means that the sizes of the queues in front of the crypto modules
+(cf. Figure \ref{fig:omnetni}) do not need to exceed around 10 flits.}.
 
 \subsection{Port Queue Sizes}\label{subsec:portqueuesizes}
+The final hyperparameter that is determined is the size of the routers' port queues. This value potentially impacts the transmission delays for
+oblivious strategies and has an influence on the routing decisions for adaptive strategies. However, as explained in Section \ref{sec:configurations},
+the queue limit is only determined and enforced for \gls{dor} due to the susceptibility of the other strategies to deadlocks. For the adaptive
+ones, the determined value is used as a congestion threshold instead of a size limit.
+
+Once again, small queues are preferable with regard to the occupied chip area of the routers, but larger queues are advantageous to achieve lower
+transmission latencies. To prevent flits from being discarded due to oversaturation of the network, the local queues of the routers are always
+assumed to be unlimited in size. Since \gls{dor} delays flits that are to be routed through a congested link, the flits will accumulate there if the
+port queue sizes are too restrictive. Thus, in the experiment, the maximum and average lengths of both the port queues and the local queues are
+investigated for varying size limits of the former.
+
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
-        \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 8 & 0.2 \\
+        \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 1 & 0.2 \\
     \end{tabulary}
     \caption[Input parameters for router queue sizes experiment]{long}
     \label{tab:setupqueuesizes}
 \end{table}
-- only node input queues; local input queues are left unlimited for simulation purposes to avoid any potential flit drops due to such a queue being full
-- why IDA? largest transmission units (G2C4) and one of the smallest (UC)
-- goal: as usual: as small as possible (→ less chip area) but not increase latencies too much
-- explored as last hyperparameter because with static DOR it only shifts where flits wait to be routed, congestions do not affect route
-  - will be crucial for the adaptive strategies though
-- chosen value: 6 (increasing it does not substantially lower max/avg times and all avgs are below 1 or just very slightly above it)
+
+The input parameters for the simulator are given in Table \vref{tab:setupqueuesizes}. As the results should be mostly independent of the protocol
+variant due to using the same base network injection rates for all of them, \gls{ida} is used as a reference. For the number of crypto modules and the
+\gls{arq} timeout, the results of the previous experiments are employed. Attackers are once again present as they may have a considerable impact on
+the network load.
 
 \begin{figure}
     \centering
@@ -303,8 +340,16 @@ This also means that the sizes of the queues in front of the crypto modules (cf.
     \label{fig:resultsqueuelengths}
 \end{figure}
 
+The results are shown in Figure \vref{fig:resultsqueuelengths}. The queue lengths were examined for size restrictions ranging from one to ten flits,
+as well as unlimited sizes for comparison. Unsurprisingly, the maximum length of the port queues matches the imposed limit (except for the unlimited
+case). Their average length stays relatively constant at approximately 0.4 flits. The more interesting results involve the local queues: with small
+size limits on the port queues, flits accumulate there faster than the network can handle them and both maximum and average lengths escalate quickly.
+A size limit of six flits was chosen for multiple reasons. First, the average length of the local queues is around one flit, which indicates that even
+sporadic accumulations (the highest being 75 flits for G2C4) are dispelled relatively quickly. Second, a higher limit only marginally improves both
+average and maximum local queue lengths and is thus not considered worth the additional required chip area.
+
 \section{Performance Comparisons}\label{sec:perfcompeval}
-\subsection{Performances Of The Protocol Variants}
+\subsection{Protocol Variants}
 \Gls{arq} flits and retransmissions are not encompassed in the base network injection rate (see Section \ref{sec:environmenteval}). However, the total injection rate including 
 
 Record:
@@ -341,7 +386,7 @@ source flit for UC (IDA protocol)
     this → how to confirm? set routers to not attack ARQ flits
   - may be exciting to see if this is the case as well for IWA because there you have 1 ARQ per source flit for both UC and NC
 
-\subsection{Performances Of The Routing Strategies}
+\subsection{Routing Strategies}
 Take: best protocol variant (IWA), use it to find the best routing strategy
 
 \begin{table}

@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0 EPSF-2.0
 %%Title: ../plots/heatmap-iwa-g2c3-dor.tex
 %%Creator: gnuplot 5.0 patchlevel 5
-%%CreationDate: Thu Jun 21 21:52:02 2018
+%%CreationDate: Fri Jun 22 10:51:52 2018
 %%DocumentFonts: 
 %%BoundingBox: 50 50 237 230
 %%EndComments
@@ -441,7 +441,7 @@ SDict begin [
   /Creator (gnuplot 5.0 patchlevel 5)
 %  /Producer (gnuplot)
 %  /Keywords ()
-  /CreationDate (Thu Jun 21 21:52:02 2018)
+  /CreationDate (Fri Jun 22 10:51:52 2018)
   /DOCINFO pdfmark
 end
 } ifelse
@@ -525,8 +525,8 @@ gsave % colour palette begin
     {RedA gidx get GreenA gidx get BlueA gidx get}
     {/dgdxval dgdx def redvalue greenvalue bluevalue} ifelse} def
 /GrayA [0 .4 .8 1 ] def
-/RedA [1 1 1 .6 ] def
-/GreenA [1 1 0 0 ] def
+/RedA [1 .9412 .9412 .6 ] def
+/GreenA [1 .9412 0 0 ] def
 /BlueA [1 0 0 0 ] def
 /pm3dround {maxcolors 0 gt {dup 1 ge
 	{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def
@@ -574,38 +574,38 @@ gsave
 [ /Indexed
   /DeviceRGB 255
   <
-   ffffff fffffd fffffa fffff8 fffff5 fffff3 fffff0 ffffee
-   ffffeb ffffe9 ffffe6 ffffe4 ffffe1 ffffdf ffffdc ffffda
-   ffffd7 ffffd5 ffffd2 ffffd0 ffffcd ffffcb ffffc8 ffffc6
-   ffffc3 ffffc1 ffffbe ffffbc ffffb9 ffffb7 ffffb4 ffffb2
-   ffffaf ffffad ffffaa ffffa8 ffffa5 ffffa3 ffffa0 ffff9e
-   ffff9b ffff99 ffff96 ffff93 ffff91 ffff8f ffff8c ffff8a
-   ffff87 ffff85 ffff82 ffff80 ffff7d ffff7b ffff78 ffff76
-   ffff73 ffff71 ffff6e ffff6c ffff69 ffff67 ffff64 ffff62
-   ffff5f ffff5d ffff5a ffff58 ffff55 ffff53 ffff50 ffff4e
-   ffff4b ffff49 ffff46 ffff44 ffff41 ffff3f ffff3c ffff39
-   ffff37 ffff35 ffff32 ffff30 ffff2d ffff2b ffff28 ffff26
-   ffff23 ffff21 ffff1e ffff1c ffff19 ffff17 ffff14 ffff11
-   ffff0f ffff0d ffff0a ffff08 ffff05 ffff03 ffff00 fffd00
-   fffa00 fff800 fff500 fff300 fff000 ffee00 ffeb00 ffe900
-   ffe600 ffe400 ffe100 ffdf00 ffdc00 ffda00 ffd700 ffd500
-   ffd200 ffd000 ffcd00 ffcb00 ffc800 ffc600 ffc300 ffc100
-   ffbe00 ffbc00 ffb900 ffb700 ffb400 ffb200 ffaf00 ffad00
-   ffaa00 ffa800 ffa500 ffa300 ffa000 ff9e00 ff9b00 ff9900
-   ff9600 ff9400 ff9100 ff8f00 ff8c00 ff8a00 ff8700 ff8500
-   ff8200 ff8000 ff7d00 ff7b00 ff7800 ff7600 ff7300 ff7100
-   ff6e00 ff6c00 ff6900 ff6700 ff6400 ff6200 ff5f00 ff5d00
-   ff5a00 ff5800 ff5500 ff5300 ff5000 ff4e00 ff4b00 ff4900
-   ff4600 ff4400 ff4100 ff3f00 ff3c00 ff3900 ff3700 ff3500
-   ff3200 ff3000 ff2d00 ff2b00 ff2800 ff2600 ff2300 ff2100
-   ff1e00 ff1c00 ff1900 ff1700 ff1400 ff1100 ff0f00 ff0d00
-   ff0a00 ff0800 ff0500 ff0300 ff0000 fd0000 fb0000 f90000
-   f70000 f50000 f30000 f10000 ef0000 ed0000 eb0000 e90000
-   e70000 e50000 e30000 e10000 df0000 dd0000 db0000 d90000
-   d70000 d50000 d30000 d10000 cf0000 cd0000 cb0000 c90000
-   c70000 c50000 c30000 c10000 bf0000 bd0000 bb0000 b90000
-   b70000 b50000 b30000 b10000 af0000 ad0000 ab0000 a90000
-   a70000 a50000 a30000 a10000 9f0000 9d0000 9b0000 990000
+   ffffff fffffd fffffa fffff8 fefef5 fefef3 fefef0 fefeee
+   fefeeb fefee9 fefee6 fdfde4 fdfde1 fdfddf fdfddc fdfdda
+   fdfdd7 fdfdd5 fcfcd2 fcfcd0 fcfccd fcfccb fcfcc8 fcfcc6
+   fbfbc3 fbfbc1 fbfbbe fbfbbc fbfbb9 fbfbb7 fbfbb4 fafab2
+   fafaaf fafaad fafaaa fafaa8 fafaa5 fafaa3 f9f9a0 f9f99e
+   f9f99b f9f999 f9f996 f9f993 f9f991 f8f88f f8f88c f8f88a
+   f8f887 f8f885 f8f882 f8f880 f7f77d f7f77b f7f778 f7f776
+   f7f773 f7f771 f6f66e f6f66c f6f669 f6f667 f6f664 f6f662
+   f6f65f f5f55d f5f55a f5f558 f5f555 f5f553 f5f550 f5f54e
+   f4f44b f4f449 f4f446 f4f444 f4f441 f4f43f f4f43c f3f339
+   f3f337 f3f335 f3f332 f3f330 f3f32d f3f32b f2f228 f2f226
+   f2f223 f2f221 f2f21e f2f21c f1f119 f1f117 f1f114 f1f111
+   f1f10f f1f10d f1f10a f0f008 f0f005 f0f003 f0f000 f0ee00
+   f0eb00 f0e900 f0e700 f0e400 f0e200 f0e000 f0dd00 f0db00
+   f0d800 f0d600 f0d400 f0d100 f0cf00 f0cd00 f0ca00 f0c800
+   f0c600 f0c300 f0c100 f0bf00 f0bc00 f0ba00 f0b800 f0b500
+   f0b300 f0b000 f0ae00 f0ac00 f0a900 f0a700 f0a500 f0a200
+   f0a000 f09e00 f09b00 f09900 f09700 f09400 f09200 f09000
+   f08d00 f08b00 f08800 f08600 f08400 f08100 f07f00 f07d00
+   f07a00 f07800 f07600 f07300 f07100 f06f00 f06c00 f06a00
+   f06800 f06500 f06300 f06000 f05e00 f05c00 f05900 f05700
+   f05500 f05200 f05000 f04e00 f04b00 f04900 f04700 f04400
+   f04200 f04000 f03d00 f03b00 f03800 f03600 f03400 f03100
+   f02f00 f02d00 f02a00 f02800 f02600 f02300 f02100 f01f00
+   f01c00 f01a00 f01800 f01500 f01300 f01000 f00e00 f00c00
+   f00900 f00700 f00500 f00200 f00000 ee0000 ed0000 eb0000
+   e90000 e70000 e60000 e40000 e20000 e10000 df0000 dd0000
+   dc0000 da0000 d80000 d60000 d50000 d30000 d10000 d00000
+   ce0000 cc0000 ca0000 c90000 c70000 c50000 c40000 c20000
+   c00000 bf0000 bd0000 bb0000 b90000 b80000 b60000 b40000
+   b30000 b10000 af0000 ad0000 ac0000 aa0000 a80000 a70000
+   a50000 a30000 a20000 a00000 9e0000 9c0000 9b0000 990000
   >
 ] setcolorspace
 %%%%EndPalette
