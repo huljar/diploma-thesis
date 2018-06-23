@@ -116,8 +116,8 @@ routers to be infected is that the presence of a hardware trojan entails a highe
 routers were malicious, it might drive the overall area requirement of the \gls{noc} to suspiciously high values, undermining the adversary's desire
 to stay concealed (cf. Section \ref{sec:hardwaretrojans}).
 
-The infected routers are assumed to not mount intelligent attacks, such as only compromising flits from a specific source. Rather, they have a
-probability $\pAttackProb{}$ to attack a passing flit. In the event of an attack, the flit is either modified or completely dropped, with both cases
+The infected routers are assumed to not mount intelligent attacks, such as only compromising flits from a specific source. Rather, they randomly
+attack passing flits based on their \textit{attack probability}. In such an event, the flit is either modified or completely dropped, with both cases
 being equiprobable.
 
 For the experiments, the eight infected routers were randomly selected from the 64 network nodes. To obviate large deviations of the recorded
@@ -378,15 +378,24 @@ details of these metrics:
 \end{itemize}
 
 \subsection{Protocol Variants}
+All protocol variants defined in Section \ref{sec:theprotocol} are compared with respect to the performance criteria outlined above. This experiment
+aims to identify the most promising one of them. The input parameters of the simulator were chosen according to the results of the preliminary
+experiments from Section \ref{sec:hyperparamseval}. The \gls{arq} limit of 1 and the \gls{dor} routing strategy are employed as baselines for the
+comparisons once more. The full list of input parameters is given in Table \vref{tab:setupprotvarexperiment}.
+
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
-        varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & 8 & varying \\
+        varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & all & varying \\
     \end{tabulary}
     \caption[Input parameters for protocol variant experiment]{long}
     \label{tab:setupprotvarexperiment}
 \end{table}
+
+The results are presented in Figure \vref{fig:resultsprotvarexperiment}. The four criteria -- acceptance rate, information rate, residual error
+probability, and average end-to-end latency -- were investigated for various attack probabilities ranging from 0 to 0.5 to illustrate both the impact
+of attackers on the communications and the capability of the different protocol variants to mitigate this impact.
 
 \begin{figure}
     \centering
@@ -398,13 +407,49 @@ details of these metrics:
     \label{fig:resultsprotvarexperiment}
 \end{figure}
 
-Observations:
-- NC does not improve (=decrease) residual error. why? might be because you have 1 ARQ per generation (=0.5ARQs per source flit) for NC, but 1 ARQ per
-source flit for UC (IDA protocol)
-  - how to confirm? UC with ARQ limit 1 vs. NC with ARQ limit 2 (then same amount of ARQs per source flit)
-  - ARQ flit itself is not coded → hence when it gets attacked, all retransmissions fail → for NC, on average a larger number of flits is affected by
-    this → how to confirm? set routers to not attack ARQ flits
-  - may be exciting to see if this is the case as well for IWA because there you have 1 ARQ per source flit for both UC and NC
+The acceptance rate rises with increasing attack probabilities as more \glspl{arq} and retransmissions become necessary. It starts at slightly
+above the base network injection rate of 0.2 even without the presence of malicious routers. This is due to a few sporadic \glspl{arq} that are
+triggered by timeouts stemming from temporarily increased network loads; the experiment in Section \ref{subsec:arqtimeouts} already confirmed that
+this is possible. With rising attack probabilities, different growth rates can be observed for the protocol variants, indicating that some entail more
+\glspl{arq} and retransmissions than others. Unsurprisingly, the uncoded versions are in the lead as they cannot recover from flit loss or
+modifications without issuing an \gls{arq}. Following them are the \gls{fga} variants. With only one \gls{mac} for a whole generation, an attack on
+the carrying flit always necessitates a retransmission. The lowest acceptance rates are achieved by network coded \gls{ida} and \gls{iwa} as they are
+resilient to sporadic attacks and no single modification or loss within a generation forces an \gls{arq}. In general, the G2C4 versions perform better
+than G2C3 due to their increased redundancy in the transmitted flits.
+
+The information rate directly reflects the overhead that each protocol variant imposes on the transmissions (cf. Table \ref{tab:creationrates}). Thus,
+for no attackers, it is around 0.5 for the uncoded protocols and \gls{fga}-G2C3, as they cause two flits to be injected into the network per source
+flit. For \gls{ida} and \gls{iwa} in their G2C4 variants, the overhead is twice as high, resulting in half the information rate. With increasing
+attack probabilities, the number of \glspl{arq} are retransmissions rises, which is reflected in declining information rates. In addition, as the
+acceptance rate and information rate both indicate the portion of \glspl{arq} and retransmissions of the total traffic, high fluctuations in the
+former are accompanied by large variations of the latter.
+
+The residual error probability is the main indicator for the ability of the protocol to mitigate the impact of attackers. Unsurprisingly, a lack of
+adversaries results in no residual errors for all variants, but this begins to deviate quickly as the attack probabilities are increased. As expected,
+the uncoded versions are both at the worse end of the spectrum. Peculiarly, for \gls{ida}, the network coded versions perform even worse than the
+uncoded one, which contrasts with the expectation of their greater resilience. This is likely due to a combination of three properties: first, network
+coded \gls{ida} binds two source flits within a single generation, so on average there are only 0.5 \glspl{arq} available per source flit (assuming an
+\gls{arq} limit of 1). Second, it comprises the largest transmission units (6 and 8 flits for G2C3 and G2C4, respectively), so the probability of at
+least one of these flits being attacked is relatively high. Third, four flits are required to arrive intactly per generation, which is the largest
+amount out of all protocol variants. Due to the large transmission units, the necessity of further \glspl{arq} might only be detected when
+their limit was already reached, leading to both source flits of the affected generation being lost. This line of thought also explains why network
+coded \gls{iwa} performs best: it has the smallest transmission units of all network coded variants, each source flit is comprised within its own
+generation, and one \gls{arq} is available for every source flit. \Gls{fga} lying in the middle is explained by the susceptibility of the \gls{mac}
+flits: if such a flit is attacked, the complete generation must be retransmitted, as it authenticates both source flits together. Moreover, \gls{fga}
+suffers from the same deficit as \gls{ida}: one failing generation entails two lost source flits.
+
+The average end-to-end latency reflects the added expenditure of time required by the protocols to transmit information. Overall, higher attack
+probabilities result in increased latencies due to the higher amount of retransmissions. It is important to note that lost source flits, i.e., those
+counting towards the residual error probability, are ignored in this statistic as they do not have an end-to-end latency. This also explains the
+turnaround at the highest attack probabilities as the retransmissions become increasingly likely to fail. As expected, \gls{fga} has by far the
+highest average latencies across all investigated attack probabilities. The reason for this is the duration of the authentication procedure: with 10
+cycles, it consumes more time than for \gls{ida} and \gls{iwa} by a large margin. Furthermore, receivers need to obtain enough flits to decode the
+generation before the \gls{mac} computation can begin. The uncoded protocol variants have the lowest latencies since no delays are imposed by network
+encoding and decoding.
+
+Overall, the network coded versions of \gls{iwa} perform best. While the redundancy entailed by network coding leads to a relatively low information
+rate, they provide the most reliable transmissions by a large margin and generate the lowest network load with a competitive average latency. For
+these reasons, \gls{iwa} is chosen to be investigated further in the following section.
 
 \subsection{Routing Strategies}
 Take: best protocol variant (IWA), use it to find the best routing strategy
@@ -415,10 +460,18 @@ Take: best protocol variant (IWA), use it to find the best routing strategy
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
     \end{tabulary}
-    \caption[Input parameters for main experiment]{long}
+    \caption[Input parameters for routing strategies experiment]{long}
     \label{tab:setuproutingstratexperiment}
 \end{table}
 
+\begin{figure}
+    \begin{tabular}{cc}
+        \input{gnuplot/plots/strategies-acceptancerate} & \input{gnuplot/plots/strategies-informationrate} \\
+        \input{gnuplot/plots/strategies-residualerror} & \input{gnuplot/plots/strategies-endtoendlatency}
+    \end{tabular}
+    \caption[Results for routing strategies experiment]{long}
+    \label{fig:resultsroutingstratsexperiment}
+\end{figure}
 
 % Heatmap of router workload
 \begin{figure}

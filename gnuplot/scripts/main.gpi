@@ -2,21 +2,23 @@ set terminal epslatex size 2.8,2.5 color colortext header \
     "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
 
 set style data lp
-set style line 1 lc rgb '#dd181f' lt 1 pt 7
-set style line 2 lc rgb '#dd181f' lt 1 pt 5
-set style line 3 lc rgb '#08bd05' lt 1 pt 7
-set style line 4 lc rgb '#08bd05' lt 1 pt 5
-set style line 5 lc rgb '#0030cd' lt 1 pt 7
-set style line 6 lc rgb '#0030cd' lt 1 pt 5
-set style line 7 lc rgb '#0030cd' lt 1 pt 3
-set style line 8 lc rgb '#0030cd' lt 1 pt 2
+set style line 1 lc rgb 'red' lt 1 pt 7 ps 0.9
+set style line 2 lc rgb 'red' lt 1 pt 5 ps 0.8
+set style line 3 lc rgb 'red' lt 1 pt 9 ps 1.1
+set style line 4 lc rgb 'forest-green' lt 1 pt 7 ps 0.9
+set style line 5 lc rgb 'forest-green' lt 1 pt 5 ps 0.8
+set style line 6 lc rgb 'forest-green' lt 1 pt 9 ps 1.1
+set style line 7 lc rgb 'blue' lt 1 pt 5 ps 0.8
+set style line 8 lc rgb 'blue' lt 1 pt 9 ps 1.1
 
 set ylabel '\ft Acceptance rate' offset 3,0
-set yrange [0.2:0.3]
+set yrange [0.2:0.29]
 
 set xlabel '\ft Attack probabilities' offset 0,0.2
 set xrange [0:13]
 set xtics ('\ty 0' 0, '\ty 0.1' 5, '\ty 0.2' 10, '' 11, '' 12, '\ty 0.5' 13)
+
+set grid ytics back lc rgb 'grey'
 
 set format '\ty %g'
 
@@ -31,7 +33,7 @@ plot '../data/main.dat' using 0:(($2+$6+$10)/3) index 0 ls 1 t '\ty IDA-UC', \
      ''                 using 0:(($2+$6+$10)/3) index 4 ls 5 t '\ty G2C3', \
      ''                 using 0:(($2+$6+$10)/3) index 5 ls 6 t '\ty G2C4', \
      ''                 using 0:(($2+$6+$10)/3) index 6 ls 7 t '\ty FGA-G2C3', \
-     ''                 using 0:(($2+$6+$10)/3) index 7 ls 8 t '\ty FGA-G2C4'
+     ''                 using 0:(($2+$6+$10)/3) index 7 ls 8 t '\ty G2C4'
 
 set ylabel '\ft Information rate' offset 3,0
 set yrange [0.2:0.5]
@@ -44,10 +46,10 @@ plot '../data/main.dat' using 0:(($3+$7+$11)/3) index 0 ls 1 t '\ty IDA-UC', \
      ''                 using 0:(($3+$7+$11)/3) index 4 ls 5 t '\ty G2C3', \
      ''                 using 0:(($3+$7+$11)/3) index 5 ls 6 t '\ty G2C4', \
      ''                 using 0:(($3+$7+$11)/3) index 6 ls 7 t '\ty FGA-G2C3', \
-     ''                 using 0:(($3+$7+$11)/3) index 7 ls 8 t '\ty FGA-G2C4'
+     ''                 using 0:(($3+$7+$11)/3) index 7 ls 8 t '\ty G2C4'
 
 set ylabel '\ft Residual error probability' offset 3,0
-set yrange [0:0.6]
+set yrange [0:0.55]
 
 set output '../plots/main-residualerror.tex'
 plot '../data/main.dat' using 0:(($4+$8+$12)/3) index 0 ls 1 t '\ty IDA-UC', \
@@ -57,7 +59,7 @@ plot '../data/main.dat' using 0:(($4+$8+$12)/3) index 0 ls 1 t '\ty IDA-UC', \
      ''                 using 0:(($4+$8+$12)/3) index 4 ls 5 t '\ty G2C3', \
      ''                 using 0:(($4+$8+$12)/3) index 5 ls 6 t '\ty G2C4', \
      ''                 using 0:(($4+$8+$12)/3) index 6 ls 7 t '\ty FGA-G2C3', \
-     ''                 using 0:(($4+$8+$12)/3) index 7 ls 8 t '\ty FGA-G2C4'
+     ''                 using 0:(($4+$8+$12)/3) index 7 ls 8 t '\ty G2C4'
 
 set ylabel '\ft Avg. end-to-end latency in cycles' offset 3,0
 set yrange [29:51]
@@ -70,4 +72,4 @@ plot '../data/main.dat' using 0:(($5+$9+$13)/3) index 0 ls 1 t '\ty IDA-UC', \
      ''                 using 0:(($5+$9+$13)/3) index 4 ls 5 t '\ty G2C3', \
      ''                 using 0:(($5+$9+$13)/3) index 5 ls 6 t '\ty G2C4', \
      ''                 using 0:(($5+$9+$13)/3) index 6 ls 7 t '\ty FGA-G2C3', \
-     ''                 using 0:(($5+$9+$13)/3) index 7 ls 8 t '\ty FGA-G2C4'
+     ''                 using 0:(($5+$9+$13)/3) index 7 ls 8 t '\ty G2C4'
