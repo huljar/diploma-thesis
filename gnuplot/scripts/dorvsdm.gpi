@@ -1,0 +1,85 @@
+set terminal epslatex size 2.8,2.8 color colortext header \
+    "\\newcommand{\\ft}[0]{\\footnotesize}\\newcommand{\\ty}[0]{\\tiny}"
+
+set style data lp
+set style line 1 lc rgb 'red' lt 1 pt 7 ps 0.9
+set style line 2 lc rgb 'red' lt 1 pt 5 ps 0.8
+set style line 3 lc rgb 'red' lt 1 pt 9 ps 1.1
+set style line 4 lc rgb 'blue' lt 1 pt 5 ps 0.8
+set style line 5 lc rgb 'blue' lt 1 pt 9 ps 1.1
+set style line 6 lc rgb 'dark-violet' lt 1 pt 7 ps 0.9
+set style line 7 lc rgb 'dark-violet' lt 1 pt 5 ps 0.8
+set style line 8 lc rgb 'dark-violet' lt 1 pt 9 ps 1.1
+set style line 9 lc rgb 'turquoise' lt 1 pt 5 ps 0.8
+set style line 10 lc rgb 'turquoise' lt 1 pt 9 ps 1.1
+
+set ylabel '\ft Acceptance rate' offset 3,0
+set yrange [0.2:0.3]
+
+set xlabel '\ft Attack probabilities' offset 0,0.2
+set xrange [0:13]
+set xtics ('\ty 0' 0, '\ty 0.1' 5, '\ty 0.2' 10, '' 11, '' 12, '\ty 0.5' 13)
+
+set grid ytics back lc rgb 'grey'
+
+set format '\ty %g'
+
+set key font ", 15"
+set key above
+
+set output '../plots/dorvsdm-acceptancerate.tex'
+plot '../data/main.dat'      using 0:2 index 0 ls 1 t '\ty IDA-UC-DOR', \
+     '../data/routingdm.dat' using 0:2 index 0 ls 6 t '\ty DM', \
+     '../data/main.dat'      using 0:2 index 1 ls 2 t '\ty G2C3-DOR', \
+     '../data/routingdm.dat' using 0:2 index 1 ls 7 t '\ty DM', \
+     '../data/main.dat'      using 0:2 index 2 ls 3 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:2 index 2 ls 8 t '\ty DM', \
+     '../data/main.dat'      using 0:2 index 6 ls 4 t '\ty FGA-G2C3-DOR', \
+     '../data/routingdm.dat' using 0:2 index 6 ls 9 t '\ty DM', \
+     '../data/main.dat'      using 0:2 index 7 ls 5 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:2 index 7 ls 10 t '\ty DM', \
+
+set ylabel '\ft Information rate' offset 3,0
+set yrange [0.2:0.5]
+
+set output '../plots/dorvsdm-informationrate.tex'
+plot '../data/main.dat'      using 0:3 index 0 ls 1 t '\ty IDA-UC-DOR', \
+     '../data/routingdm.dat' using 0:3 index 0 ls 6 t '\ty DM', \
+     '../data/main.dat'      using 0:3 index 1 ls 2 t '\ty G2C3-DOR', \
+     '../data/routingdm.dat' using 0:3 index 1 ls 7 t '\ty DM', \
+     '../data/main.dat'      using 0:3 index 2 ls 3 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:3 index 2 ls 8 t '\ty DM', \
+     '../data/main.dat'      using 0:3 index 6 ls 4 t '\ty FGA-G2C3-DOR', \
+     '../data/routingdm.dat' using 0:3 index 6 ls 9 t '\ty DM', \
+     '../data/main.dat'      using 0:3 index 7 ls 5 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:3 index 7 ls 10 t '\ty DM', \
+
+set ylabel '\ft Residual error probability' offset 3,0
+set yrange [0:0.6]
+
+set output '../plots/dorvsdm-residualerror.tex'
+plot '../data/main.dat'      using 0:4 index 0 ls 1 t '\ty IDA-UC-DOR', \
+     '../data/routingdm.dat' using 0:4 index 0 ls 6 t '\ty DM', \
+     '../data/main.dat'      using 0:4 index 1 ls 2 t '\ty G2C3-DOR', \
+     '../data/routingdm.dat' using 0:4 index 1 ls 7 t '\ty DM', \
+     '../data/main.dat'      using 0:4 index 2 ls 3 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:4 index 2 ls 8 t '\ty DM', \
+     '../data/main.dat'      using 0:4 index 6 ls 4 t '\ty FGA-G2C3-DOR', \
+     '../data/routingdm.dat' using 0:4 index 6 ls 9 t '\ty DM', \
+     '../data/main.dat'      using 0:4 index 7 ls 5 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:4 index 7 ls 10 t '\ty DM', \
+
+set ylabel '\ft Avg. end-to-end latency in cycles' offset 3,0
+set yrange [29:51]
+
+set output '../plots/dorvsdm-endtoendlatency.tex'
+plot '../data/main.dat'      using 0:5 index 0 ls 1 t '\ty IDA-UC-DOR', \
+     '../data/routingdm.dat' using 0:5 index 0 ls 6 t '\ty DM', \
+     '../data/main.dat'      using 0:5 index 1 ls 2 t '\ty G2C3-DOR', \
+     '../data/routingdm.dat' using 0:5 index 1 ls 7 t '\ty DM', \
+     '../data/main.dat'      using 0:5 index 2 ls 3 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:5 index 2 ls 8 t '\ty DM', \
+     '../data/main.dat'      using 0:5 index 6 ls 4 t '\ty FGA-G2C3-DOR', \
+     '../data/routingdm.dat' using 0:5 index 6 ls 9 t '\ty DM', \
+     '../data/main.dat'      using 0:5 index 7 ls 5 t '\ty G2C4-DOR', \
+     '../data/routingdm.dat' using 0:5 index 7 ls 10 t '\ty DM', \

@@ -1,6 +1,6 @@
 % GNUPLOT: LaTeX picture with Postscript
 \begingroup
-\newcommand{\ft}[0]{\footnotesize}\newcommand{\st}[0]{\scriptsize}
+\newcommand{\ft}[0]{\footnotesize}\newcommand{\ty}[0]{\tiny}
   \makeatletter
   \providecommand\color[2][]{%
     \GenericError{(gnuplot) \space\space\space\@spaces}{%
@@ -80,13 +80,64 @@
     \fi%
     \setlength{\fboxrule}{0.5pt}%
     \setlength{\fboxsep}{1pt}%
-\begin{picture}(1872.00,1872.00)%
+\begin{picture}(4030.00,4030.00)%
     \gplgaddtomacro\gplbacktext{%
+      \csname LTb\endcsname%
+      \put(990,660){\makebox(0,0)[r]{\strut{}\ty 0.2}}%
+      \csname LTb\endcsname%
+      \put(990,821){\makebox(0,0)[r]{\strut{}\ty 0.21}}%
+      \csname LTb\endcsname%
+      \put(990,981){\makebox(0,0)[r]{\strut{}\ty 0.22}}%
+      \csname LTb\endcsname%
+      \put(990,1142){\makebox(0,0)[r]{\strut{}\ty 0.23}}%
+      \csname LTb\endcsname%
+      \put(990,1302){\makebox(0,0)[r]{\strut{}\ty 0.24}}%
+      \csname LTb\endcsname%
+      \put(990,1463){\makebox(0,0)[r]{\strut{}\ty 0.25}}%
+      \csname LTb\endcsname%
+      \put(990,1623){\makebox(0,0)[r]{\strut{}\ty 0.26}}%
+      \csname LTb\endcsname%
+      \put(990,1784){\makebox(0,0)[r]{\strut{}\ty 0.27}}%
+      \csname LTb\endcsname%
+      \put(990,1944){\makebox(0,0)[r]{\strut{}\ty 0.28}}%
+      \csname LTb\endcsname%
+      \put(990,2105){\makebox(0,0)[r]{\strut{}\ty 0.29}}%
+      \csname LTb\endcsname%
+      \put(990,2265){\makebox(0,0)[r]{\strut{}\ty 0.3}}%
+      \put(1122,440){\makebox(0,0){\strut{}\ty 0}}%
+      \put(2063,440){\makebox(0,0){\strut{}\ty 0.1}}%
+      \put(3004,440){\makebox(0,0){\strut{}\ty 0.2}}%
+      \put(3192,440){\makebox(0,0){\strut{}}}%
+      \put(3380,440){\makebox(0,0){\strut{}}}%
+      \put(3568,440){\makebox(0,0){\strut{}\ty 0.5}}%
     }%
     \gplgaddtomacro\gplfronttext{%
+      \csname LTb\endcsname%
+      \put(352,1462){\rotatebox{-270}{\makebox(0,0){\strut{}\ft Acceptance rate}}}%
+      \put(2345,154){\makebox(0,0){\strut{}\ft Attack probabilities}}%
+      \csname LTb\endcsname%
+      \put(2673,3892){\makebox(0,0)[r]{\strut{}\ty IDA-UC-DOR}}%
+      \csname LTb\endcsname%
+      \put(2673,3742){\makebox(0,0)[r]{\strut{}\ty DM}}%
+      \csname LTb\endcsname%
+      \put(2673,3592){\makebox(0,0)[r]{\strut{}\ty G2C3-DOR}}%
+      \csname LTb\endcsname%
+      \put(2673,3442){\makebox(0,0)[r]{\strut{}\ty DM}}%
+      \csname LTb\endcsname%
+      \put(2673,3292){\makebox(0,0)[r]{\strut{}\ty G2C4-DOR}}%
+      \csname LTb\endcsname%
+      \put(2673,3142){\makebox(0,0)[r]{\strut{}\ty DM}}%
+      \csname LTb\endcsname%
+      \put(2673,2992){\makebox(0,0)[r]{\strut{}\ty FGA-G2C3-DOR}}%
+      \csname LTb\endcsname%
+      \put(2673,2842){\makebox(0,0)[r]{\strut{}\ty DM}}%
+      \csname LTb\endcsname%
+      \put(2673,2692){\makebox(0,0)[r]{\strut{}\ty G2C4-DOR}}%
+      \csname LTb\endcsname%
+      \put(2673,2542){\makebox(0,0)[r]{\strut{}\ty DM}}%
     }%
     \gplbacktext
-    \put(0,0){\includegraphics{../plots/heatmap-iwa-g2c3-dor}}%
+    \put(0,0){\includegraphics{../plots/dorvsdm-acceptancerate}}%
     \gplfronttext
   \end{picture}%
 \endgroup

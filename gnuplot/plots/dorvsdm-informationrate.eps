@@ -1,9 +1,9 @@
 %!PS-Adobe-2.0 EPSF-2.0
-%%Title: ../plots/heatmap-iwa-g2c3-romm.tex
+%%Title: ../plots/dorvsdm-informationrate.tex
 %%Creator: gnuplot 5.0 patchlevel 5
-%%CreationDate: Sat Jun 23 17:32:12 2018
+%%CreationDate: Sat Jun 23 20:05:23 2018
 %%DocumentFonts: 
-%%BoundingBox: 50 50 143 143
+%%BoundingBox: 50 50 251 251
 %%EndComments
 %%BeginProlog
 /gnudict 256 dict def
@@ -43,7 +43,7 @@ gnudict begin
 /vpt vpt_ def
 /doclip {
   ClipToBoundingBox {
-    newpath 50 50 moveto 143 50 lineto 143 143 lineto 50 143 lineto closepath
+    newpath 50 50 moveto 251 50 lineto 251 251 lineto 50 251 lineto closepath
     clip
   } if
 } def
@@ -436,12 +436,12 @@ systemdict /pdfmark known not {
   userdict /pdfmark systemdict /cleartomark get put
 } if
 SDict begin [
-  /Title (../plots/heatmap-iwa-g2c3-romm.tex)
+  /Title (../plots/dorvsdm-informationrate.tex)
   /Subject (gnuplot plot)
   /Creator (gnuplot 5.0 patchlevel 5)
 %  /Producer (gnuplot)
 %  /Keywords ()
-  /CreationDate (Sat Jun 23 17:32:12 2018)
+  /CreationDate (Sat Jun 23 20:05:23 2018)
   /DOCINFO pdfmark
 end
 } ifelse
@@ -483,166 +483,606 @@ doclip
 0.050 0.050 scale
 0 setgray
 newpath
-gsave % colour palette begin
-/maxcolors 0 def
-/HSV2RGB {  exch dup 0.0 eq {pop exch pop dup dup} % achromatic gray
-  { /HSVs exch def /HSVv exch def 6.0 mul dup floor dup 3 1 roll sub
-     /HSVf exch def /HSVi exch cvi def /HSVp HSVv 1.0 HSVs sub mul def
-	 /HSVq HSVv 1.0 HSVs HSVf mul sub mul def 
-	 /HSVt HSVv 1.0 HSVs 1.0 HSVf sub mul sub mul def
-	 /HSVi HSVi 6 mod def 0 HSVi eq {HSVv HSVt HSVp}
-	 {1 HSVi eq {HSVq HSVv HSVp}{2 HSVi eq {HSVp HSVv HSVt}
-	 {3 HSVi eq {HSVp HSVq HSVv}{4 HSVi eq {HSVt HSVp HSVv}
-	 {HSVv HSVp HSVq} ifelse} ifelse} ifelse} ifelse} ifelse
-  } ifelse} def
-/Constrain {
-  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def
-/YIQ2RGB {
-  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll
-  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll
-  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def
-/CMY2RGB {  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def
-/XYZ2RGB {  3 copy -0.9017 mul exch -0.1187 mul add exch 0.0585 mul exch add
-  Constrain 4 1 roll 3 copy -0.0279 mul exch 1.999 mul add exch
-  -0.9844 mul add Constrain 5 1 roll -0.2891 mul exch -0.5338 mul add
-  exch 1.91 mul exch add Constrain 3 1 roll} def
-/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {
-  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}
-  if} ifelse} ifelse} ifelse} def
-/InterpolatedColor true def
-/grayindex {/gidx 0 def
-  {GrayA gidx get grayv ge {exit} if /gidx gidx 1 add def} loop} def
-/dgdx {grayv GrayA gidx get sub GrayA gidx 1 sub get
-  GrayA gidx get sub div} def 
-/redvalue {RedA gidx get RedA gidx 1 sub get
-  RedA gidx get sub dgdxval mul add} def
-/greenvalue {GreenA gidx get GreenA gidx 1 sub get
-  GreenA gidx get sub dgdxval mul add} def
-/bluevalue {BlueA gidx get BlueA gidx 1 sub get
-  BlueA gidx get sub dgdxval mul add} def
-/interpolate {
-  grayindex grayv GrayA gidx get sub abs 1e-5 le
-    {RedA gidx get GreenA gidx get BlueA gidx get}
-    {/dgdxval dgdx def redvalue greenvalue bluevalue} ifelse} def
-/GrayA [0 .4 .8 1 ] def
-/RedA [1 .9412 .9412 .6 ] def
-/GreenA [1 .9412 0 0 ] def
-/BlueA [1 0 0 0 ] def
-/pm3dround {maxcolors 0 gt {dup 1 ge
-	{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def
-/pm3dGamma 1.0 1.5 Gamma mul div def
-/ColorSpace (RGB) def
-Color InterpolatedColor or { % COLOUR vs. GRAY map
-  InterpolatedColor { %% Interpolation vs. RGB-Formula
-    /g {stroke pm3dround /grayv exch def interpolate
-        SelectSpace setrgbcolor} bind def
-  }{
-  /g {stroke pm3dround dup cF7 Constrain exch dup cF5 Constrain exch cF15 Constrain 
-       SelectSpace setrgbcolor} bind def
-  } ifelse
-}{
-  /g {stroke pm3dround pm3dGamma exp setgray} bind def
-} ifelse
 1.000 UL
 LTb
 LCb setrgbcolor
 [] 0 setdash
-1.000 UP
-% Begin plot #1
-1.000 UL
-LTb
-0.58 0.00 0.83 C %%%%BeginImage
-gsave 441 644 N 441 1448 L 1431 1448 L 1431 644 L Z clip
-InterpretLevel1 {
-  %% Construct a box instead of image
-  LTb
-  441 1448 M
-  989 0 V
-  0 -805 V
-  -989 0 V
-  441 1448 L
-  40 -110 R
-  (PS level 2 image) Lshow
-  % Read data but ignore it
-  /imagebuf 83 string def
-  currentfile imagebuf readstring
-} {
-gsave
-441 1448 translate
-989 -805 scale
-%%%%BeginPalette
-[ /Indexed
-  /DeviceRGB 255
-  <
-   ffffff fffffd fffffa fffff8 fefef5 fefef3 fefef0 fefeee
-   fefeeb fefee9 fefee6 fdfde4 fdfde1 fdfddf fdfddc fdfdda
-   fdfdd7 fdfdd5 fcfcd2 fcfcd0 fcfccd fcfccb fcfcc8 fcfcc6
-   fbfbc3 fbfbc1 fbfbbe fbfbbc fbfbb9 fbfbb7 fbfbb4 fafab2
-   fafaaf fafaad fafaaa fafaa8 fafaa5 fafaa3 f9f9a0 f9f99e
-   f9f99b f9f999 f9f996 f9f993 f9f991 f8f88f f8f88c f8f88a
-   f8f887 f8f885 f8f882 f8f880 f7f77d f7f77b f7f778 f7f776
-   f7f773 f7f771 f6f66e f6f66c f6f669 f6f667 f6f664 f6f662
-   f6f65f f5f55d f5f55a f5f558 f5f555 f5f553 f5f550 f5f54e
-   f4f44b f4f449 f4f446 f4f444 f4f441 f4f43f f4f43c f3f339
-   f3f337 f3f335 f3f332 f3f330 f3f32d f3f32b f2f228 f2f226
-   f2f223 f2f221 f2f21e f2f21c f1f119 f1f117 f1f114 f1f111
-   f1f10f f1f10d f1f10a f0f008 f0f005 f0f003 f0f000 f0ee00
-   f0eb00 f0e900 f0e700 f0e400 f0e200 f0e000 f0dd00 f0db00
-   f0d800 f0d600 f0d400 f0d100 f0cf00 f0cd00 f0ca00 f0c800
-   f0c600 f0c300 f0c100 f0bf00 f0bc00 f0ba00 f0b800 f0b500
-   f0b300 f0b000 f0ae00 f0ac00 f0a900 f0a700 f0a500 f0a200
-   f0a000 f09e00 f09b00 f09900 f09700 f09400 f09200 f09000
-   f08d00 f08b00 f08800 f08600 f08400 f08100 f07f00 f07d00
-   f07a00 f07800 f07600 f07300 f07100 f06f00 f06c00 f06a00
-   f06800 f06500 f06300 f06000 f05e00 f05c00 f05900 f05700
-   f05500 f05200 f05000 f04e00 f04b00 f04900 f04700 f04400
-   f04200 f04000 f03d00 f03b00 f03800 f03600 f03400 f03100
-   f02f00 f02d00 f02a00 f02800 f02600 f02300 f02100 f01f00
-   f01c00 f01a00 f01800 f01500 f01300 f01000 f00e00 f00c00
-   f00900 f00700 f00500 f00200 f00000 ee0000 ed0000 eb0000
-   e90000 e70000 e60000 e40000 e20000 e10000 df0000 dd0000
-   dc0000 da0000 d80000 d60000 d50000 d30000 d10000 d00000
-   ce0000 cc0000 ca0000 c90000 c70000 c50000 c40000 c20000
-   c00000 bf0000 bd0000 bb0000 b90000 b80000 b60000 b40000
-   b30000 b10000 af0000 ad0000 ac0000 aa0000 a80000 a70000
-   a50000 a30000 a20000 a00000 9e0000 9c0000 9b0000 990000
-  >
-] setcolorspace
-%%%%EndPalette
-<<
-  /ImageType 1
-  /Width 8
-  /Height 8
-  /BitsPerComponent 8
-  /ImageMatrix [ 8 0 0 8 0 0 ]
-  /Decode [ 0 255 ]
-  /DataSource currentfile /ASCII85Decode filter
-  /MultipleDataSources false
-  /Interpolate false
->>
-image
-} ifelse
-$Sb4R<Cf"V1MDiATT*S;7u=Xrf=$N*;OYnkj3=)k;l%V*im!rj7uFe$d(,E30PQN=WfLjJ$o(C\<_G
-+T~>
-InterpretLevel1 not {
-  grestore
-} if
-grestore
-%%%%EndImage
-LTw
-% End plot #1
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 660 M
+2446 0 V
+stroke
 1.000 UL
 LTb
 LCb setrgbcolor
 [] 0 setdash
-441 1448 N
-0 -804 V
-990 0 V
-0 804 V
--990 0 V
+1122 660 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 928 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 928 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 1195 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 1195 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 1462 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 1462 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 1730 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 1730 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 1997 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 1997 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+0.500 UL
+LTa
+LCa setrgbcolor
+0.75 0.75 0.75 C 1122 2265 M
+2446 0 V
+stroke
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1122 2265 M
+63 0 V
+2383 0 R
+-63 0 V
+stroke
+LTb
+1122 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+2063 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+3004 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+3192 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+3380 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+3568 660 M
+0 63 V
+0 1542 R
+0 -63 V
+stroke
+1.000 UL
+LTb
+1122 2265 N
+0 -1605 V
+2446 0 V
+0 1605 V
+-2446 0 V
 Z stroke
 1.000 UP
-grestore % colour palette end
+1.000 UL
+LTb
+% Begin plot #1
+0.900 UP
+1.000 UL
+LTb
+1.00 0.00 0.00 C LCb setrgbcolor
+0.900 UP
+1.000 UL
+LTb
+1.00 0.00 0.00 C 2763 3892 M
+423 0 V
+1122 2256 M
+188 -102 V
+188 -87 V
+188 -76 V
+189 -67 V
+188 -62 V
+188 -48 V
+188 -43 V
+188 -42 V
+188 -30 V
+189 -34 V
+188 -106 V
+188 -48 V
+188 -15 V
+1122 2256 CircleF
+1310 2154 CircleF
+1498 2067 CircleF
+1686 1991 CircleF
+1875 1924 CircleF
+2063 1862 CircleF
+2251 1814 CircleF
+2439 1771 CircleF
+2627 1729 CircleF
+2815 1699 CircleF
+3004 1665 CircleF
+3192 1559 CircleF
+3380 1511 CircleF
+3568 1496 CircleF
+2974 3892 CircleF
+LTw
+% End plot #1
+% Begin plot #2
+0.900 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.58 0.00 0.83 C LCb setrgbcolor
+0.900 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C 2763 3742 M
+423 0 V
+1122 2213 M
+188 -113 V
+188 -88 V
+188 -81 V
+189 -67 V
+188 -61 V
+188 -51 V
+188 -42 V
+188 -36 V
+188 -33 V
+189 -31 V
+188 -95 V
+188 -45 V
+188 -16 V
+1122 2213 CircleF
+1310 2100 CircleF
+1498 2012 CircleF
+1686 1931 CircleF
+1875 1864 CircleF
+2063 1803 CircleF
+2251 1752 CircleF
+2439 1710 CircleF
+2627 1674 CircleF
+2815 1641 CircleF
+3004 1610 CircleF
+3192 1515 CircleF
+3380 1470 CircleF
+3568 1454 CircleF
+2974 3742 CircleF
+LTw
+% End plot #2
+% Begin plot #3
+0.800 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1.00 0.00 0.00 C LCb setrgbcolor
+0.800 UP
+1.000 UL
+LTb
+1.00 0.00 0.00 C 2763 3592 M
+423 0 V
+1122 1348 M
+188 -11 V
+188 -21 V
+188 -20 V
+189 -23 V
+188 -23 V
+188 -26 V
+188 -20 V
+188 -22 V
+188 -22 V
+189 -16 V
+188 -68 V
+188 -38 V
+188 -13 V
+1122 1348 BoxF
+1310 1337 BoxF
+1498 1316 BoxF
+1686 1296 BoxF
+1875 1273 BoxF
+2063 1250 BoxF
+2251 1224 BoxF
+2439 1204 BoxF
+2627 1182 BoxF
+2815 1160 BoxF
+3004 1144 BoxF
+3192 1076 BoxF
+3380 1038 BoxF
+3568 1025 BoxF
+2974 3592 BoxF
+LTw
+% End plot #3
+% Begin plot #4
+0.800 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.58 0.00 0.83 C LCb setrgbcolor
+0.800 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C 2763 3442 M
+423 0 V
+1122 1357 M
+188 -15 V
+188 -18 V
+188 -21 V
+189 -25 V
+188 -22 V
+188 -27 V
+188 -22 V
+188 -17 V
+188 -20 V
+189 -18 V
+188 -68 V
+188 -36 V
+188 -15 V
+1122 1357 BoxF
+1310 1342 BoxF
+1498 1324 BoxF
+1686 1303 BoxF
+1875 1278 BoxF
+2063 1256 BoxF
+2251 1229 BoxF
+2439 1207 BoxF
+2627 1190 BoxF
+2815 1170 BoxF
+3004 1152 BoxF
+3192 1084 BoxF
+3380 1048 BoxF
+3568 1033 BoxF
+2974 3442 BoxF
+LTw
+% End plot #4
+% Begin plot #5
+1.100 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1.00 0.00 0.00 C LCb setrgbcolor
+1.100 UP
+1.000 UL
+LTb
+1.00 0.00 0.00 C 2763 3292 M
+423 0 V
+1122 899 M
+188 -7 V
+188 -4 V
+188 -8 V
+189 -7 V
+188 -9 V
+188 -13 V
+188 -10 V
+188 -12 V
+188 -9 V
+189 -10 V
+188 -49 V
+188 -31 V
+188 -17 V
+1122 899 TriUF
+1310 892 TriUF
+1498 888 TriUF
+1686 880 TriUF
+1875 873 TriUF
+2063 864 TriUF
+2251 851 TriUF
+2439 841 TriUF
+2627 829 TriUF
+2815 820 TriUF
+3004 810 TriUF
+3192 761 TriUF
+3380 730 TriUF
+3568 713 TriUF
+2974 3292 TriUF
+LTw
+% End plot #5
+% Begin plot #6
+1.100 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.58 0.00 0.83 C LCb setrgbcolor
+1.100 UP
+1.000 UL
+LTb
+0.58 0.00 0.83 C 2763 3142 M
+423 0 V
+1122 912 M
+188 -6 V
+188 -7 V
+188 -8 V
+189 -8 V
+188 -9 V
+188 -12 V
+188 -11 V
+188 -7 V
+188 -11 V
+189 -11 V
+188 -45 V
+188 -29 V
+188 -16 V
+1122 912 TriUF
+1310 906 TriUF
+1498 899 TriUF
+1686 891 TriUF
+1875 883 TriUF
+2063 874 TriUF
+2251 862 TriUF
+2439 851 TriUF
+2627 844 TriUF
+2815 833 TriUF
+3004 822 TriUF
+3192 777 TriUF
+3380 748 TriUF
+3568 732 TriUF
+2974 3142 TriUF
+LTw
+% End plot #6
+% Begin plot #7
+0.800 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.00 0.00 1.00 C LCb setrgbcolor
+0.800 UP
+1.000 UL
+LTb
+0.00 0.00 1.00 C 2763 2992 M
+423 0 V
+1122 2244 M
+188 -73 V
+188 -67 V
+188 -59 V
+189 -55 V
+188 -47 V
+188 -40 V
+188 -43 V
+188 -33 V
+188 -32 V
+189 -28 V
+188 -94 V
+188 -49 V
+188 -14 V
+1122 2244 BoxF
+1310 2171 BoxF
+1498 2104 BoxF
+1686 2045 BoxF
+1875 1990 BoxF
+2063 1943 BoxF
+2251 1903 BoxF
+2439 1860 BoxF
+2627 1827 BoxF
+2815 1795 BoxF
+3004 1767 BoxF
+3192 1673 BoxF
+3380 1624 BoxF
+3568 1610 BoxF
+2974 2992 BoxF
+LTw
+% End plot #7
+% Begin plot #8
+0.800 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.25 0.88 0.82 C LCb setrgbcolor
+0.800 UP
+1.000 UL
+LTb
+0.25 0.88 0.82 C 2763 2842 M
+423 0 V
+1122 2241 M
+188 -78 V
+188 -70 V
+188 -58 V
+189 -59 V
+188 -48 V
+188 -45 V
+188 -40 V
+188 -37 V
+188 -28 V
+189 -30 V
+188 -99 V
+188 -46 V
+188 -15 V
+1122 2241 BoxF
+1310 2163 BoxF
+1498 2093 BoxF
+1686 2035 BoxF
+1875 1976 BoxF
+2063 1928 BoxF
+2251 1883 BoxF
+2439 1843 BoxF
+2627 1806 BoxF
+2815 1778 BoxF
+3004 1748 BoxF
+3192 1649 BoxF
+3380 1603 BoxF
+3568 1588 BoxF
+2974 2842 BoxF
+LTw
+% End plot #8
+% Begin plot #9
+1.100 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.00 0.00 1.00 C LCb setrgbcolor
+1.100 UP
+1.000 UL
+LTb
+0.00 0.00 1.00 C 2763 2692 M
+423 0 V
+1122 1702 M
+188 -46 V
+188 -42 V
+188 -37 V
+189 -35 V
+188 -29 V
+188 -30 V
+188 -25 V
+188 -25 V
+188 -18 V
+189 -20 V
+188 -71 V
+188 -41 V
+188 -16 V
+1122 1702 TriUF
+1310 1656 TriUF
+1498 1614 TriUF
+1686 1577 TriUF
+1875 1542 TriUF
+2063 1513 TriUF
+2251 1483 TriUF
+2439 1458 TriUF
+2627 1433 TriUF
+2815 1415 TriUF
+3004 1395 TriUF
+3192 1324 TriUF
+3380 1283 TriUF
+3568 1267 TriUF
+2974 2692 TriUF
+LTw
+% End plot #9
+% Begin plot #10
+1.100 UP
+1.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+0.25 0.88 0.82 C LCb setrgbcolor
+1.100 UP
+1.000 UL
+LTb
+0.25 0.88 0.82 C 2763 2542 M
+423 0 V
+1122 1708 M
+188 -48 V
+188 -45 V
+188 -38 V
+189 -37 V
+188 -30 V
+188 -31 V
+188 -25 V
+188 -25 V
+188 -20 V
+189 -18 V
+188 -71 V
+188 -39 V
+188 -18 V
+1122 1708 TriUF
+1310 1660 TriUF
+1498 1615 TriUF
+1686 1577 TriUF
+1875 1540 TriUF
+2063 1510 TriUF
+2251 1479 TriUF
+2439 1454 TriUF
+2627 1429 TriUF
+2815 1409 TriUF
+3004 1391 TriUF
+3192 1320 TriUF
+3380 1281 TriUF
+3568 1263 TriUF
+2974 2542 TriUF
+LTw
+% End plot #10
+2.000 UL
+LTb
+LCb setrgbcolor
+[] 0 setdash
+1.000 UL
+LTb
+1122 2265 N
+0 -1605 V
+2446 0 V
+0 1605 V
+-2446 0 V
+Z stroke
+1.000 UP
+1.000 UL
+LTb
 stroke
 grestore
 end

@@ -377,7 +377,7 @@ details of these metrics:
         cycles.
 \end{itemize}
 
-\subsection{Protocol Variants}
+\subsection{Protocol Variants}\label{subsec:protocolvariantseval}
 All protocol variants defined in Section \ref{sec:theprotocol} are compared with respect to the performance criteria outlined above. This experiment
 aims to identify the most promising one of them. The input parameters of the simulator were chosen according to the results of the preliminary
 experiments from Section \ref{sec:hyperparamseval}. The \gls{arq} limit of 1 and the \gls{dor} routing strategy are employed as baselines for the
@@ -449,16 +449,20 @@ encoding and decoding.
 
 Overall, the network coded versions of \gls{iwa} perform best. While the redundancy entailed by network coding leads to a relatively low information
 rate, they provide the most reliable transmissions by a large margin and generate the lowest network load with a competitive average latency. For
-these reasons, \gls{iwa} is chosen to be investigated further in the following section.
+these reasons, \gls{iwa} is chosen to be investigated further in the following section. As the results only varied minimally among the three different
+attacker sets, only the first one will be used for the remaining experiments to simplify the simulation process.
 
 \subsection{Routing Strategies}
-Take: best protocol variant (IWA), use it to find the best routing strategy
+After identifying \gls{iwa} as the most promising variant, it is subjected to further investigation. In the next experiment, the effect of substituting
+the routing strategy is examined. All variants of \gls{iwa} are tested with each of the three other routing strategies -- \gls{dm}, \gls{romm}, and
+\gls{ramm}. The full simulation setup is shown in Table \vref{tab:setuproutingstratexperiment} and the results are presented in Figure
+\vref{fig:resultsroutingstratsexperiment}.
 
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
-        \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 8 & varying \\
+        \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 1 & varying \\
     \end{tabulary}
     \caption[Input parameters for routing strategies experiment]{long}
     \label{tab:setuproutingstratexperiment}
@@ -473,19 +477,52 @@ Take: best protocol variant (IWA), use it to find the best routing strategy
     \label{fig:resultsroutingstratsexperiment}
 \end{figure}
 
+The acceptance rates are revealed to be mostly unaffected by the choice of routing strategy, except for the uncoded case. There, all of the dynamic
+strategies lead to noticeably higher values than the static \gls{dor}. A likely explanation of this phenomenon is that the usage of different paths
+for flits in the same transmission unit increases the probability that at least one of these flits encounters an attacker. As the uncoded protocol
+version does not tolerate any modifications or losses, it leads to more \glspl{arq} and retransmissions than with static routes. Interestingly, the
+dynamic strategies were only able to lower the acceptance rate slightly for very high attack probabilities when network coding is employed. This may
+be caused by more network traffic being routed through the center of the \gls{noc}, leading to congestions in this area. To verify this assumption,
+the router workload distributions over the network were investigated as well (see below).
+
+The information rates largely reflect the same impact that the routing strategies had on the acceptance rates. For uncoded \gls{iwa}, the dynamic ones
+perform worse than \gls{dor}, while the margin is miniscule for the network coded variants.
+
+Similar observations are made for the residual error probabilities. The dynamic strategies have a negative impact on the reliability of the uncoded
+variant, likely for the same reasons that were outlined above. With network coding, the effects are almost unrecognizable for low and medium attack
+probabilities. However, as they rise above 0.2, the envisioned advantages of dynamic routing (cf. Figure \ref{fig:circumventattackers}) come to
+fruition and a considerable improvement is observed.
+
+In terms of average end-to-end latency, there is no clear best or worst strategy. They all perform similarly, but the discrepancies between the
+protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} and \gls{ramm} seem to enable slightly faster transmissions than
+\gls{dor} and \gls{romm}.
+
 % Heatmap of router workload
 \begin{figure}
-    \begin{tabular}{cc}
-        \input{gnuplot/plots/heatmap-iwa-g2c3-dor} & \input{gnuplot/plots/heatmap-iwa-g2c3-dm} \\
-        (a) & (b) \\
+    \begin{tabular}{cccc}
+        \input{gnuplot/plots/heatmap-iwa-g2c3-dor} & \input{gnuplot/plots/heatmap-iwa-g2c3-dm} &
         \input{gnuplot/plots/heatmap-iwa-g2c3-romm} & \input{gnuplot/plots/heatmap-iwa-g2c3-ramm} \\
-        (c) & (d) \\
+        (a) & (b) & (c) & (d) \\
     \end{tabular}
     \caption[Heatmaps of the routers for different routing strategies]{Heatmaps of the routers for different routing strategies.}
     \label{fig:resultsroutingstratheatmaps}
 \end{figure}
 
+% DM for other strats
+\begin{figure}
+    \begin{tabular}{cc}
+        \input{gnuplot/plots/dorvsdm-acceptancerate} & \input{gnuplot/plots/dorvsdm-informationrate} \\
+        \input{gnuplot/plots/dorvsdm-residualerror} & \input{gnuplot/plots/dorvsdm-endtoendlatency}
+    \end{tabular}
+    \caption[Results for the DOR and DM comparison]{long}
+    \label{fig:resultsroutingdorvsdm}
+\end{figure}
+
+Once again, DM brings an advantage only for the network coded version. This result matches the expectation (cf. Section
+\ref{subsec:routingclassification}) since only the network coded protocols benefit from partially circumventing malicious routers.
+
 \subsection{Increased ARQ limit}
+DOR as routing strategy to preserve comparability with the results from Section \ref{subsec:protocolvariantseval}.
 
 \section{Area Overhead}
 Encryption units: 3x PRINCE (8260 GE each\footnote{For Nangate 45 nm Generic technology with a unit delay of 1000. Both lower and higher values were
