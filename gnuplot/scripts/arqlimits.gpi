@@ -10,7 +10,7 @@ set style line 5 lc rgb 'sea-green' lt 1 pt 5 ps 0.8
 set style line 6 lc rgb 'sea-green' lt 1 pt 9 ps 1.1
 
 set ylabel '\ft Acceptance rate' offset 3,0
-set yrange [0.2:0.3]
+set yrange [0.2:0.35]
 
 set xlabel '\ft Attack probabilities' offset 0,0.2
 set xrange [0:13]
@@ -24,42 +24,42 @@ set key font ", 15"
 set key above
 
 set output '../plots/arqlimits-acceptancerate.tex'
-plot '../data/main.dat'       using 0:2 index 3 ls 1 t '\ty IWA-UC-1', \
-     '../data/arqlimits2.dat' using 0:2 index 0 ls 6 t '\ty 2', \
-     '../data/main.dat'       using 0:2 index 4 ls 2 t '\ty G2C3-1', \
-     '../data/arqlimits2.dat' using 0:2 index 1 ls 7 t '\ty 2', \
-     '../data/main.dat'       using 0:2 index 5 ls 3 t '\ty G2C4-1', \
-     '../data/arqlimits2.dat' using 0:2 index 2 ls 8 t '\ty 2'
+plot '../data/main.dat'      using 0:2 index 3 ls 1 t '\ty IWA-UC-1', \
+     '../data/arqlimit2.dat' using 0:2 index 0 ls 4 t '\ty 2', \
+     '../data/main.dat'      using 0:2 index 4 ls 2 t '\ty G2C3-1', \
+     '../data/arqlimit2.dat' using 0:2 index 1 ls 5 t '\ty 2', \
+     '../data/main.dat'      using 0:2 index 5 ls 3 t '\ty G2C4-1', \
+     '../data/arqlimit2.dat' using 0:2 index 2 ls 6 t '\ty 2'
 
 set ylabel '\ft Information rate' offset 3,0
-set yrange [0.2:0.5]
+set yrange [0.1:0.5]
 
 set output '../plots/arqlimits-informationrate.tex'
-plot '../data/main.dat'       using 0:3 index 3 ls 1 t '\ty IWA-UC-1', \
-     '../data/arqlimits2.dat' using 0:3 index 0 ls 6 t '\ty 2', \
-     '../data/main.dat'       using 0:3 index 4 ls 2 t '\ty G2C3-1', \
-     '../data/arqlimits2.dat' using 0:3 index 1 ls 7 t '\ty 2', \
-     '../data/main.dat'       using 0:3 index 5 ls 3 t '\ty G2C4-1', \
-     '../data/arqlimits2.dat' using 0:3 index 2 ls 8 t '\ty 2'
+plot '../data/main.dat'      using 0:3 index 3 ls 1 t '\ty IWA-UC-1', \
+     '../data/arqlimit2.dat' using 0:3 index 0 ls 4 t '\ty 2', \
+     '../data/main.dat'      using 0:3 index 4 ls 2 t '\ty G2C3-1', \
+     '../data/arqlimit2.dat' using 0:3 index 1 ls 5 t '\ty 2', \
+     '../data/main.dat'      using 0:3 index 5 ls 3 t '\ty G2C4-1', \
+     '../data/arqlimit2.dat' using 0:3 index 2 ls 6 t '\ty 2'
 
 set ylabel '\ft Residual error probability' offset 3,0
-set yrange [0:0.6]
+set yrange [0:0.55]
 
 set output '../plots/arqlimits-residualerror.tex'
-plot '../data/main.dat'       using 0:4 index 3 ls 1 t '\ty IWA-UC-1', \
-     '../data/arqlimits2.dat' using 0:4 index 0 ls 6 t '\ty 2', \
-     '../data/main.dat'       using 0:4 index 4 ls 2 t '\ty G2C3-1', \
-     '../data/arqlimits2.dat' using 0:4 index 1 ls 7 t '\ty 2', \
-     '../data/main.dat'       using 0:4 index 5 ls 3 t '\ty G2C4-1', \
-     '../data/arqlimits2.dat' using 0:4 index 2 ls 8 t '\ty 2'
+plot '../data/main.dat'      using 0:4 index 3 ls 1 t '\ty IWA-UC-1', \
+     '../data/arqlimit2.dat' using 0:4 index 0 ls 4 t '\ty 2', \
+     '../data/main.dat'      using 0:4 index 4 ls 2 t '\ty G2C3-1', \
+     '../data/arqlimit2.dat' using 0:4 index 1 ls 5 t '\ty 2', \
+     '../data/main.dat'      using 0:4 index 5 ls 3 t '\ty G2C4-1', \
+     '../data/arqlimit2.dat' using 0:4 index 2 ls 6 t '\ty 2'
 
 set ylabel '\ft Avg. end-to-end latency in cycles' offset 3,0
 set yrange [29:51]
 
 set output '../plots/arqlimits-endtoendlatency.tex'
-plot '../data/main.dat'       using 0:5 index 3 ls 1 t '\ty IWA-UC-1', \
-     '../data/arqlimits2.dat' using 0:5 index 0 ls 6 t '\ty 2', \
-     '../data/main.dat'       using 0:5 index 4 ls 2 t '\ty G2C3-1', \
-     '../data/arqlimits2.dat' using 0:5 index 1 ls 7 t '\ty 2', \
-     '../data/main.dat'       using 0:5 index 5 ls 3 t '\ty G2C4-1', \
-     '../data/arqlimits2.dat' using 0:5 index 2 ls 8 t '\ty 2'
+plot '../data/main.dat'      using 0:5 index 3 ls 1 t '\ty IWA-UC-1', \
+     '../data/arqlimit2.dat' using 0:5 index 0 ls 4 t '\ty 2', \
+     '../data/main.dat'      using 0:5 index 4 ls 2 t '\ty G2C3-1', \
+     '../data/arqlimit2.dat' using 0:5 index 1 ls 5 t '\ty 2', \
+     '../data/main.dat'      using 0:5 index 5 ls 3 t '\ty G2C4-1', \
+     '../data/arqlimit2.dat' using 0:5 index 2 ls 6 t '\ty 2'

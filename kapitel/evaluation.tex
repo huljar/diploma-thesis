@@ -518,11 +518,20 @@ protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} 
     \label{fig:resultsroutingdorvsdm}
 \end{figure}
 
-Once again, DM brings an advantage only for the network coded version. This result matches the expectation (cf. Section
-\ref{subsec:routingclassification}) since only the network coded protocols benefit from partially circumventing malicious routers.
+%Once again, DM brings an advantage only for the network coded version. This result matches the expectation (cf. Section
+%\ref{subsec:routingclassification}) since only the network coded protocols benefit from partially circumventing malicious routers.
 
 \subsection{Increased ARQ limit}
 DOR as routing strategy to preserve comparability with the results from Section \ref{subsec:protocolvariantseval}.
+
+\begin{figure}
+    \begin{tabular}{cc}
+        \input{gnuplot/plots/arqlimits-acceptancerate} & \input{gnuplot/plots/arqlimits-informationrate} \\
+        \input{gnuplot/plots/arqlimits-residualerror} & \input{gnuplot/plots/arqlimits-endtoendlatency}
+    \end{tabular}
+    \caption[Results for the ARQ limit comparison]{ARQ limit 1 and 2 comparison.}
+    \label{fig:resultsroutingdorvsdm}
+\end{figure}
 
 \section{Area Overhead}
 Encryption units: 3x PRINCE (8260 GE each\footnote{For Nangate 45 nm Generic technology with a unit delay of 1000. Both lower and higher values were
