@@ -1,15 +1,3 @@
-% 1. novel approach, why? protection goals and performance → security and efficiency
-% 2. what precisely was done at the TUD chair → say that their research proved the potential of NC and that's why we persue it here again
-% 3. NC provides no confidentiality/integrity guarantees → we implement encryption+authentication
-% 3.1 Availability only partially adressed
-% 3.2 recall NoC architecture → this is implemented in the network interfaces
-% 4. Different variants envisioned (3 methods) + comparison with uncoded variant where applicable
-% 5. Multiple paths focus → why multiple paths in the first place? → chance to avoid compromised routers, still have enough flits
-%    thanks to NC
-% 6. Routing strategies: deterministic vs. non-deterministic routing → XY, smart random XY, ROMM+XY, ROMM+srXY
-% 7. Attacker/Threat model
-% 8. Evaluation
-% Always refer to the chapters that explain this in detail
 In this thesis, a novel approach for securing the communications in a \gls{noc}-based \gls{mpsoc} is presented. The goal was to design and implement a protocol that
 remedies both accidental and malicious modifications to the transmitted data as much as possible while meeting the performance requirements of a \gls{noc} (cf. Section
 \ref{sec:networkonchipfun}). Furthermore, confidentiality should be assured to prevent attackers from accessing the transmitted information. In this

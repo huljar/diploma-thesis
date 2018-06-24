@@ -9,7 +9,8 @@ simulations are delineated (Section \ref{sec:environmenteval}). Following this, 
 the hyperparameters\footnote{The term \textit{hyperparameters} refers to those parameters whose value is determined through a number of preliminary
 experiments and remains static for the main experiments.} are fixed through a series of representative experiments (Section
 \ref{sec:hyperparamseval}), followed by the main evaluation where the different protocol variants and routing strategies are compared (Section
-\ref{sec:perfcompeval}).
+\ref{sec:perfcompeval}). Finally, an estimation of the required area overhead is presented in Section \ref{sec:areaoverhead} before giving a summary
+of the results in Section \ref{sec:summaryeval}.
 
 \section{Notation}\label{sec:notationeval}
 To improve readability, abbreviations are introduced for the protocol variants and network coding modes. This facilitates their representation within
@@ -166,8 +167,9 @@ the network interfaces. Thus, a reasonable trade-off between latency and area ne
 The \gls{arq} limit is the number of \glspl{arq} that are allowed to be issued per transmission unit (see Section \ref{subsec:arqretransmissions}).
 Only the values 1 and 2 are considered here for multiple reasons. First, the more \glspl{arq} are allowed, the larger the \glspl{rtb} need to be:
 since additional \glspl{arq} are only sent if the preceding ones did not yield successful retransmissions, senders need to retain flits in their
-\glspl{rtb} over a longer period. Second, if more \glspl{arq} and consequently more retransmissions are injected into the network, congestions become
-more likely, which in turn may induce timeouts for other transmissions.
+\glspl{rtb} over a longer period\footnote{A detailed calculation of the \gls{rtb} size requirements is given in Section \ref{sec:areaoverhead}.}.
+Second, if more \glspl{arq} and consequently more retransmissions are injected into the network, congestions become more likely, which in turn may
+induce timeouts for other transmissions.
 
 The value of the \gls{arq} timeout is the first hyperparameter that is fixed through an experiment (Section \ref{subsec:arqtimeouts}). As explained in
 Section \ref{subsec:arqretransmissions}, it represents the amount of clock cycles after receiving a flit from a particular transmission unit until the
@@ -201,8 +203,9 @@ particular source $S$ and destination $D$, $d$ is the Manhattan distance between
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{arq-timeouts-calc}
-    \caption[Example of ARQ timeout calculation]{Example for the calculation of \gls{arq} timeouts. With a Manhattan distance of 4 between source $S$ and
-    destination $D$ and a given inter-arrival timeout $t_1$, the \gls{arq} timeout $t_2(S, D)$ is computed as $t_1 + 2 \cdot 4 = t_1 + 8$ cycles.}
+    \caption[Example of the post-ARQ timeout calculation]{Example for the calculation of post-\gls{arq} timeouts. With a Manhattan distance of 4
+    between source $S$ and destination $D$, a given inter-arrival timeout $t_1$, and an \gls{rtb} lookup time of $l$ cycles, the post-\gls{arq}
+    timeout $t_2(S, D)$ is computed as $t_1 + l + 2 \cdot 4 = t_1 + l + 8$ cycles.}
     \label{fig:arqtimeoutscalc}
 \end{figure}
 
@@ -244,8 +247,6 @@ Figure \vref{fig:resultsarqtimeouts} presents the number of \glspl{arq} issued f
 the number of created source flits instead of the number of transmission units as the size of the latter varies significantly depending on the network
 coding scheme. For timeout values of 12 or greater, less than 1 \gls{arq} per 100 source flits is sent, which is considered sufficiently small here.
 Hence, $t_1 = 12$ is chosen and used in all future experiments.
-
-% TODO: Use sadias formula for RTB size estimation
 
 \subsection{Number Of Crypto Modules}\label{subsec:numcryptomodules}
 The second experiment concerns itself with the number of required encryption and authentication modules in the network interfaces. Here, a
@@ -602,25 +603,82 @@ produced the steepest curve. As the likelihood of attacks surpasses 0.2, the ave
 network becomes unable to handle the rising traffic volume quickly enough and that flits begin to accumulate at the routers' local queues. This matches
 the development of the acceptance rate, which also exhibits a prominent upsurge beyond attack probabilities of 0.2.
 
-\section{Area Overhead}
-Encryption units: 3x PRINCE (8260 GE each\footnote{For Nangate 45 nm Generic technology with a unit delay of 1000. Both lower and higher values were
-obtained with other technologies.} \cite[16]{borghoff12prince})
+\section{Area Overhead}\label{sec:areaoverhead}
+The network coding, encryption, and authentication layers naturally increase the area requirement of the \gls{noc}. In this section, the percentage of
+these components in relation to the remainder of the system is estimated.
 
-Authentication units: 9x PRINCE (8260 GE each)
+Network coding requires matrix multiplications in the domain $GF(2^4)$ to be computed (cf. Section \ref{sec:designnc}). According to
+\citeauthor{moriam18activeattackers}, an efficient implementation can be achieved by using lookup tables to store all possible products of such
+multiplications \cite[6]{moriam18activeattackers}. For \gls{ida} and \gls{fga}, 36 parallel lookups are required, while only 20 are necessary for
+\gls{iwa} due to the shorter data parts of the payloads \cite[6]{moriam18activeattackers}. Assuming a size of 118 gate equivalents (\gls{ge}) per
+table \cite[6]{moriam18activeattackers}, this accumulates to 4248 \gls{ge} in order to compute one combination in a single clock cycle. As the decoder
+is a separate module in the network interface design (see Figure \ref{fig:omnetni}), it requires another 4248 \gls{ge}. Thus, for each interface,
+network coding implies an area overhead of 8496 \gls{ge} (excluding any additional wiring required).
 
-Network coding lookup tables: 7080 GEs (G2C3) or 16992 GEs (G2C4) \cite[5]{moriam18activeattackers}
+The cryptographic modules, however, occupy significantly more area. The authors of PRINCE have found their algorithm to require 8260
+\gls{ge}\footnote{This value was obtained with Nangate 45 nm Generic technology and a unit delay of 1000. Both lower and higher values were calculated
+with other technologies.} \cite[16]{borghoff12prince}. Thus, for three encryption and nine authentication modules, a total of twelve parallel
+instances are necessary, resulting in \num{99120} \gls{ge} per network interface.
 
-compare with the area overhead estimated by moriam et al., also reference the state-of-the-art MPSoC [14]
+Finally, the \glspl{rtb} that are necessary for retransmissions also increase the area overhead. Their size depends on several factors:
+\begin{itemize}
+    \item \textbf{\Gls{noc} dimensions.} For larger network, there are higher maximum distances between nodes. Thus, \glspl{arq} may arrive later and
+        flits need to be stored for a longer period of time. The equation below is established for an 8x8 \gls{noc} since this was used in all
+        experiments.
+    \item \textbf{\Gls{arq} limit.} If more than one \gls{arq} is allowed, the required storage duration increases as flits still need to be present
+        when the secondary \gls{arq} arrives.
+    \item \textbf{Network load.} A higher network load entails more congestions in the routers, which may delay both the delivery of the initial flits
+        as well as the \glspl{arq}. However, such congestions are volatile and hard to estimate, so for the following calculation, they are not taken
+        into account.
+\end{itemize}
 
-\section{Summary}
+With \gls{noc} dimensions of 8x8, the highest Manhattan distance between two nodes is $d = 14$ hops. For an inter-arrival timeout of $t_1 = 12$ cycles, the
+highest post-\gls{arq} timeout is consequently $t_2 = t_1 + 2 \cdot 14 + 2 = 42$ cycles for network coded protocols (cf. Section
+\ref{subsec:arqtimeouts}). Assuming \gls{ida}-G2C4 as the protocol variant (since it has the largest transmission units) and no network congestion,
+the 8 flits that comprise a generation arrive within 8 consecutive clock cycles at the receiver. Thus, in case the last flit is lost in transit, an
+\gls{arq} will be issued $d + 7 + t_1$ cycles after the first flit was injected into the network, and it will arrive at the sender after $2d + 7 +
+t_1 = 47$ cycles. Hence, each flit needs to reside for at least 47 cycles within the \gls{rtb} for an \gls{arq} limit of 1. With a base network
+injection rate of 0.2, 9.4 further flits are on average injected into the network during this timespan. Thus, an \gls{rtb} size of 10 flits is
+required to have no requested flit already overwritten once the \gls{arq} arrives. For a limit of 2, the duration until the second \gls{arq}
+arrives needs to be taken into account. Assuming that with the first \gls{arq}, one flit was retransmitted and once more lost in transmit, this
+timespan amounts to $d + 7 + t_1 + t_2 + d = 4d + 2t_1 + 9 = 89$ cycles, during which 17.8 more flits are injected into the network on average. Hence,
+for an \gls{arq} limit of 2, \glspl{rtb} with a size of 18 flits are necessary.
 
-\iffalse
-"Results for IWA-NC confirm the alleged positive effect of NC in unreliable networks"
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C||C}
+        Crypto modules & Network coding & \glspl{rtb} & Total \\\hline
+        \multirow{2}{=}{\num{99120} \gls{ge}} & \multirow{2}{=}{8496 \gls{ge}} & \multirow{2}{=}{335.25 B} & \num{107616} \gls{ge} \\
+                                              & & & 335.25 B
+    \end{tabulary}
+    \caption[Area overhead per network interface]{The area overhead that the protocol imposes per network interface. While the circuit sizes of the
+    crypto modules and the network coding tables are given in \gls{ge}, the size of the buffers is expressed through the amount of required memory in
+    bytes (for an \gls{arq} limit of 2).}
+    \label{tab:areaoverheads}
+\end{table}
 
-"Creation rate adjustment to keep the base injection rate constant is reflected in the differing information rates"
+Table \vref{tab:areaoverheads} gives a summary of the area overhead per network interface. To put these numbers into perspective, a state-of-the-art
+\gls{mpsoc} that implements a software-defined radio platform \cite{haas18sdrmpsoc} is used as a reference. They employ a relatively small hexagonal
+\gls{noc} with 10 network interfaces where the maximum distance between two nodes is 3 hops. Thus, it would only require an \gls{rtb} size of 9 flits
+(amounting to 168 bytes of memory) for \gls{arq} limit 2 assuming the same base network injection rate of 0.2. As their \gls{mpsoc} encompasses 24.43
+million \gls{ge} of chip area and 844 kB memory \cite[4]{haas18sdrmpsoc}, the protocol would impose a total area overhead of approximately 4.4\% in
+terms of \gls{ge} and 0.2\% in terms of memory.
 
-"IDA: 4 flits need to arrive unharmed for successful transmission unit, 3 for FGA, and 2 for IWA"
+\section{Summary}\label{sec:summaryeval}
+Out of the five protocol variants, network coded \gls{iwa} has proven to perform best. It entails the lowest percentages of failing
+transmissions while exhibiting a very competitive average latency. Both G2C3 and G2C4 are viable; while the former is slightly more error-prone, it
+simultaneously allows for considerably higher information rates, rendering the choice between the two largely application-dependent. However, it
+should be noted that the shorter authcodes employed here are not as secure as the longer \glspl{mac} used in the other protocols.
 
-"NC proves to provide a performance improvement, although more in the sense of less residual errors than a decrease in latency since ARQs are still
-limited to 1 per transmission unit across all variants."
-\fi
+The choice of routing strategy is not as clear-cut as that of the protocol variant. The dynamic ones marginally reduce the error probability for
+network coded \gls{iwa}, but also entail slightly lower information rates. Furthermore, their alleged benefit is diminished by the network load being
+concentrated on the central regions of the \gls{noc}, making their selection largely dependent on the traffic generation pattern of the network. For the
+investigated scenario, \gls{dor} seems like a solid choice, given its simplicity of implementation and the more evenly distributed network load.
+
+Increasing the \gls{arq} limit from 1 to 2 has yielded a significant improvement in terms of reliability. However, this coincides with lower
+information rates and slightly higher transmission latencies. Nevertheless, as a slower but successful transmission appears to be more practical than
+a fast, erroneous one, the outcome is considered an improvement.
+
+Overall, network coded interwoven authentication with dimension order routing and an \gls{arq} limit of 2 per transmission unit is inferred as the
+most effective protocol. With the relatively low network saturations investigated here, G2C4 is more suitable, but G2C3 may prove advantageous for
+higher loads.

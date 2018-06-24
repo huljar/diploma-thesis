@@ -35,7 +35,8 @@ On these grounds, a globally synchronous architecture with a single clock drivin
 
 \subsection{Clock Frequency}\label{subsec:clockfrequency}
 The \gls{noc}'s global clock runs at a frequency of 500 MHz as this is a common speed in \gls{noc}-related research
-\cites{frey15stateobfuscation}{frey17hardenednoc}. Unfortunately, the PRINCE cipher that is employed for all cryptographic operations is unable to run at
+\cites{frey15stateobfuscation}{frey17hardenednoc}{haas18sdrmpsoc}. Unfortunately, the PRINCE cipher that is employed for all cryptographic operations
+is unable to run at
 such a high frequency. However, in Section \ref{subsubsec:prince} it was shown that the algorithm runs flawlessly at frequencies of up to 250 MHz.
 Thus, the crypto modules operate at half the frequency of the \gls{noc}, with every two cycles of the global clock corresponding to one
 cycle for the crypto modules. Hence, the processing of a single block with PRINCE is assumed to take two clock cycles in the simulator.

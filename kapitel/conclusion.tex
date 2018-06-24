@@ -1,1 +1,35 @@
-Failed transmission intuitively appears less useful than a slow one, so an \gls{arq} limit of 2 is considered more appropriate.
+In this thesis, a novel approach for securing the communications within a \gls{noc} against compromised routers with hardware trojans was presented
+and evaluated. For this purpose, a protocol was designed that aims to ensure the protection goals of confidentiality and integrity. After examining
+and assessing related work from this field of research, an in-depth explanation of said protocol was given. Several performance indicators were then
+evaluated through extensive simulations with varying parameters. To conduct these experiment, a dedicated software was developed that facilitates
+cycle-accurate analyses with detailed statistics for all facets of the protocol. Finally, the most suitable configuration was determined based on the
+obtained results.
+
+Future work:
+\begin{itemize}
+    \item Sequential IDs for uncoded and network coded → full transmission unit loss can be detected, ARQ issued
+    \item Authenticated ARQs
+    \item Different attacker models/smarter attackers
+    \item If attacker model changes, i.e. attackers start to drop specific/whole generations,
+        how does that influence the Routing/ARQ design? → ability to detect fully lost flits/gens via continuous IDs
+    \item My idea of G3C4 with generation MAC as part of the G3? → it is feasible, would require experiments → G3C4 or G3C5? → refer to Yexin's
+        experiments
+    \item Authenticated encryption schemes in the NIs
+    \item Local network coding, local encoding vectors
+    \item Burst mode (w/ head and tail flits)
+    \item TDM route selecting
+    \item RNG for path selection in simulator → according to \cite{stefan11enhancingnocs}, non-static selection can be very expensive in area →
+        explore static routes?
+    \item Intelligent attackers → modify ARQs or send own ARQs → they are unauthenticated so DoS attack by maximizing retransmissions
+    \item Usage of ECC (error correcting codes) to potentially reduce number of ARQs (at least for accidental bit flips)
+    \item Security of the encryption → we kind of use ECB here which is not secure → e.g. a nonce is needed? or the flits need to be chained with some
+        mode of operation like CBC or CTR → CBC requires no residual errors
+    \item Mixing G2C3 and G2C4 -- e.g. once a network interface detects that it receives an unusually high amount of ARQs, indicating a very
+        unreliable network, network coding could be \enquote{upgraded} from G2C3 to G2C4, so it is not statically one or the other
+    \item Int. auth: adapt the scheme to compute MAC over the data part as well as just use the first 32 bit of the result as the "authcode". Saves a
+        clock cycle because the cogwheel lookup function is omitted and input still fits into two blocks, but maybe security implications?
+    \item Encryption (and encoding) of the address field → it may convey information useful to an attacker since the memory layout of the PEs is probably not random
+        (→ ASLR?)
+    \item Application of NC to ARQs (interwoven variant)
+    \item Head-of-line blocking in routers → future work w/ virtual channels/TDM etc.
+\end{itemize}

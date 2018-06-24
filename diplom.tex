@@ -229,86 +229,8 @@
     \chapter{Evaluation}\label{ch:evaluation}
     \input{kapitel/evaluation}
 
-    \chapter{Conclusion}\label{ch:conclusion}
+    \chapter{Conclusion And Outlook}\label{ch:conclusion}
     \input{kapitel/conclusion}
-
-    \chapter{Future Work}\label{ch:futurework}
-    \input{kapitel/futurework}
-
-
-
-    \chapter{Talk About}
-    \begin{itemize}
-        \item Welche Komponenten brauchen wie viele Takte
-        \item Anzahl der Enc/Auth units bei den verschiedenen Methoden (mehr enc als auth bei Methode 2)
-        \item GALS design pattern - wir sind aber auf jeden Fall synchron innerhalb einer Node, d.h. wenn GALS vs GS diskutiert wird,
-            ändert sich nur die Zeit der Übertragung zwischen den Routern → zur Vereinfachung wird GS angenommen
-        \item Leichtgewichtige Krypto: FPGA vs. ASIC, speedup von Faktor 3-4 wahrscheinlich möglich (→ critical path delay) \cite{kuon07fpgavsasic}
-            → AES und AES\_INV zum Vergleich, da ähnlicher Aufbau von kombinatorischer Logik + FlipFlops (Rundenfunktionen etc.)
-        \item Statistiken: Wie viele Crypto Units für Auth+Enc sind gleichzeitig besetzt (→ Auslastung)
-        \item Threat model, protection goals
-        \item node-unique FIDs/GIDs have advantage that 24 bits are not full nearly as fast as with globally unique IDs
-        \item Deadlock/Livelock possibilities? D yes, L not
-        \item Unicast/Multicast
-        \item Head-of-line blocking in routers → future work w/ virtual channels/TDM etc.
-        \item Säulendiagramm (mit verschiedenfarbigen Abschnitten?): Latenz der (einzelnen Phasen der) Flitübertragung im Vergleich: mit NC, mit
-            Enc/auth methoden, mit beidem, ohne alles
-        \item Tortendiagramm: Für NC+Enc/Auth Methoden, welche Phasen dauern wie lange anteilig
-    \end{itemize}
-
-    \section{Assumptions}
-    \begin{itemize}
-        \item only input buffers are used (for app, NI, router), no output buffers
-        \item network coding module stores flits until enough flits with the same
-            destination are available (in our case: 2)
-        \item network coding (creating all 3 combinations) takes one cycle, but
-            because we can only send one flit out per cycle, it takes 3 cycles until
-            all combinations are sent (so in the end it's one combination per cycle)
-        \item we have a variable number of authentication units and the amount of
-            cycles the encryption algorithm takes can be set by a parameter
-        \item if all crypto units are busy, the encoded flit combinations are held
-            back in a dedicated buffer
-        \item if e.g. authentication method 1 is used (1 MAC flit per data flit),
-            the data flit is sent out one cycle before the MAC finished computing,
-            so the MAC can be sent immediately when it's ready
-        \item the encoding/authentication and decoding/verification pipelines in the
-            network interface share the same crypto units (but this is not
-            implemented yet)
-        \item when a flit arrives at the NI from the router, the first thing that is
-            done is checking if this is an ARQ. If yes, it is delivered directly to
-            the retransmission buffer. Otherwise, it goes through the normal network
-            decoding pipeline
-        \item when an ARQ arrives at a NI, it takes one cycle to look up the correct
-            flit and it will be sent out in the same cycle (not sure about this, two
-            cycles might be more realistic)
-        \item size of the retransmission buffer is configurable
-        \item retransmission buffers use a FIFO caching strategy
-        \item if an ARQ and a new data flit arrive a the retransmission buffer
-            during the same clock cycle, the ARQ answer (retransmission) has
-            priority to be sent out first
-        \item in a router, several flits can be routed simultaneously, provided that
-            they do not share an input or output port
-        \item also in router: flits are held back in the input queues if the
-            receiving router's input queue is full (this was discussed in an earlier
-            email)
-        \item in uncoded flits, the GID header contains a flit ID instead of
-            generation ID, and MAC and data flit have the same ID
-        \item the different values for the mode header are: normal data flit, mac
-            flit, data/mac combined, ARQ
-        \item entry guard can distribute a departing and an arriving flit at the same
-            time, as long as units are free
-        \item it does not matter whether data or mac flit is sent out first (order),
-            because they can arrive out-of-order at the destination node anyway
-        \item encryption units can also be used for decryption
-    \end{itemize}
-
-    \chapter{Notes}
-    \section{NoC Design}
-    \begin{itemize}
-        \item Router: in+out buffer vs. only input buffer (2 cycles vs. 1 cycle routing)
-        \item GenTraffic: injection rate of 0.2 was considered in Sadia's calculations and is a good starting point
-        \item Speed: \gls{noc} usually runs at ~500 MHz or a bit lower, but definitely runs a lot faster than the maximum frequency of the lightweight encryption algorithms. Using multiple clock domains is hard and requires expertise
-    \end{itemize}
 
     % % % Glossary % % %
     %\glsaddall % Print all glossary entries, not only the referenced ones
