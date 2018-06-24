@@ -143,8 +143,9 @@ The experiments were performed with a simulator specifically crafted for this th
 quickly swapping and reordering the internal components of the network interfaces, which is a great asset for testing the different protocol variants.
 The details of the implementation are described in Chapter \ref{ch:implementation}.
 
-The workflow of the evaluation was as follows: at first, the hyperparameters were determined once, with the resulting values being used in all
-subsequent experiments. These hyperparameters include, e.g., the number of required parallel crypto modules\footnote{The term \textit{crypto modules} is
+The workflow of the evaluation was as follows: at first, the hyperparameters\footnote{The term \textit{hyperparameters} refers to those parameters
+whose value is determined through a number of preliminary experiments and remains static for the main experiments.} were
+calculated which include, e.g., the number of required parallel crypto modules\footnote{The term \textit{crypto modules} is
 used to refer to both encryption and authentication modules.} per network interface and the \gls{arq} timeouts. Afterwards, the remaining parameters are
 varied to find the optimal configuration for each protocol variant. Finally, the most promising of these variants is identified. The full evaluation
 process is elaborated in Chapter \ref{ch:evaluation}.

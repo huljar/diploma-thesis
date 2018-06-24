@@ -6,8 +6,7 @@ is determined through several metrics that indicate its performance for a given 
 The next section establishes notations and key terms that are used throughout this chapter. Afterwards, the environment and frame conditions for the
 simulations are delineated (Section \ref{sec:environmenteval}). Following this, the employed attacker model is discussed (Section
 \ref{sec:attackermodeleval}) and the configurable parameters for the simulations are explained (Section \ref{sec:configurations}). Subsequently,
-the hyperparameters\footnote{The term \textit{hyperparameters} refers to those parameters whose value is determined through a number of preliminary
-experiments and remains static for the main experiments.} are fixed through a series of representative experiments (Section
+the hyperparameters are fixed through a series of representative experiments (Section
 \ref{sec:hyperparamseval}), followed by the main evaluation where the different protocol variants and routing strategies are compared (Section
 \ref{sec:perfcompeval}). Finally, an estimation of the required area overhead is presented in Section \ref{sec:areaoverhead} before giving a summary
 of the results in Section \ref{sec:summaryeval}.
@@ -158,6 +157,7 @@ lists all the variable input parameters.
     that are used in subsequent experiment setups to represent the corresponding parameters.}
     \label{tab:inputparams}
 \end{table}
+% TODO: notation for integer/real intervals
 
 Each network interface contains a number of encryption and authentication modules. On the one hand, there need to be enough modules to process both
 departing and arriving flits quickly without incurring congestions. On the other hand, each additional module entails a higher area requirement for

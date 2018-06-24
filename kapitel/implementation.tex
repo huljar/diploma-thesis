@@ -1,14 +1,15 @@
 Following the design phase, it is crucial to test the protocol in a practical environment in order to verify that it works as intended. Furthermore,
 extensive performance evaluations need to be conducted to assure the viability of the devised techniques. Both of these tasks are achieved through
-thorough software simulation. For this purpose, a dedicated, cycle-accurate simulator was developed that supports the designed protocol with all the
-features described in Chapter \ref{ch:protocol}. A very small portion of the codebase was already implemented before this thesis at the TU Dresden
+software simulation. For this purpose, a dedicated, cycle-accurate simulator was developed that supports the designed protocol with all the
+features described in Chapter \ref{ch:protocol}. A small portion of the codebase was already implemented before this thesis at the TU Dresden
 Chair of Privacy and Data Security. However, most of it was refactored and the vast majority of the source code was written from scratch.
 
 The simulator is implemented in C++ and based on the \textit{\omnet{}} discrete event simulation framework \cite{omnet}. \omnet{} provides a general-purpose
 network simulation architecture and promotes a modular design. In general, it allows the programmer to define the components of the network via a
-special scripting language called \textit{NED}. With NED files, modules may be specified as they appear from the outside, by means of parameters,
+special scripting language called \textit{Network Description (NED)}. With NED files, the network's modules are specified as they appear from the
+outside, by means of parameters,
 gates, and connections. Furthermore, a module is allowed to have any number of submodules, facilitating a hierarchical structure. A C++
-class is assigned to each module that controls the component's internal behavior together with the parameters. The gates define the ports of the
+class is assigned to each module that defines its internal behavior based on the given parameters. The gates define the communication interfaces of the
 module through which it sends and receives messages. The connections link the gates of different modules (or submodules) together and thus define the
 message flows and the network's topology.
 
@@ -25,11 +26,11 @@ In Section \ref{sec:generalass}, fundamental assumptions about the simulation en
 and latencies that the various submodules entail is given in Section \ref{sec:internaldelays}.
 
 \section{General Assumptions}\label{sec:generalass}
-\subsection{The GALS Paradigm}
+\subsection{Globally Synchronous Architecture}
 In Section \ref{sec:networkonchipfun}, it was mentioned that \glspl{noc} lend themselves well to the implementation of the \gls{gals} design paradigm.
 For the simulation, it was not considered for three reasons. First, its usage requires the existance of multiple clock domains: each core runs with the
 frequency best suited for itself and is not synchronized with other cores in the network (\enquote{globally asynchronous}). This, however, is very
-finical to implement correctly. Second, since the cores themselves each operate under a single clock (\enquote{locally synchronous}), \gls{gals} would
+cumbersome to implement correctly. Second, since the cores themselves each operate under a single clock (\enquote{locally synchronous}), \gls{gals} would
 only affect the transmissions from one router to another. Third, the cores are assumed to be identical and hence run with the same frequency anyway.
 On these grounds, a globally synchronous architecture with a single clock driving all components is used in the simulator.
 
@@ -41,13 +42,14 @@ such a high frequency. However, in Section \ref{subsubsec:prince} it was shown t
 Thus, the crypto modules operate at half the frequency of the \gls{noc}, with every two cycles of the global clock corresponding to one
 cycle for the crypto modules. Hence, the processing of a single block with PRINCE is assumed to take two clock cycles in the simulator.
 
-It was mentioned above that the integration of multiple clock domains is very finical. However, when they are not independent and the global clock's
-frequency is evenly divisible by the required frequency, as is the case for the crypto modules, this becomes significantly easier. Here, a new clock
+It was mentioned above that the integration of multiple clock domains is intricate. However, when they are not independent and the global clock's
+frequency is evenly divisible by the target frequency, as is the case for the crypto modules, this becomes significantly easier. Here, a new clock
 is derived from the global clock that simply omits every other tick.
 
 \subsection{Single Cycle Routing}\label{subsec:singlecyclerouting}
 The number of cycles required for routing\footnote{Routing refers to the whole process from receiving a flit on an input port to forwarding it on the
-appropriate output port, including route calculation, switch allocation, and switch traversal \cite[see][2]{routinglectureutah}.} is a key factor to the
+appropriate output port, including route calculation, switch allocation, and switch traversal \cite[see][2]{routinglectureutah}. These computations
+are performed by every intermediate node along a flit's path.} is a key factor to the
 overall performance of the \gls{noc}. While four cycle \cite[e.g.][]{routinglectureutah} and two cycle routing \cite[e.g.][]{lu11nocrouter} are
 popular approaches, architectures requiring only a single cycle have also proven to be both feasible and practical
 \cites{hayenga09scarab}{ved17routeonfly}.
@@ -56,10 +58,13 @@ As achieving low latencies is of utmost importance for this thesis, single cycle
 able to operate at the required frequency of 500 MHz \cite[7]{hayenga09scarab}. Furthermore, high routing speeds imply less required buffers
 \cite[1]{ved17routeonfly}, reducing the occupied chip area of the routers. Although completely bufferless architectures are possible
 \cite{hayenga09scarab}, the implemented scheme grants each router one input buffer per port (i.e., five buffers per router) in order to prevent
-immediate discarding of flits in the case of link congestions. Output buffers, however, are not used.
+flits from being discarded if they cannot be forwarded immediately. Their sizes are one of the hyperparameters of the simulator and are determined in
+Section \ref{subsec:portqueuesizes}. Output buffers are not used in the routers.
 
 In order for the complexity of the simulator to stay within manageable bounds, the internal structure of the routers is kept simple. For instance, no
-virtual channels are used for the input buffers mentioned above. This, however, implies that a flit delayed by a congestion of the targeted output
+virtual channels\footnote{When the physical connections between routers are multiplexed onto multiple virtual ones with separate input
+buffers, this is referred to as virtual channels.} are used for the input buffers mentioned above. This, however, implies that a flit delayed by a
+congestion of the targeted output
 link also holds back all following flits in the buffer, even if they would be routed to a different link.
 
 \subsection{Retransmission Buffer}
@@ -102,7 +107,8 @@ consumer with an input queue. Figure \vref{fig:omnetpe} depicts its appearance i
     \label{fig:omnetpe}
 \end{figure}
 
-The traffic generator randomly produces flits and sends them to the network interface. On each clock tick, one flit is created with a configurable
+The traffic generator randomly produces flits and sends them to the network interface\footnote{This traffic generation scheme was adopted from
+\citeauthor{moriam18activeattackers} \cite{moriam18activeattackers}.}. On each clock tick, one flit is created with a configurable
 \textit{generation probability}. The destination is chosen at random from the set of network nodes (excluding the own node) with a uniform
 distribution. The produced flits are always data flits (not \glspl{mac} or \glspl{arq}) without any meaningful information contained in their
 payloads\footnote{For the simulation, only the transmission parameters are of interest, not the actual data being transferred.}. Furthermore, the
@@ -155,7 +161,9 @@ encrypted flit is sent to the \textit{flitSplitter}.
 
 With the interwoven authentication protocol variant, the next step is to create a new flit that half the payload is moved to. Afterwards, these two
 flits are encoded as a generation by the \textit{encoder}. The resulting three or four flits are subsequently sent back to the \textit{cryptoExit}
-auxiliary module which merely forwards them to the \textit{authenticateQueue}. As the computation of a combination takes one clock cycle, the encoder
+auxiliary module which merely forwards them to the \textit{authenticateQueue}\footnote{The flits could also bypass the \textit{cryptoExit} and head
+straight for the \textit{authenticateQueue}, but this would have been more tedious to implement. The forwarding by \textit{cryptoExit} imposes no
+temporal overhead.}. As the computation of a combination takes one clock cycle, the encoder
 consequently sends out precisely one combination per cycle.
 
 Now, each combination needs to be authenticated. The \textit{authenticateQueue} is one of the four queues connected to the \textit{cryptoEntry}. In
@@ -222,13 +230,13 @@ Flits from different queues with differing output ports can be routed simultaneo
 
 Routers are able to inform neighboring ones of congestions of their input queues. Once a queue has reached a certain size, the router sends a congestion signal to the
 neighbor connected to this queue\footnote{For instance, these notifications can be realized through dedicated signaling lines on the router
-interconnections. This would increase the channel width from 141 to 142 wires or from 149 to 150 wires for uncoded and network coded protocols,
+interconnections. This would increase the channel width from 141 to 142 wires and from 149 to 150 wires for uncoded and network coded protocols,
 respectively (cf. Section \ref{subsec:flitstructure}).}, thereby instructing it to delay all flits that are supposed to be routed towards the
 signaling router, if possible. Once the congestion has subsided, the affected neighbor is informed of this event through a similar signal and may
 resume normal routing of flits in the affected direction.
 
 \section{Internal Delays}\label{sec:internaldelays}
-To provide a better understanding of the impact of each module on the overall processing latency, their delays are given in a concise, tabular form.
+To elucidate the impact of each module on the overall processing latency, their delays are elaborated in this section.
 Table \ref{tab:processinglatencies} presents the processing times for the submodules of the network interfaces, while Table
 \vref{tab:transmissionlatencies} shows the transmission durations between the \gls{noc}'s components.
 
@@ -265,7 +273,7 @@ Table \ref{tab:processinglatencies} presents the processing times for the submod
     \label{tab:transmissionlatencies}
 \end{table}
 
-The delay for the encryption and decryption is precisely two clock cycles for all protocol variants a exactly one input block (the flit payload)
+The delay for the encryption and decryption is precisely two clock cycles for all protocol variants as exactly one input block (the flit payload)
 needs to be processed. For authentication, the number of input blocks (and consequently the delay) varies. With individual authentication, three
 blocks are processed, corresponding to six clock cycles. Interwoven authentication only has two input blocks, but entails an additional cycle for the
 authcode calculation. With full-generation authentication, the two input flits are divided into five blocks and thus require ten cycles of
