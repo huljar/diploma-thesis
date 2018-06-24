@@ -483,7 +483,7 @@ for flits in the same transmission unit increases the probability that at least 
 version does not tolerate any modifications or losses, it leads to more \glspl{arq} and retransmissions than with static routes. Interestingly, the
 dynamic strategies were only able to lower the acceptance rate slightly for very high attack probabilities when network coding is employed. This may
 be caused by more network traffic being routed through the center of the \gls{noc}, leading to congestions in this area. To verify this assumption,
-the router workload distributions over the network were investigated as well (see below).
+the router workload distributions over the network were analyzed (see below).
 
 The information rates largely reflect the same impact that the routing strategies had on the acceptance rates. For uncoded \gls{iwa}, the dynamic ones
 perform worse than \gls{dor}, while the margin is miniscule for the network coded variants.
@@ -497,7 +497,20 @@ In terms of average end-to-end latency, there is no clear best or worst strategy
 protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} and \gls{ramm} seem to enable slightly faster transmissions than
 \gls{dor} and \gls{romm}.
 
-% Heatmap of router workload
+As mentioned above, the workload distribution among the routers varies with the different routing strategies. Thus, using the example of
+\gls{iwa}-G2C3, those discrepancies were analyzed and visualized in heatmaps. The simulation setup for this experiment is given in Table
+\vref{tab:setuproutingheatmaps} and the results are presented in Figure \vref{fig:resultsroutingstratheatmaps}.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
+        \gls{iwa} & G2C3 & 3 & 9 & 6 & 1 & 12 & varying & 1 & 0.2 \\
+    \end{tabulary}
+    \caption[Input parameters for routing heatmap comparison]{long}
+    \label{tab:setuproutingheatmaps}
+\end{table}
+
 \begin{figure}
     \begin{tabular}{cccc}
         \input{gnuplot/plots/heatmap-iwa-g2c3-dor} & \input{gnuplot/plots/heatmap-iwa-g2c3-dm} &
@@ -508,7 +521,29 @@ protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} 
     \label{fig:resultsroutingstratheatmaps}
 \end{figure}
 
-% DM for other strats
+The findings confirm the assumption that the dynamic strategies route more traffic through the center of the network. For instance, if the bottom
+left and top right node were to communicate, \gls{dor} would force the traffic to be routed along the edges of the \gls{noc}, while the dynamic
+strategies favor more jagged paths on average. However, the results reveal that even \gls{dor} effects traffic concentrations in the center, although
+less severe. A major contributing factor to this phenomenon is the uniform traffic pattern that is employed for the experiments; nodes closer to the
+center generate and receive just as many flits as the fringe nodes, which naturally leads to more paths involving central routers. Hence, in scenarios
+with higher injection rates, \gls{dor} may prove to be favorable as it causes less congestions in this area. However, with non-uniform generation
+patterns where the fringe nodes produce a higher traffic volume, the advantages of dynamic routing are likely to surface more clearly.
+
+Finally, the impact of a dynamic routing strategy on protocols other than \gls{iwa} was investigated. For this purpose, \gls{dm} was selected since it
+performed marginally better for uncoded \gls{iwa} while being on the same level as \gls{romm} and \gls{ramm} when network coding was involved. In
+Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are listed, while the results are presented in Figure
+\vref{fig:resultsroutingdorvsdm}.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
+        \gls{ida}, \gls{fga} & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor}, \gls{dm} & 1 & varying \\
+    \end{tabulary}
+    \caption[Input parameters for comparing DOR and DM]{long}
+    \label{tab:setuproutingdorvsdm}
+\end{table}
+
 \begin{figure}
     \begin{tabular}{cc}
         \input{gnuplot/plots/dorvsdm-acceptancerate} & \input{gnuplot/plots/dorvsdm-informationrate} \\
@@ -518,11 +553,28 @@ protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} 
     \label{fig:resultsroutingdorvsdm}
 \end{figure}
 
-%Once again, DM brings an advantage only for the network coded version. This result matches the expectation (cf. Section
-%\ref{subsec:routingclassification}) since only the network coded protocols benefit from partially circumventing malicious routers.
+Similar to the earlier results for \gls{iwa} (Figure \ref{fig:resultsroutingstratsexperiment}), DM provides a benefit only in conjunction with network
+coding while deteriorating the performance in its absence. This result matches the envisioned impact of dynamic routing (cf. Section
+\ref{subsec:routingclassification}) since only the network coded protocols benefit from partially circumventing malicious routers. However, this
+advantage is partially mitigated by the increased traffic clustering that these strategies entail (cf. Figure \ref{fig:resultsroutingstratheatmaps}).
 
-\subsection{Increased ARQ limit}
-DOR as routing strategy to preserve comparability with the results from Section \ref{subsec:protocolvariantseval}.
+\subsection{Increased ARQ Limit}
+A variable parameter that was not touched so far is the \gls{arq} limit. Hence, the final experiment concerns itself with the effects of allowing up
+to two \glspl{arq} per transmission unit. As explained in Section \ref{sec:configurations}, higher values are not considered since they entail
+unreasonably large \glspl{rtb}. The selected protocol is \gls{iwa} as it proved to be the most promising variant. \Gls{dor} is the routing strategy of
+choice to preserve comparability with the results from Section \ref{subsec:protocolvariantseval}; moreover, the dynamic strategies did not lead to a
+distinct performance gain. Table \vref{tab:setuparqlimits} summarizes the full list of input parameters and Figure \vref{fig:resultsarqlimits}
+visualizes the simulation results.
+
+\begin{table}
+    \centering
+    \begin{tabulary}{\textwidth}{C|C|C|C|C|C|C|C|C|C}
+        \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
+        \gls{iwa} & varying & 3 & 9 & 6 & varying & 12 & \gls{dor} & 1 & varying \\
+    \end{tabulary}
+    \caption[Input parameters for comparing different ARQ limits]{Input parameters for comparing ARQ limits 1 and 2 for \gls{iwa}.}
+    \label{tab:setuparqlimits}
+\end{table}
 
 \begin{figure}
     \begin{tabular}{cc}
@@ -530,8 +582,25 @@ DOR as routing strategy to preserve comparability with the results from Section 
         \input{gnuplot/plots/arqlimits-residualerror} & \input{gnuplot/plots/arqlimits-endtoendlatency}
     \end{tabular}
     \caption[Results for the ARQ limit comparison]{ARQ limit 1 and 2 comparison.}
-    \label{fig:resultsroutingdorvsdm}
+    \label{fig:resultsarqlimits}
 \end{figure}
+
+Expectedly, the acceptance rates are substantially higher for an \gls{arq} limit of 2 due to the increased number of retransmissions. Hence, a higher
+limit directly corresponds to an increase in network load. A similar development is reflected in the information rates: the amount of \glspl{arq} and
+retransmissions in relation to the total amount of flits injected into the network decreases considerably. In this sense, incrementing the \gls{arq}
+limit did not elevate the protocol's performance.
+
+However, the positive impact of the higher limit comes to fruition when analyzing the residual error probabilities. For all variants, a significant
+improvement can be observed for low and medium attack probabilities. The effect is most striking for the uncoded variant, cutting the number of
+unsuccessfully transmitted source flits by more than 50\% at an attack probability of 0.1. For high attack probabilities, the positive effect
+diminishes and even entails more errors for the uncoded protocol. This is likely due to the increased amount of \glspl{arq} and retransmissions
+that traverse the network causing additional congestions and thus leading to failures for other transmission units in the process.
+
+The average end-to-end latency increases significantly for the incremented \gls{arq} limit. This indicates that with rising attack probabilities,
+larger portions of transmissions only succeed due to the possibility of secondary \glspl{arq}. The effect is most apparent for the uncoded protocol, which
+produced the steepest curve. As the likelihood of attacks surpasses 0.2, the average end-to-end latency spikes up to over 400 cycles, indicating that the
+network becomes unable to handle the rising traffic volume quickly enough and that flits begin to accumulate at the routers' local queues. This matches
+the development of the acceptance rate, which also exhibits a prominent upsurge beyond attack probabilities of 0.2.
 
 \section{Area Overhead}
 Encryption units: 3x PRINCE (8260 GE each\footnote{For Nangate 45 nm Generic technology with a unit delay of 1000. Both lower and higher values were
@@ -542,6 +611,8 @@ Authentication units: 9x PRINCE (8260 GE each)
 Network coding lookup tables: 7080 GEs (G2C3) or 16992 GEs (G2C4) \cite[5]{moriam18activeattackers}
 
 compare with the area overhead estimated by moriam et al., also reference the state-of-the-art MPSoC [14]
+
+\section{Summary}
 
 \iffalse
 "Results for IWA-NC confirm the alleged positive effect of NC in unreliable networks"
