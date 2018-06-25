@@ -114,7 +114,7 @@ distribution. The produced flits are always data flits (not \glspl{mac} or \glsp
 payloads\footnote{For the simulation, only the transmission parameters are of interest, not the actual data being transferred.}. Furthermore, the
 generator may be configured to always produce a pair of two flits: in the event of a flit creation as described above, another flit will always be
 produced on the next clock tick with the same destination. The purpose of this generation pattern is to allow for a fair comparison of uncoded and
-network coded protocol variants and explained in detail in Section (insert ref here).
+network coded protocol variants. A detailed explanation is given in Section \ref{sec:environmenteval}.
 
 The flit consumer simply accepts any flits arriving from the local network interface and records these events with \omnet{}'s statistics system. Since
 the flits are of no further use after this, they are subsequently destroyed. An input buffer is located in front of the consumer to ensure both

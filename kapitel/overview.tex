@@ -48,7 +48,7 @@ control} \cite[2]{moriam18activeattackers}, eliminating the attack vector of thi
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\textwidth]{noc-trust-boundaries}
+    \includegraphics[width=0.5\textwidth]{noc-trust-boundaries}
     \caption[Trust boundaries in a NoC]{Visualization of the trusted and untrusted hardware components in a NoC. The processing elements and network
     interfaces, which are assumed to be trusted, are marked green. The network itself, which is comprised of the routers and their interconnections,
     is not trustworthy and thus marked red. The dotted lines at the local connections mark the trust boundaries.}
@@ -60,7 +60,7 @@ The intent of integrating encryption and authentication is to provide confidenti
 implement this, a novel network interface design is proposed. Since all flits that enter the network must traverse one of the network interfaces,
 they were chosen to host the cryptographic protection measures. In the proposed design, they encrypt all outgoing flits, which can only be decrypted by the
 receiver. In addition, a \gls{mac} is computed that is sent together with the encrypted data. On the receiver side, the flits are decrypted and the
-\gls{mac} is verified. This scheme is illustrated in Figure \vref{fig:nocflitencauth} and further explained in Section (insert ref here).
+\gls{mac} is verified. This scheme is illustrated in Figure \vref{fig:nocflitencauth} and further explained in Section \ref{subsec:crypto}.
 
 \begin{figure}
     \centering

@@ -159,9 +159,9 @@ significantly reduce the number of required retransmissions and the residual err
 information rate describes the amount of transmitted information in relation to the total number of flits.}.
 
 Since this thesis seeks to build upon their work, some concepts of \citeauthor{moriam18activeattackers} can be found here as well. Their network coding
-scheme was reimplemented, which is elaborated in Section (insert vref here). Additionally, the authentication methods that they experimented with
-are taken up (see Section (insert vref here)). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as
-described in Section (insert vref here).
+scheme was reimplemented, which is elaborated in Section \ref{sec:designnc}. Additionally, the authentication methods that they experimented with
+are taken up (see Section \ref{sec:theprotocol}). The performance metrics used to evaluate the effectiveness of their approach are also adopted, as
+described in Section \ref{subsec:criteria}.
 
 \section{Lightweight Cryptographic Algorithms}\label{sec:lightweightcrypto}
 In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, the addition of encryption and authentication to
@@ -217,4 +217,5 @@ noticeable area overhead.
 Finally, the work preceding this thesis was presented in Section \ref{sec:lightweightcrypto}. It confirmed the applicability of lightweight
 cryptographic algorithms in constrained hardware environments (such as \glspl{noc}). Especially the PRINCE algorithm is of high interest due to its
 low latency, which is a direct requirement for efficient communication\footnote{Since low area is also a requirement, PRESENT is of a similar
-interest. However, latency was deemed more important than area. The reasoning is explained in Section (insert ref here).} (cf. Section \ref{sec:networkonchipfun}).
+interest. However, latency was deemed more important than area. The reasoning is explained in Section \ref{subsubsec:prince}.} (cf. Section
+\ref{sec:networkonchipfun}).

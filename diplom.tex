@@ -122,23 +122,23 @@
 \newcommand{\omnet}{OMNeT++}
 
 % Platzhalter für Evaluationsparameter
-\newcommand{\pProtVar}{p} % Protocol variant
-\newcommand{\pNCMode}{a} % Network coding mode
-\newcommand{\pEncMods}{b} % Number of encryption modules
-\newcommand{\pAuthMods}{c} % Number of authentication modules
-\newcommand{\pRQSize}{rs} % Queue size limit for router←→router input queues
-\newcommand{\pARQLimit}{d} % ARQ Limit
-\newcommand{\pARQTimeout}{e} % ARQ flit inter-arrival timeout
-\newcommand{\pRStrat}{f} % Routing strategy
-\newcommand{\pAttackerSet}{g} % Which set of 8 malicious routers is used
-\newcommand{\pAttackProb}{h} % Probability of an attack
+\newcommand{\pProtVar}{\ensuremath{v}} % Protocol variant
+\newcommand{\pNCMode}{\ensuremath{n}} % Network coding mode
+\newcommand{\pEncMods}{\ensuremath{e}} % Number of encryption modules
+\newcommand{\pAuthMods}{\ensuremath{a}} % Number of authentication modules
+\newcommand{\pRQSize}{\ensuremath{q}} % Queue size limit for router←→router input queues
+\newcommand{\pARQLimit}{\ensuremath{l}} % ARQ Limit
+\newcommand{\pARQTimeout}{\ensuremath{t_1}} % ARQ flit inter-arrival timeout
+\newcommand{\pRStrat}{\ensuremath{r}} % Routing strategy
+\newcommand{\pAttackerSet}{\ensuremath{s}} % Which set of 8 malicious routers is used
+\newcommand{\pAttackProb}{\ensuremath{p}} % Probability of an attack
 
 \begin{document}
     \frenchspacing % Disable double spaces between sentences
 	\begin{titlepage}
-		\includegraphics[width=0.28\textwidth]{header_logo_tud}
+		\includegraphics[width=0.25\textwidth]{TU_Dresden_Logo_blau_HKS41}
 		\hfill
-		\includegraphics[width=0.28\textwidth]{header_logo_haec} % TODO: find HD HAEC logo
+		\includegraphics[width=0.23\textwidth]{HAEC_Logo_cmyk}
 		\vspace{1.5\baselineskip}
 		
 		\begin{center}
@@ -187,24 +187,28 @@
     \vspace{0.5\baselineskip}
     Dresden, 28.\ Juni 2018 \\
 
-    \vspace{2\baselineskip}
+    \vspace{1.5\baselineskip}
     \theauthor
 
 	\chapter*{Acknowledgement}
     In addition to my supervisors, I would like to thank M.Sc. EE Sadia Moriam from the TU Dresden Vodafone Chair Mobile Communications Systems for
     her invaluable counsel throughout the process of creating this diploma thesis.
 	
+    \begingroup
 	\tableofcontents
 	
 	\addtocontents{lot}{\protect\vspace{-1.4\baselineskip}}
 	\addtocontents{lof}{\protect\vspace{-1.4\baselineskip}}
 	
+    \let\clearpage\relax
 	\listoftables
 	\vspace{-2.6\baselineskip}
 	\begingroup
 	\let\clearpage\relax
 	\listoffigures
 	\endgroup
+
+    \endgroup
 	
 	
 	\chapter{Introduction}\label{ch:introduction}

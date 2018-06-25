@@ -120,7 +120,7 @@ the performance drop caused by the security measures. For instance, a preceding 
 \glspl{noc} \cite{moriam18activeattackers}.}, resulting in a noticeable performance impact. In order to minimize these effects, several countermeasures
 are implemented:
 \begin{itemize}
-    \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latency in the network interfaces, they
+    \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latencies in the network interfaces, they
         threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple cryptographic modules are employed in each network
         interface. While this does not speed up the individual cryptographic computations, it allows for multiple flits to be processed in parallel. For
         instance, each network interface could have three encryption modules, allowing it to encrypt up to three flits simultaneously. Alas, this
@@ -131,7 +131,7 @@ are implemented:
         compared \cite{harttung17lightweightcrypto}. The most promising algorithm is PRINCE \cite{borghoff12prince}, which is introduced below.
     \item \textbf{Parallel decryption and verification.} When flits arrive from the network, the \gls{mac} is verified to ensure integrity. When
         successful, the data are decrypted and passed on. To speed up this process, verification and decryption is performed in parallel. Should the
-        integrity check fail, the decrypted data have to be discarded. In case of success, however, this results in a significant latency reduction.
+        integrity check fail, the decrypted data have to be discarded. In case of success, however, this results in a considerable latency reduction.
         This scheme is illustrated in detail in the step-by-step description of the protocol (Section \ref{sec:theprotocol}).
 \end{itemize}
 
@@ -169,7 +169,7 @@ On the sender side, \gls{etm} necessitates sequential encryption and authenticat
         Ciphertext integrity & no & no & yes% TODO: more aspects?
     \end{tabulary}
     \caption[Comparison of authenticated encryption composition methods]{Comparison of the authenticated encryption composition methods
-    Encrypt-and-MAC (\gls{eam}, MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
+    Encrypt-and-MAC (\gls{eam}), MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
     \label{tab:compositionmethods}
 \end{table}
 
