@@ -1,6 +1,17 @@
-Since the dawn of multiprocessor systems, the way/design of communicating/communication has been an integral part of processor design.
-Multi-core chips are/were often based on bus communication, which quickly becomes impractical for many-core chips.
-To confront this scaling problem, new ways of communication were developed, and thus the Network-on-Chip principle was devised.
+The complexity of integrated circuits has been growing steadily since the dawn of the digital age. The amount of transistors employed on a single chip
+continues to increase to this day, consistent with Moore's Law \cite{mack11mooreslaw}. The clock frequency of the systems, however, has not
+experienced substantial growth rates for about a decade \cite{intelfrequency}. One of the main limiting factors here is the heat emission of the
+circuits: as clock frequencies increase, the generated heat rises as well. At too high frequencies, the whole circuit might experience a physical
+meltdown \cite{intelfrequency}.
+
+Since the desire for more performance did not subside with the decelerating clock frequency growth, the trend has shifted towards parallelized
+architectures, where multiple interconnected processor cores are placed on a single die \cite[6]{kumar08parallel}. As the level of parallelism has
+increased substantially over the last years, leading from multi-core to many-core systems, the importance of an efficient interconnection architecture
+capable of handling highly parallelized systems has equally grown.
+
+Traditional interconnection architectures employ a global bus that all cores are attached to. However, as their number increases, buses quickly become
+a bottleneck for the overall performance \cite[6]{tatas16designingnocs}. To confront this scaling problem, new ways of communicating were developed,
+and thus the Network-on-Chip paradigm was devised \cites{kumar02networkonchip}{benini02nocparadigm}.
 
 NoCs are a novel idea, seeking to overcome the drawbacks of traditional bus-based interconnect systems.
 
