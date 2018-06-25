@@ -18,7 +18,7 @@
 *.fdb_latexmk
 
 # Compiled document
-/*.pdf
+diplom.pdf
 
 # BibLaTeX auxiliary files
 *.bbl

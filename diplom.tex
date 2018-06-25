@@ -2,8 +2,8 @@
 % !TeX spellcheck = en_US
 \documentclass[
 	paper=a4,
-	%open=right, % Chapters start on right pages
-	%twoside=true,
+	open=right, % Chapters start on right pages
+	twoside=true,
 	fontsize=11pt,
 	parskip=full % Space between paragraphs
 ]{scrreprt}
@@ -102,6 +102,9 @@
 % % % EPStoPDF % % %
 \usepackage{epstopdf}
 
+% % % PDFpages % % %
+\usepackage{pdfpages}
+
 % % % Color % % %
 \usepackage{color}
 
@@ -172,7 +175,8 @@
 	
 	\pagenumbering{roman}
 	
-	% TODO: include scan of printed task with signature here
+    % Task page
+    \includepdf[pages={-}]{aufgabe.pdf}
 	
     \chapter*{Selbstständigkeitserklärung}
     Hiermit erkläre ich, dass ich die von mir am heutigen Tag dem Prüfungsausschuss der Fakultät Informatik eingereichte Arbeit zum Thema:
