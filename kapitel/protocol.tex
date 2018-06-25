@@ -212,6 +212,8 @@ omitting the XOR operation for the encryption case.
 % TODO: here: ECB is used. This is not secure, e.g. because same plaintexts yield same ciphertexts. One possibility: CTR mode where the flit ID is the
 % counter. As ID is unique per encrypted flit, it can be used as the counter; this way, decryption also works when the flit stream is interrupted (no
 % synchronization between sender and receiver required).
+Security of the encryption → we kind of use ECB here which is not secure → e.g. a nonce is needed? or the flits need to be chained with some
+mode of operation like CBC or CTR → CBC requires no residual errors
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
