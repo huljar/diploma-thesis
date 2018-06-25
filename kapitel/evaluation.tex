@@ -288,7 +288,7 @@ computation). Hence, at most 11 modules are required for this variant.
 
 \begin{figure}
     \centering
-    \begin{tabular}{ll}
+    \begin{tabular}{cc}
         \input{gnuplot/plots/encmodules-ida} & \input{gnuplot/plots/authmodules-ida.tex} \\
         \input{gnuplot/plots/encmodules-iwa} & \input{gnuplot/plots/authmodules-iwa.tex} \\
         \input{gnuplot/plots/encmodules-fga} & \input{gnuplot/plots/authmodules-fga.tex}
@@ -334,7 +334,7 @@ the network load.
 
 \begin{figure}
     \centering
-    \begin{tabular}{ll}
+    \begin{tabular}{cc}
         \input{gnuplot/plots/queuelengths-ports} & \input{gnuplot/plots/queuelengths-local}
     \end{tabular}
     \caption[Results for router queue lengths experiment]{long}
@@ -400,7 +400,7 @@ of attackers on the communications and the capability of the different protocol 
 
 \begin{figure}
     \centering
-    \begin{tabular}{ll}
+    \begin{tabular}{cc}
         \input{gnuplot/plots/main-acceptancerate} & \input{gnuplot/plots/main-informationrate} \\
         \input{gnuplot/plots/main-residualerror} & \input{gnuplot/plots/main-endtoendlatency}
     \end{tabular}
@@ -470,6 +470,7 @@ the routing strategy is examined. All variants of \gls{iwa} are tested with each
 \end{table}
 
 \begin{figure}
+    \centering
     \begin{tabular}{cc}
         \input{gnuplot/plots/strategies-acceptancerate} & \input{gnuplot/plots/strategies-informationrate} \\
         \input{gnuplot/plots/strategies-residualerror} & \input{gnuplot/plots/strategies-endtoendlatency}
@@ -513,10 +514,12 @@ As mentioned above, the workload distribution among the routers varies with the 
 \end{table}
 
 \begin{figure}
+    \centering
     \begin{tabular}{cccc}
         \input{gnuplot/plots/heatmap-iwa-g2c3-dor} & \input{gnuplot/plots/heatmap-iwa-g2c3-dm} &
         \input{gnuplot/plots/heatmap-iwa-g2c3-romm} & \input{gnuplot/plots/heatmap-iwa-g2c3-ramm} \\
-        (a) & (b) & (c) & (d) \\
+        \hspace*{0.3em}\footnotesize\textbf{(a)} & \hspace*{0.3em}\footnotesize\textbf{(b)} &
+        \hspace*{0.3em}\footnotesize\textbf{(c)} & \footnotesize\textbf{(d)}\hspace*{3.6em} \\
     \end{tabular}
     \caption[Heatmaps of the routers for different routing strategies]{Heatmaps of the routers for different routing strategies.}
     \label{fig:resultsroutingstratheatmaps}
@@ -546,6 +549,7 @@ Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are
 \end{table}
 
 \begin{figure}
+    \centering
     \begin{tabular}{cc}
         \input{gnuplot/plots/dorvsdm-acceptancerate} & \input{gnuplot/plots/dorvsdm-informationrate} \\
         \input{gnuplot/plots/dorvsdm-residualerror} & \input{gnuplot/plots/dorvsdm-endtoendlatency}
@@ -578,6 +582,7 @@ visualizes the simulation results.
 \end{table}
 
 \begin{figure}
+    \centering
     \begin{tabular}{cc}
         \input{gnuplot/plots/arqlimits-acceptancerate} & \input{gnuplot/plots/arqlimits-informationrate} \\
         \input{gnuplot/plots/arqlimits-residualerror} & \input{gnuplot/plots/arqlimits-endtoendlatency}

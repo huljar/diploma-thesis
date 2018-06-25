@@ -1,6 +1,6 @@
 % GNUPLOT: LaTeX picture with Postscript
 \begingroup
-\newcommand{\ft}[0]{\footnotesize}\newcommand{\st}[0]{\scriptsize}
+\newcommand{\ft}[0]{\footnotesize}\newcommand{\ty}[0]{\tiny}
   \makeatletter
   \providecommand\color[2][]{%
     \GenericError{(gnuplot) \space\space\space\@spaces}{%
@@ -80,18 +80,17 @@
     \fi%
     \setlength{\fboxrule}{0.5pt}%
     \setlength{\fboxsep}{1pt}%
-\begin{picture}(1872.00,1872.00)%
+\begin{picture}(2160.00,1440.00)%
     \gplgaddtomacro\gplbacktext{%
     }%
     \gplgaddtomacro\gplfronttext{%
       \csname LTb\endcsname%
-      \put(1638,644){\makebox(0,0)[l]{\strut{}\st 20000}}%
-      \put(1638,804){\makebox(0,0)[l]{\strut{}\st 40000}}%
-      \put(1638,965){\makebox(0,0)[l]{\strut{}\st 60000}}%
-      \put(1638,1126){\makebox(0,0)[l]{\strut{}\st 80000}}%
-      \put(1638,1287){\makebox(0,0)[l]{\strut{}\st 100000}}%
-      \put(1638,1448){\makebox(0,0)[l]{\strut{}\st 120000}}%
-      \put(2760,1046){\rotatebox{-270}{\makebox(0,0){\strut{}\ft Flits forwarded}}}%
+      \put(1816,36){\makebox(0,0)[l]{\strut{}\ty \num{20000}}}%
+      \put(1816,309){\makebox(0,0)[l]{\strut{}\ty \num{40000}}}%
+      \put(1816,582){\makebox(0,0)[l]{\strut{}\ty \num{60000}}}%
+      \put(1816,856){\makebox(0,0)[l]{\strut{}\ty \num{80000}}}%
+      \put(1816,1129){\makebox(0,0)[l]{\strut{}\ty \num{100000}}}%
+      \put(1816,1403){\makebox(0,0)[l]{\strut{}\ty \num{120000}}}%
     }%
     \gplbacktext
     \put(0,0){\includegraphics{../plots/heatmap-iwa-g2c3-ramm}}%

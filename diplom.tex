@@ -50,7 +50,7 @@
 
 % % % VarioRef % % %
 %\usepackage{varioref}
-\newcommand\vref{\ref} % TODO: disabling varioref for now because it causes unstable typesetting
+\newcommand\vref{\ref} % disabling varioref because it causes unstable typesetting
 
 % % % GraphicX % % %
 \usepackage{graphicx}
@@ -241,8 +241,7 @@
     \input{kapitel/conclusion}
 
     % % % Glossary % % %
-    %\glsaddall % Print all glossary entries, not only the referenced ones
-    % TODO: add specific entries (the ones only occuring in images) explicitly
+    \glsaddall % Print all glossary entries, not only the referenced ones (because some are only used in figures)
     \printglossaries
 	
 	% % % Bibliography % % %

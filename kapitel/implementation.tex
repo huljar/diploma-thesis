@@ -101,7 +101,7 @@ consumer with an input queue. Figure \vref{fig:omnetpe} depicts its appearance i
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{omnet-pe}
-    \caption[Simulator view of the processing element]{An instance of a processing element module of \omnet{}. A traffic generator (producer) randomly
+    \caption[Simulator view of a processing element]{An instance of a processing element module of \omnet{}. A traffic generator (producer) randomly
     creates flits and sends them to the connected network interface. Flits arriving from the network interface are accepted by a pseudo-buffer
     (inputQueue) that subsequently passes them to the consumer.}
     \label{fig:omnetpe}
@@ -130,7 +130,7 @@ is described below. Figure \vref{fig:omnetni} shows the internal structure as re
 \begin{figure}
     \centering
     \includegraphics[width=0.85\textwidth]{omnet-ni}
-    \caption[Simulator view of the network interface]{An instance of a network interface for network coded interwoven authentication as rendered by
+    \caption[Simulator view of a network interface]{An instance of a network interface for network coded interwoven authentication as rendered by
     \omnet{}. Flits from the processing element arrive on the left side and subsequently traverse a pipeline of encryption, encoding, and
     authentication modules. The flits from the router enter the interface on the bottom right. After \glspl{arq} are filtered out, the remaining flits
     are subjected to decoding, decryption, and verification procedures before being forwarded to the processing element.}
@@ -215,7 +215,7 @@ queue} and the \textit{port queues}, respectively.
 \begin{figure}
     \centering
     \includegraphics[width=0.55\textwidth]{omnet-router}
-    \caption[Simulator view of the router]{An instance of a router as rendered by \omnet{}. The five input gates are connected to the switch via their
+    \caption[Simulator view of a router]{An instance of a router as rendered by \omnet{}. The five input gates are connected to the switch via their
     input queues. The five respective output connections are not interposed by a buffer. In the renderings of \omnet{}, the spatial layout of the
     connections sometimes does not match their logical correlations, as is the case here with the output lines being drawn in parallel. However, there is
     in fact one output connection corresponding to each input gate.}
