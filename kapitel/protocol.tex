@@ -18,7 +18,6 @@ As mentioned in Section \ref{sec:flitsfun}, flits are the fundamental unit of tr
 payload. Their structure differs slightly depending on whether or not network coding is employed. For network coded flits, one additional
 header field is required (the global encoding vector) and the generation ID replaces the flit ID. These structures are depicted in Figure
 \vref{fig:flitstructureuncoded} (uncoded) and Figure \ref{fig:flitstructurenetworkcoded} (network coded).
-% TODO: table comparing the protocol variants, their properties (e.g. lane width)
 
 \begin{figure}
     \centering
@@ -49,9 +48,9 @@ transmitted information. Uncoded flits have the following fields:
         resulting in at most $16 \cdot 16 = 256$ nodes being addressable. Hence, the maximum \gls{noc} size is 16x16 as well, which is deemed
         sufficient\footnote{It is certainly possible to increase the field sizes to, e.g., 8 bit, allowing for up to $256 \cdot 256 = 65536$ addressable
         nodes, should the need arise. However, as this would increase the flit size, it is not implemented here.}. The source header fields describe
-        the address of the flit's sender.% TODO: refer to a figure describing a routing strategy, which shows addresses of a sender and receiver
-    \item \textbf{Destination X, Destination Y.} These fields also describe the address of a node in 2D cartesian coordinates. As opposed to the
-        source fields, they indicate the intended destination of the flit.
+        the address of the flit's sender.
+    \item \textbf{Destination X, Destination Y.} These fields also represent the address of a node in 2D cartesian coordinates. As opposed to the
+        source fields, they describe the intended destination of the flit.
     \item \textbf{Mode.} The mode field indicates what type of data the flit contains. It signals to the receiver whether the flit contains, e.g.,
         data, a \gls{mac}, or an \gls{arq}. There are a few more special modes that are explained in Section \ref{sec:theprotocol}. The
         field size is 4 bit, allowing for 16 different modes. Not all of them are used for this thesis, so it is possible to define additional modes
@@ -87,8 +86,8 @@ has the significant advantage that flits can be transferred between directly con
 cycle. For example, sending a flit from a router to a neighboring one, or sending it from a processing element
 to the attached network interface takes one cycle. In a hardware implementation, this is facilitated by parallel communication channels that are able
 to transmit multiple bits simultaneously. This results in multiple wires (or other electical conductors) at the physical layer, as each one may convey
-precisely one bit of information per cycle \cite{wikiparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required, and at least 149
-in a network coded setting.% TODO: remove/replace this shitty wikipedia reference
+precisely one bit of information per cycle \cite{encyclopediaparallelcomm}. Thus, for uncoded flits, a channel width of 141 or more wires is required,
+and at least 149 in a network coded setting.
 
 \subsection{Cryptography}\label{subsec:crypto}
 \subsubsection{Notation}\label{subsubsec:cryptonotation}
@@ -166,7 +165,7 @@ On the sender side, \gls{etm} necessitates sequential encryption and authenticat
         Parallel encryption/authentication & yes & no & no \\
         Parallel decryption/verification & no & no & yes \\
         Plaintext integrity & yes & yes & yes \\
-        Ciphertext integrity & no & no & yes% TODO: more aspects?
+        Ciphertext integrity & no & no & yes
     \end{tabulary}
     \caption[Comparison of authenticated encryption composition methods]{Comparison of the authenticated encryption composition methods
     Encrypt-and-MAC (\gls{eam}), MAC-then-Encrypt (\gls{mte}), and Encrypt-then-MAC (\gls{etm}).}
@@ -209,11 +208,29 @@ other keys, $k_0$ and $k_0'$ are used as whitening keys.}. Now, $d_{(k_0, k_0', 
 omitting the XOR operation for the encryption case.
 
 \subsubsection{Mode Of Operation}
-% TODO: here: ECB is used. This is not secure, e.g. because same plaintexts yield same ciphertexts. One possibility: CTR mode where the flit ID is the
-% counter. As ID is unique per encrypted flit, it can be used as the counter; this way, decryption also works when the flit stream is interrupted (no
-% synchronization between sender and receiver required).
-Security of the encryption → we kind of use ECB here which is not secure → e.g. a nonce is needed? or the flits need to be chained with some
-mode of operation like CBC or CTR → CBC requires no residual errors
+If a sender were to encrypt all flits with the same receiver individually and independently (corresponding to the \textit{Electronic Codebook
+(\gls{ecb})} mode of operation), full confidentiality would not be achieved. Identical plaintext blocks would result in identical ciphertexts, giving
+away information to an eavesdropping adversary. As a solution, \textit{Counter Mode (\gls{ctr})} is employed instead of \gls{ecb}. Here, instead of
+encrypting the payload directly, a counter value is encrypted with the cipher, and the result is added to the message via bitwise XOR. This counter is
+incremented for each successive flit. However, this scheme requires the receiver to decrypt the flits using the same values as the sender. If the counter is simply
+incremented by one for each successive flit, the loss of flits in transit may lead to a desynchronization between the sender and receiver. To
+eliminate this problem, the flit ID serves as the counter value, which is embedded in the flit header anyway. As encryption keys should be
+renegotiated once flit IDs begin to repeat themselves (see Section \ref{subsec:fidsandgids}), no counter value is used more than once with the same
+key. Figure \vref{fig:ecbvsctr} presents the \gls{ctr} mode of operation in contrast to \gls{ecb}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{cipher-mode-ecb}\hfill
+    \includegraphics[width=0.45\textwidth]{cipher-mode-ctr}\\
+    \vspace{0.5\baselineskip}
+    \begin{footnotesize}
+        \hspace*{0.2\textwidth}\textbf{(a)}\hfill\textbf{(b)}\hspace*{0.19\textwidth}
+    \end{footnotesize}
+    \caption[ECB and CTR block cipher modes of operation]{The block cipher modes of operation \gls{ecb} (a) and \gls{ctr} (b) applied to two exemplary
+    flits. The flit IDs in (b) are padded (e.g., with zero-bits) to obtain a 64 bit input block. For \gls{ecb}, $\text{payload}_1 = \text{payload}_2$
+    entails $\text{enc.\,payload}_1 = \text{enc.\,payload}_2$.}
+    \label{fig:ecbvsctr}
+\end{figure}
 
 \subsubsection{A Note On Stream Ciphers}
 While block ciphers dominate the lightweight cryptography field of research, there has been notable research on stream ciphers as well
@@ -336,7 +353,6 @@ The solution is obtained by applying Gaussian elimination until the matrix is in
 Now, the original flits may be recreated. The vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in [0, G-1]$ obtained from the system of linear
 equations above are their payloads. The flit IDs are reconstructed from the generation ID $j$: with $G = 2$, they are $2j$ and $2j+1$. The other
 header fields are simply copied over from one of the combinations as they have not changed during the encoding phase.
-% TODO: vector symbols over p_i, beta_i etc. where appropriate (im Fließtext)
 
 \subsubsection{Effect On The Network}
 On the one hand, \gls{rlnc} provides the great benefit that flit loss is tolerable to a certain degree. If $C > G$, i.e., the number of computed
@@ -346,9 +362,8 @@ are lost in transit.
 On the other hand, the amount of flits injected into the network increases considerably depending on the coding scheme. For G2C3, 50\% more flits are
 sent out, and 100\% more for G2C4 (compared to uncoded communication). However, the additional resilience to flit loss entails less \glspl{arq} to be
 issued (in an unreliable network), which in turn may reduce the overall load and the average transmission latencies.
-% TODO: mention that G2C4 is better than e.g. sending every flit twice (which also results in a 100% flit increase)
 
-\subsection{Flit And Generation IDs}
+\subsection{Flit And Generation IDs}\label{subsec:fidsandgids}
 For each sender-receiver pair, the IDs of flits and generations should be unique in order to eliminate ambiguities between flits and inhibit replay
 attacks. Hence, for each such pair, IDs start at zero and are incremented with every newly created flit or generation, respectively. However, as only a finite amount of
 distinct values can be represented by the carrying header field, long-running systems are bound to cause an arithmetic overflow at some point. Prior
@@ -427,8 +442,9 @@ precisely, a data flit is considered \enquote{currently being verified} if its c
 the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
 \gls{arq} as well, should the integrity check fail.
 
-% TODO: explain case of complete transmission unit lost; receivers can detect this through the ID stream from this sender not being continuous.
-% full transmission unit loss beyond scope of this thesis though
+A receiver is able to detect the loss of a complete transmission unit if the stream of flit or generation IDs from the affected sender is not
+continuous. In this case, an \gls{arq} could be issued that requests a retransmission of the entire unit. For this thesis, such cases are not taken into
+account, but their inclusion is an important aspect for future work (see Chapter \ref{ch:conclusion}).
 
 \Glspl{arq} are not encrypted because they only contain metadata that are not confidential. Furthermore, they are not authenticated in order to save
 time and trigger the retransmissions as quickly as possible. Unfortunately, with the integrity checks missing, malicious routers are able to undetectably
@@ -571,7 +587,6 @@ interface, while Figure \vref{fig:protchartindauthnc} shows the internal steps.
     handling arrivals from the network.}
     \label{fig:protchartindauthnc}
 \end{figure}
-% TODO: say in caption how many flits are needed and are output at coding steps
 
 This amounts to the following procedure for sending flits to the network (upper part of Figure \ref{fig:protchartindauthnc}):
 \begin{enumerate}

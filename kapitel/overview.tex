@@ -17,8 +17,8 @@ methodology for evaluating the design through in-depth simulations is presented.
 \section{Necessity Of Security Measures}\label{sec:necessityofsecurity}
 In Section \ref{sec:nocsecurity}, it was shown that attacks specifically tailored for \gls{noc} architectures are feasible and practical. In
 particular, hardware trojans pose a potent threat to \glspl{mpsoc} that incorporate \glspl{noc} as their communication backbone. Pure software attacks
-originating from a processing element are feasible as well \cites(e.g.)(){biswas15routerattack}{kocher04embeddedsecurity}, but will not be considered
-during this thesis. % TODO: schöner formulieren?
+originating from a processing element are feasible as well \cites(e.g.)(){biswas15routerattack}{kocher04embeddedsecurity}, but go beyond the scope of
+this thesis and hence will not be considered here.
 
 There are a number of possible infection vectors that adversaries may try to exploit in order to covertly introduce a hardware trojan into a \gls{noc}
 implemented in an \gls{mpsoc}\footnote{Theoretically, the aforementioned infection vectors are not specific to \glspl{mpsoc} and \glspl{noc}, but
@@ -124,14 +124,13 @@ replaced in a \gls{fifo} manner once maximum size is reached.
 
 \section{Protocol Variants}\label{sec:protocolvariants}
 To unearth and analyze the most efficient way of applying the ideas outlined above, different variants of the protocol were implemented. They differ
-in the way the authentication \glspl{mac} are included in the flit transmissions. Furthermore, both network coded and uncoded versions are compared to
+in the way the authentication \glspl{mac} are included in the flit transmissions. Furthermore, network coded and uncoded versions are compared to
 examine the effects of network coding in combination with the cryptographic procedures. The emphasis of this thesis, however, is put on the network
 coded forms.
 
 The examined variants are \textit{individual authentication}, \textit{interwoven authentication}, and \textit{full-generation authentication}. For the
-first two, both uncoded and network coded variants are implemented. For the latter, only a network coded version is feasible: the authentication
-scheme relies on the existance of generations. A comprehensive description of all variants is given in Section
-\ref{sec:theprotocol}. % TODO: wiederholung mit "both uncoded and network coded versions/variants"
+first two, both uncoded and network coded variants are implemented. For the latter, only a network coded version is feasible as the authentication
+scheme relies on the existance of generations. A comprehensive description of all variants is given in Section \ref{sec:theprotocol}.
 
 \section{Analysis And Evaluation}
 All of the aforementioned protocol variants were implemented to empirically determine their quality and suitability for the task at hand. Many

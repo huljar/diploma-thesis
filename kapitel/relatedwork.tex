@@ -72,9 +72,9 @@ harden the \gls{noc} design against potential hardware trojans located inside th
 \enquote{complement […] the previous \gls{noc} works aiming for \gls{ni} security} \cite[16]{frey17hardenednoc} and address \gls{dos} attacks rather
 than information leakage.
 
-The idea of the authors is to detect any flit tampering right after the flit leaves a router. To achieve this, an error control code and dynamic flit
+The idea of the authors is to detect any flit tampering right after it leaves a router. To achieve this, an error control code and dynamic flit
 permutation are applied to all flits before they enter a router, and the reverse transformations are applied after they exit the router again. This
-prevents (or at least detects) small and targeted modifications to the flit headers. % TODO: not the best wording
+prevents (or at least detects) small and targeted modifications to the flit headers.
 
 % AMD codes
 \citeauthor{boraten16packetsecurity} pursue a very similar approach. In their 2016 paper \cite{boraten16packetsecurity}, they propose to apply
