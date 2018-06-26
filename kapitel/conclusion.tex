@@ -1,6 +1,5 @@
-In this thesis, a novel approach for securing the communications within a \gls{noc} against routers compromised with hardware trojans was presented
-and evaluated. For this purpose, a protocol was designed that achieves the protection goals of confidentiality and integrity. After examining
-and assessing related work from this field of research, an in-depth explanation of said protocol was given. Several performance indicators were then
+In this thesis, a new approach for securing the communications within a \gls{noc} against routers compromised with hardware trojans was presented
+and evaluated. For this purpose, a protocol was designed that achieves the protection goals of confidentiality and integrity. Several performance indicators were then
 evaluated through extensive simulations with varying parameters. To conduct these experiment, a dedicated software was developed that facilitates
 cycle-accurate analyses with detailed statistics for all facets of the protocol. Finally, the most suitable configuration was determined based on the
 obtained results.
@@ -21,8 +20,8 @@ while being a great asset in error-prone networks, it has a negative impact on t
 
 The ability to request retransmissions via \glspl{arq} is crucial to provide a possibility to recover from integrity breaches and still facilitate
 successful transmissions of source flits. Since the \glspl{arq} and retransmissions themselves are also vulnerable to attackers, doubling
-the number of allowed \glspl{arq} further improved the resilience of the protocol. With the same configurations as above, it decreased the amount of
-residual errors by 23\% at the cost of a network load increase of 7\%.
+the number of allowed \glspl{arq} further improved the resilience of the protocol. With the same configurations as above and G2C4, it decreased the
+amount of residual errors by 23\% at the cost of a network load increase of 7\%.
 
 There are still many avenues of improvement that have not been explored here as they would go beyond the scope of this thesis. Nonetheless, they may
 be of interest and spark inspiration for future work that draws upon the presented ideas. The following list provides a selection of such avenues:
@@ -33,8 +32,8 @@ be of interest and spark inspiration for future work that draws upon the present
         generation IDs, it is possible to detect the loss of complete transmission units if the stream of IDs is discontinuous on the receiving side.
         In this case, an \gls{arq} could be issued that requests all flits associated with the missing ID.
     \item \textbf{Protecting the \gls{arq} flits.} In the designed protocol, \glspl{arq} are neither authenticated nor network coded. Hence, they are
-        one of the most vulnerable parts of the protocol: in case of an attack on an \gls{arq} flit, the retransmissions fail. Adding authentication
-        or redundancy to \glspl{arq} may help to decrease the residual error probabilities even further, albeit at the cost of a higher network load.
+        one of the most vulnerable parts of the protocol: in case of an attack on an \gls{arq} flit, the retransmissions fail. Adding redundancy to
+        \glspl{arq} may help to decrease the residual error probabilities even further, albeit at the cost of a higher network load.
     \item \textbf{Different paths for retransmissions.} To increase the probability of successful retransmissions, it may be beneficial to ensure that
         they take different paths than the initially sent flits, even if the resulting routes are not minimal. If a specific flit is requested via an
         \gls{arq}, its original path could be prohibited for the subsequent retransmission.

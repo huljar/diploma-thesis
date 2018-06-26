@@ -10,22 +10,22 @@ As the number of processing cores continues to rise, the importance of having an
 highly parallelized systems grows as well. Traditional interconnection architectures employ a global bus that all cores are attached to. However,
 buses quickly became a bottleneck for the overall performance \cite[6]{tatas16designingnocs} as their bandwidth is shared by all connected cores. To confront this
 scaling problem, novel interconnection approaches were developed, and thus the \textit{Network-on-Chip (\gls{noc})} paradigm was devised
-\cites{kumar02networkonchip}{benini02nocparadigm}. It is explained in detail in Section \ref{sec:networkonchipfun}.
+\cites{kumar02networkonchip}{benini02nocparadigm}.
 
-\Glspl{noc} scale significantly better with the number of cores and aim to overcome the drawbacks of traditional buses, which is also elaborated in
-Section \ref{sec:networkonchipfun}. However, as the popularity of \glspl{noc} increases, so does the interest of adversaries to compromise systems
+\Glspl{noc} scale significantly better with the number of cores and aim to overcome the drawbacks of traditional buses. However, as the popularity of
+\glspl{noc} increases, so does the interest of adversaries to compromise systems
 that implement them as their communication backbone. Particularly due to the trend of chip manufacturers integrating a growing amount of third party components, the
 threat of the hardware itself being compromised becomes increasingly relevant \cites{ancajas14fortnocs}{sethumadhavan15trustworthyhardware}.
 
-In order to counteract such threats, it is desirable to embed security considerations directly into the design phase of the circuits (cf. Section
-\ref{sec:nocsecurity}). In recent research, numerous approaches to integrate such security measures have been pursued\footnote{For an elaborate
-discourse on related research, see Chapter \ref{ch:relatedwork}.}. At the TU Dresden Chair of Privacy and Data Security, a method to protect the
-communications between the cores against adversaries residing in the networking hardware was explored
-\cites{moriam15manycorenc}{moriam18activeattackers}. In their approach, network coding was combined with authentication, yielding a significant
-increase of their system's resilience to active attackers.
+In order to counteract such threats, it is desirable to embed security considerations directly into the design phase of the circuits. In recent
+research, numerous approaches to integrate such security measures have been pursued\footnote{For an elaborate
+discourse on related research, see Chapter \ref{ch:relatedwork}.}. At the TU Dresden Chair of Privacy and Data Security,
+\citeauthor{moriam18activeattackers} have explored a method to protect the communications between the cores against adversaries residing in the networking
+hardware \cites{moriam15manycorenc}{moriam18activeattackers}. In their approach, network coding was combined with authentication, yielding a
+significant increase of their system's resilience to active attackers.
 
-This thesis sets out to expand and improve this approach. Aiming to enhance both performance and security, their scheme is augmented through the
-addition of encryption and multipath routing, amongst others.
+This thesis sets out to expand and improve this approach. Aiming to enhance both performance and security, their scheme is augmented with
+encryption and multipath routing, amongst others.
 
 For the TU Dresden, \gls{noc}-related research is of particular importance. In a large-scale, interdisciplinary, and collaborative research center
 called \textit{Highly Adaptive and Energy-efficient Computing (\gls{haec})}, a novel approach for massively parallel computing is pursued
@@ -51,6 +51,6 @@ extensive evaluation through software simulation.
 The thesis begins with an explanation of key terms and concepts that are essential for the comprehension of the remainder of this work (Chapter
 \ref{ch:fundamentals}). Afterwards, a discourse on related research in the field of \glspl{noc} and their security is provided (Chapter
 \ref{ch:relatedwork}). Subsequently, Chapter \ref{ch:overview} gives an overview of the methodologies and courses of action that were employed in this
-thesis, followed by an exhaustive and detailed description of the designed communication protocol in Chapter \ref{ch:protocol}. Then, the
-implementation of the simulator is presented (Chapter \ref{ch:implementation}), followed by the evaluation of the devised protocol (Chapter
+thesis, followed by an exhaustive and detailed description of the designed communication protocols in Chapter \ref{ch:protocol}. Then, the
+implementation of the simulator is presented (Chapter \ref{ch:implementation}), followed by the evaluation of the devised protocols (Chapter
 \ref{ch:evaluation}). Finally, the thesis concludes with a summary and an outlook on future work (Chapter \ref{ch:conclusion}).

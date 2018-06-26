@@ -239,7 +239,8 @@ the baseline for all experiments before evaluating the effects of other routing 
 \begin{figure}
     \centering
     \input{gnuplot/plots/arqtimeouts}
-    \caption[Results for ARQ timeouts experiment]{long}
+    \caption[Results for ARQ timeouts experiment]{Results for the experiment to determine the \gls{arq} inter-arrival timeout. The number of \gls{arq}
+    issued on average per source flit is shown for various timeout values.}
     \label{fig:resultsarqtimeouts}
 \end{figure}
 
@@ -295,7 +296,7 @@ computation). Hence, at most 11 modules are required for this variant.
     \end{tabular}
     \caption[Results for number of crypto modules experiment]{Results for the experiment to determine the number of required crypto modules. The
     number of encryption modules (left column) and authentication modules (right column) is shown in relation to the maximum and average wait times of
-    enqueued flits. Each row represents one protocol variant.}
+    enqueued flits. Each row represents one protocol version with all applicable network coding modes.}
     \label{fig:resultscryptomodules}
 \end{figure}
 
@@ -323,7 +324,8 @@ investigated for varying size limits of the former.
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 1 & 0.2 \\
     \end{tabulary}
-    \caption[Input parameters for router queue sizes experiment]{long}
+    \caption[Input parameters for router queue sizes experiment]{The input parameters for the simulator in the experiment to determine the size of the
+    routers' port queues.}
     \label{tab:setupqueuesizes}
 \end{table}
 
@@ -337,7 +339,9 @@ the network load.
     \begin{tabular}{cc}
         \input{gnuplot/plots/queuelengths-ports} & \input{gnuplot/plots/queuelengths-local}
     \end{tabular}
-    \caption[Results for router queue lengths experiment]{long}
+    \caption[Results for router queue lengths experiment]{Results for the experiment to find an appropriate size for the routers' port queues. The
+    effect of restricting their size is shown in relation to both the lengths of the port queues themselves (left) and the lengths of the local queues
+    (right).}
     \label{fig:resultsqueuelengths}
 \end{figure}
 
@@ -390,7 +394,8 @@ comparisons once more. The full list of input parameters is given in Table \vref
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & all & varying \\
     \end{tabulary}
-    \caption[Input parameters for protocol variant experiment]{long}
+    \caption[Input parameters for protocol variant experiment]{The input parameters for the simulator in the experiment to compare the five protocol
+    variants.}
     \label{tab:setupprotvarexperiment}
 \end{table}
 
@@ -404,7 +409,8 @@ of attackers on the communications and the capability of the different protocol 
         \input{gnuplot/plots/main-acceptancerate} & \input{gnuplot/plots/main-informationrate} \\
         \input{gnuplot/plots/main-residualerror} & \input{gnuplot/plots/main-endtoendlatency}
     \end{tabular}
-    \caption[Results for protocol variant experiment]{long}
+    \caption[Results for protocol variant experiment]{Results of the experiment where the five protocol variants are compared. The defined criteria
+    are shown in relation to varying attack probabilities. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsprotvarexperiment}
 \end{figure}
 
@@ -465,7 +471,8 @@ the routing strategy is examined. All variants of \gls{iwa} are tested with each
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 1 & varying \\
     \end{tabulary}
-    \caption[Input parameters for routing strategies experiment]{long}
+    \caption[Input parameters for routing strategies experiment]{The input parameters for the simulator in the experiment to compare the four routing
+    strategies.}
     \label{tab:setuproutingstratexperiment}
 \end{table}
 
@@ -475,7 +482,8 @@ the routing strategy is examined. All variants of \gls{iwa} are tested with each
         \input{gnuplot/plots/strategies-acceptancerate} & \input{gnuplot/plots/strategies-informationrate} \\
         \input{gnuplot/plots/strategies-residualerror} & \input{gnuplot/plots/strategies-endtoendlatency}
     \end{tabular}
-    \caption[Results for routing strategies experiment]{long}
+    \caption[Results for routing strategies experiment]{Results of the experiment where the four routing strategies are compared. The defined criteria
+    are shown in relation to varying attack probabilities. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsroutingstratsexperiment}
 \end{figure}
 
@@ -509,7 +517,8 @@ As mentioned above, the workload distribution among the routers varies with the 
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & G2C3 & 3 & 9 & 6 & 1 & 12 & varying & 1 & 0.2 \\
     \end{tabulary}
-    \caption[Input parameters for routing heatmap comparison]{long}
+    \caption[Input parameters for routing heatmap comparison]{The input parameters for the simulator in the experiment to determine the network load
+    distribution for each routing strategy.}
     \label{tab:setuproutingheatmaps}
 \end{table}
 
@@ -521,7 +530,8 @@ As mentioned above, the workload distribution among the routers varies with the 
         \hspace*{0.3em}\footnotesize\textbf{(a)} & \hspace*{0.3em}\footnotesize\textbf{(b)} &
         \hspace*{0.3em}\footnotesize\textbf{(c)} & \footnotesize\textbf{(d)}\hspace*{3.6em} \\
     \end{tabular}
-    \caption[Heatmaps of the routers for different routing strategies]{Heatmaps of the routers for different routing strategies.}
+    \caption[Heatmaps of the routers for different routing strategies]{Heatmaps of the router workloads for different routing strategies. The color
+    scale represent the number of flits forwarded by a router over the course of the simulation.}
     \label{fig:resultsroutingstratheatmaps}
 \end{figure}
 
@@ -544,7 +554,8 @@ Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida}, \gls{fga} & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor}, \gls{dm} & 1 & varying \\
     \end{tabulary}
-    \caption[Input parameters for comparing DOR and DM]{long}
+    \caption[Input parameters for comparing DOR and DM]{The input parameters for the simulator in the experiment where the routing strategies
+    \gls{dor} and \gls{dm} are juxtaposed.}
     \label{tab:setuproutingdorvsdm}
 \end{table}
 
@@ -554,7 +565,9 @@ Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are
         \input{gnuplot/plots/dorvsdm-acceptancerate} & \input{gnuplot/plots/dorvsdm-informationrate} \\
         \input{gnuplot/plots/dorvsdm-residualerror} & \input{gnuplot/plots/dorvsdm-endtoendlatency}
     \end{tabular}
-    \caption[Results for the DOR and DM comparison]{long}
+    \caption[Results for the DOR and DM comparison]{Results of the experiment where the routing strategies \gls{dm} and \gls{dor} are juxtaposed. The
+    defined criteria are shown in relation to varying attack probabilities. The charts do not include \gls{iwa} since this variant is already
+    presented in Figure \ref{fig:resultsroutingstratsexperiment}. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsroutingdorvsdm}
 \end{figure}
 
@@ -587,7 +600,9 @@ visualizes the simulation results.
         \input{gnuplot/plots/arqlimits-acceptancerate} & \input{gnuplot/plots/arqlimits-informationrate} \\
         \input{gnuplot/plots/arqlimits-residualerror} & \input{gnuplot/plots/arqlimits-endtoendlatency}
     \end{tabular}
-    \caption[Results for the ARQ limit comparison]{ARQ limit 1 and 2 comparison.}
+    \caption[Results for the ARQ limit comparison]{Results of the experiment where the \gls{arq} limit was increased. For the protocol
+    variant \gls{iwa}, the effect of raising the \gls{arq} limit to 2 is shown, while the results for limit 1 are included for comparison. It should
+    be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsarqlimits}
 \end{figure}
 
@@ -616,9 +631,10 @@ Network coding requires matrix multiplications in the domain $GF(2^4)$ to be com
 \citeauthor{moriam18activeattackers}, an efficient implementation can be achieved by using lookup tables to store all possible products of such
 multiplications \cite[6]{moriam18activeattackers}. For \gls{ida} and \gls{fga}, 36 parallel lookups are required, while only 20 are necessary for
 \gls{iwa} due to the shorter data parts of the payloads \cite[6]{moriam18activeattackers}. Assuming a size of 118 gate equivalents (\gls{ge}) per
-table \cite[6]{moriam18activeattackers}, this accumulates to 4248 \gls{ge} in order to compute one combination in a single clock cycle. As the decoder
-is a separate module in the network interface design (see Figure \ref{fig:omnetni}), it requires another 4248 \gls{ge}. Thus, for each interface,
-network coding implies an area overhead of 8496 \gls{ge} (excluding any additional wiring required).
+table \cite[6]{moriam18activeattackers}, this accumulates to 4248 \gls{ge} in order to compute one combination in a single clock cycle. The decoder
+is a separate module in the network interface design (see Figure \ref{fig:omnetni}) that calculates the inverse of 2x2 matrices (the \glspl{gev} of
+the flits; cf. Section \ref{sec:designnc}). Its exact size was not determined, so it is estimated to occupy the same amount of space as the encoder.
+Thus, for each interface, network coding implies an area overhead of 8496 \gls{ge} (excluding any additional wiring required).
 
 The cryptographic modules, however, occupy significantly more area. The authors of PRINCE have found their algorithm to require 8260
 \gls{ge}\footnote{This value was obtained with Nangate 45 nm Generic technology and a unit delay of 1000. Both lower and higher values were calculated
@@ -640,40 +656,46 @@ Finally, the \glspl{rtb} that are necessary for retransmissions also increase th
 With \gls{noc} dimensions of 8x8, the highest Manhattan distance between two nodes is $d = 14$ hops. For an inter-arrival timeout of $t_1 = 12$ cycles, the
 highest post-\gls{arq} timeout is consequently $t_2 = t_1 + 2 \cdot 14 + 2 = 42$ cycles for network coded protocols (cf. Section
 \ref{subsec:arqtimeouts}). Assuming \gls{ida}-G2C4 as the protocol variant (since it has the largest transmission units) and no network congestion,
-the 8 flits that comprise a generation arrive within 8 consecutive clock cycles at the receiver. Thus, in case the last flit is lost in transit, an
-\gls{arq} will be issued $d + 7 + t_1$ cycles after the first flit was injected into the network, and it will arrive at the sender after $2d + 7 +
-t_1 = 47$ cycles. Hence, each flit needs to reside for at least 47 cycles within the \gls{rtb} for an \gls{arq} limit of 1. With a base network
-injection rate of 0.2, 9.4 further flits are on average injected into the network during this timespan. Thus, an \gls{rtb} size of 10 flits is
+the 8 flits that comprise a generation arrive within 8 consecutive clock cycles at the receiver. Since the inter-arrival timeout $t_1$ is longer than
+the time required for verifications, the case of flit losses is the one of interest. Here, the scenario where only the first and last flit arrive is
+considered. An
+\gls{arq} will be issued $d + 8 + t_1$ cycles after the first flit was injected into the network, and it will arrive at the sender after $2d + 8 +
+t_1 = 48$ cycles. Hence, each flit needs to reside for at least 48 cycles within the \gls{rtb} for an \gls{arq} limit of 1. With a base network
+injection rate of 0.2, 9.6 further flits are on average injected into the network during this timespan. Thus, an \gls{rtb} size of 10 flits is
 required to have no requested flit already overwritten once the \gls{arq} arrives. For a limit of 2, the duration until the second \gls{arq}
-arrives needs to be taken into account. Assuming that with the first \gls{arq}, one flit was retransmitted and once more lost in transmit, this
-timespan amounts to $d + 7 + t_1 + t_2 + d = 4d + 2t_1 + 9 = 89$ cycles, during which 17.8 more flits are injected into the network on average. Hence,
-for an \gls{arq} limit of 2, \glspl{rtb} with a size of 18 flits are necessary.
+arrives needs to be taken into account. Assuming that with the first \gls{arq}, six flits were retransmitted, but all except the last one are lost in
+transit, this timespan amounts to $d + 8 + t_1 + d + 2 + d + 6 + t_1 + d = 4d + 2t_1 + 16 = 96$ cycles. This formula includes the time until the first
+\gls{arq} arrives as well as the \gls{rtb} lookup time (2 cycles) and the time until the last of the six retransmitted flits arrives at the receiver
+($d + 6$ cycles). Note that $t_2$ does nor occur in the formula since the arrival of the one successful retransmission increases the \gls{arq} timer
+to $t_1$ again. During the calculated period of 96 cycles, 19.2 more flits are injected into the network on average. Hence,
+for an \gls{arq} limit of 2, \glspl{rtb} with a size of 20 flits are necessary.
 
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C||C}
         Crypto modules & Network coding & \glspl{rtb} & Total \\\hline
-        \multirow{2}{=}{\num{99120} \gls{ge}} & \multirow{2}{=}{8496 \gls{ge}} & \multirow{2}{=}{335.25 B} & \num{107616} \gls{ge} \\
-                                              & & & 335.25 B
+        \multirow{2}{=}{\num{99120} \gls{ge}} & \multirow{2}{=}{8496 \gls{ge}} & \multirow{2}{=}{372.5 B} & \num{107616} \gls{ge} \\
+                                              & & & 372.5 B
     \end{tabulary}
     \caption[Area overhead per network interface]{The area overhead that the protocol imposes per network interface. While the circuit sizes of the
-    crypto modules and the network coding tables are given in \gls{ge}, the size of the buffers is expressed through the amount of required memory in
-    bytes (for an \gls{arq} limit of 2).}
+    crypto and network coding modules are given in \gls{ge}, the size of the buffers is expressed through the amount of required memory in bytes to
+    store the necessary flits (for an \gls{arq} limit of 2 and a flit size of 149 bit).}
     \label{tab:areaoverheads}
 \end{table}
 
 Table \vref{tab:areaoverheads} gives a summary of the area overhead per network interface. To put these numbers into perspective, a state-of-the-art
 \gls{mpsoc} that implements a software-defined radio platform \cite{haas18sdrmpsoc} is used as a reference. They employ a relatively small hexagonal
-\gls{noc} with 10 network interfaces where the maximum distance between two nodes is 3 hops. Thus, it would only require an \gls{rtb} size of 9 flits
-(amounting to 168 bytes of memory) for \gls{arq} limit 2 assuming the same base network injection rate of 0.2. As their \gls{mpsoc} encompasses 24.43
+\gls{noc} with 10 network interfaces where the maximum distance between two nodes is 3 hops. Thus, it would only require an \gls{rtb} size of 11 flits
+(amounting to approximately 205 bytes of memory) for \gls{arq} limit 2 assuming the same base network injection rate of 0.2. As their \gls{mpsoc} encompasses 24.43
 million \gls{ge} of chip area and 844 kB memory \cite[4]{haas18sdrmpsoc}, the protocol would impose a total area overhead of approximately 4.4\% in
-terms of \gls{ge} and 0.2\% in terms of memory.
+terms of \gls{ge} and 0.24\% in terms of memory.
 
 \section{Summary}\label{sec:summaryeval}
 Out of the five protocol variants, network coded \gls{iwa} has proven to perform best. It entails the lowest percentages of failing
 transmissions while exhibiting a very competitive average latency. Both G2C3 and G2C4 are viable; while the former is slightly more error-prone, it
 simultaneously allows for considerably higher information rates, rendering the choice between the two largely application-dependent. However, it
-should be noted that the shorter authcodes employed here are not as secure as the longer \glspl{mac} used in the other protocols.
+should be noted that the authcodes employed here may not be as secure as the \glspl{mac} used in the other protocols since they are only 32 bit long
+(as opposed to the 64 bit of the \glspl{mac}).
 
 The choice of routing strategy is not as clear-cut as that of the protocol variant. The dynamic ones marginally reduce the error probability for
 network coded \gls{iwa}, but also entail slightly lower information rates. Furthermore, their alleged benefit is diminished by the network load being
@@ -683,6 +705,9 @@ investigated scenario, \gls{dor} seems like a solid choice, given its simplicity
 Increasing the \gls{arq} limit from 1 to 2 has yielded a significant improvement in terms of reliability. However, this coincides with lower
 information rates and slightly higher transmission latencies. Nevertheless, as a slower but successful transmission appears to be more practical than
 a fast, erroneous one, the outcome is considered an improvement.
+
+A surprising result was the deteriorating performance when network coding was added to the \gls{ida} protocol variant; it led to an increase in the
+number of residual errors. This was attributed to the relatively large transmission units that impede an effective use of the available \glspl{arq}.
 
 Overall, network coded interwoven authentication with dimension order routing and an \gls{arq} limit of 2 per transmission unit is inferred as the
 most effective protocol. With the relatively low network saturations investigated here, G2C4 is more suitable, but G2C3 may prove advantageous for

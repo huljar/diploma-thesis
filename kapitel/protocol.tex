@@ -211,7 +211,7 @@ omitting the XOR operation for the encryption case.
 If a sender were to encrypt all flits with the same receiver individually and independently (corresponding to the \textit{Electronic Codebook
 (\gls{ecb})} mode of operation), full confidentiality would not be achieved. Identical plaintext blocks would result in identical ciphertexts, giving
 away information to an eavesdropping adversary. As a solution, \textit{Counter Mode (\gls{ctr})} is employed instead of \gls{ecb}. Here, instead of
-encrypting the payload directly, a counter value is encrypted with the cipher, and the result is added to the message via bitwise XOR. This counter is
+encrypting the payload directly, a counter value is encrypted with the cipher, and the result is combined with the message via bitwise XOR. This counter is
 incremented for each successive flit. However, this scheme requires the receiver to decrypt the flits using the same values as the sender. If the counter is simply
 incremented by one for each successive flit, the loss of flits in transit may lead to a desynchronization between the sender and receiver. To
 eliminate this problem, the flit ID serves as the counter value, which is embedded in the flit header anyway. As encryption keys should be
@@ -342,7 +342,8 @@ form):
         \beta_{G-1,\,0} & \cdots & \beta_{G-1,\,G-1} & q_{G-1,\,0} & \cdots & q_{G-1,\,P-1}
     \end{bmatrix}
 \]
-The solution is obtained by applying Gaussian elimination until the matrix is in reduced row echelon form with the following structure:
+It is important to note that in the above matrix, any $G$ of the $C$ combination may be used, and in any order; the given indices are examplary. The
+solution of the system is obtained by applying Gaussian elimination until the matrix is in reduced row echelon form with the following structure:
 \[
     \begin{bmatrix}
         1 & & 0 & p_{0,\,0} & \cdots & p_{0,\,P-1} \\
