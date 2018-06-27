@@ -52,7 +52,7 @@ transmitted information. Uncoded flits have the following fields:
     \item \textbf{Destination X, Destination Y.} These fields also represent the address of a node in 2D cartesian coordinates. As opposed to the
         source fields, they describe the intended destination of the flit.
     \item \textbf{Mode.} The mode field indicates what type of data the flit contains. It signals to the receiver whether the flit contains, e.g.,
-        data, a \gls{mac}, or an \gls{arq}. There are a few more special modes that are explained in Section \ref{sec:theprotocol}. The
+        data, a \gls{mac}, or an \gls{arq}. There are a few more special modes that are explained in Section \ref{subsec:arqretransmissions}. The
         field size is 4 bit, allowing for 16 different modes. Not all of them are used for this thesis, so it is possible to define additional modes
         in a future work if necessary.
     \item \textbf{Address.} Not to be confused with the source and destination addresses described above, this field may contain a 32 bit memory
@@ -70,7 +70,7 @@ transmitted information. Uncoded flits have the following fields:
 
 When network coding is applied to a flit, the following fields are added:
 \begin{itemize}
-    \item \textbf{Generation ID.} Replacing the flit ID, the generation ID is also a 24 bit numeric idenfier. As network coding intermingles multiple
+    \item \textbf{Generation ID.} Replacing the flit ID, the generation ID is also a 24 bit numeric identifier. As network coding intermingles multiple
         flits, their original IDs become meaningless and are replaced by the generation ID (which is the same for all flits of a generation). Apart
         from this, they follow the same rules as the flit IDs described above.
     \item \textbf{Global Encoding Vector.} This field contains the global encoding vector used to create the flit when applying network coding. It is
@@ -115,12 +115,12 @@ The integration of cryptographic operations inevitably entails a degradation of 
 latencies and increased chip area requirements. There usually is a reversely proportional relation between performance and safety: as the level of security
 increases, the communication performance declines. In order to satisfy the protection goals of confidentiality and integrity, both encryption and
 authentication are required\footnote{Depending on the use case, it may be adequate to fulfill only one of these goals (or none at all), alleviating
-the performance drop caused by the security measures. For instance, a preceding work of this thesis concerns itself with providing only integrity in
+the performance drop caused by the security measures. For instance, the foundational work of this thesis concerns itself with providing only integrity in
 \glspl{noc} \cite{moriam18activeattackers}.}, resulting in a noticeable performance impact. In order to minimize these effects, several countermeasures
 are implemented:
 \begin{itemize}
     \item \textbf{Parallel modules.} As the cryptographic computations are the operations with the highest latencies in the network interfaces, they
-        threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple cryptographic modules are employed in each network
+        threaten to become a bottleneck and congest the traffic flow. To prevent this, multiple crypto modules are employed in each network
         interface. While this does not speed up the individual cryptographic computations, it allows for multiple flits to be processed in parallel. For
         instance, each network interface could have three encryption modules, allowing it to encrypt up to three flits simultaneously. Alas, this
         approach naturally increases the occupied chip area.
@@ -141,7 +141,7 @@ $p$ corresponds to the payload of flit $f$.} \cite{bellare00authenc}:
 \begin{itemize}
     \item \textbf{Encrypt-and-MAC (\gls{eam}).} The plaintext is encrypted and the \gls{mac} is computed over the plaintext. Afterwards, the \gls{mac} is
         appended to the ciphertext. More precisely, $r = e_{k_e}(p)\|a_{k_m}(f)$.
-    \item \textbf{MAC-then-Encrypt (\gls{mte}).} The \gls{mac} is computed over the plaintext and then appended to it. The result is then
+    \item \textbf{MAC-then-Encrypt (\gls{mte}).} The \gls{mac} is computed over the plaintext and appended to it. The result is then
         encrypted. In other words, $r = e_{k_e}(p\|a_{k_m}(f))$.
     \item \textbf{Encrypt-then-MAC (\gls{etm}).} First, the plaintext is encrypted. Subsequently, the \gls{mac} is computed over the ciphertext and appended to it.
         Namely, $c = e_{k_e}(p)$ and $r = c\|a_{k_m}(f_c)$ where $f_c$ refers to the flit with encrypted payload.
@@ -180,7 +180,7 @@ The cipher that is used for encryption, decryption, and authentication is \texti
 a block size of 64 bit and a key size of 128 bit, structured as a \textit{substitution-permutation network (\gls{spn})} with 12 rounds. Among its many
 competitors, it is the algorithm of choice because it has the lowest encryption and decryption latency with a competitive area requirement
 \cite{harttung17lightweightcrypto}. Here, low latency is deemed more important than low chip area requirements, rendering it a natural choice. Besides, the
-faster the algorithm runs, the less parallel modules may be required, potentialls reducing the overall area requirement in the end. Furthermore, with a
+faster the algorithm runs, the less parallel modules may be required, potentially reducing the overall area requirement in the end. Furthermore, with a
 key length of 128 bit, it provides relatively high security\footnote{Similar algorithms often have a key length of just 80 or 96 bit
 \cite[5]{harttung17lightweightcrypto}.}. To date, it remains unbroken despite monetary incentives to develop attacks \cite{princechallenge}.
 
@@ -189,9 +189,9 @@ strategy, each round is computed using its own dedicated part of the circuit. Th
 enables the algorithm to be executed within a single clock cycle. In contast, traditional iterative implementations of round-based ciphers usually
 have a single circuit constituting the round function that is reused for all rounds. There, one clock cycle per round is required.
 
-Although single-cycle execution suggests a tremendously low latency, the number of cycles cannot be directly mapped to execution speed. The long critical path
+Although single-cycle execution suggests a tremendously low latency, the number of cycles cannot be mapped directly to execution speed. The long critical path
 entailed by the chained round functions results in a relatively low maximum clock frequency. Furthermore, the unrolled design entails a comparatively
-higher area requirement than iterative ones; however, it is still \enquote{considerably lower than fully unrolled versions of \gls{aes} or PRESENT}
+higher area requirement than an iterative one; however, it is still \enquote{considerably lower than fully unrolled versions of \gls{aes} or PRESENT}
 \cite[3]{borghoff12prince}.
 
 The authors of PRINCE have investigated the maximum clock frequency of their algorithm under varying conditions. They were able to achieve 212.8 MHz
@@ -472,7 +472,7 @@ both sending to and receiving from the network are given in Figure \vref{fig:pro
     \caption[Uncoded ind. auth., outside view]{Outside view of the network interface for uncoded individual authentication. The processing of one
     transmission unit is depicted for both sending and receiving. For sending, the unencrypted flit $f_1$ results in the encrypted flit $f_1'$ and the
     corresponding \gls{mac} flit $m_1'$ being injected into the network. For receiving, the arrival of the encrypted flit $f_2'$ and its \gls{mac}
-    $m_2'$ results in the decrypted flit $f_2$ being sent to the processing element.}
+    $m_2'$ results in the decrypted flit $f_2$.}
     \label{fig:protflitdistindauthuc}
 \end{figure}
 

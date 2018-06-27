@@ -1,4 +1,4 @@
-In this thesis, a novel approach for securing the communications in a \gls{noc}-based \gls{mpsoc} is presented. The goal was to design and implement a protocol that
+In this thesis, a new approach for securing the communications in a \gls{noc}-based \gls{mpsoc} is presented. The goal was to design and implement a protocol that
 remedies both accidental and malicious modifications to the transmitted data as much as possible while meeting the performance requirements of a \gls{noc} (cf. Section
 \ref{sec:networkonchipfun}). Furthermore, confidentiality should be assured to prevent attackers from accessing the transmitted information. In this
 thesis, a scheme is envisioned and investigated that attempts to satisfy these ambitions by combining encryption and authentication techniques with
@@ -19,6 +19,7 @@ In Section \ref{sec:nocsecurity}, it was shown that attacks specifically tailore
 particular, hardware trojans pose a potent threat to \glspl{mpsoc} that incorporate \glspl{noc} as their communication backbone. Pure software attacks
 originating from a processing element are feasible as well \cites(e.g.)(){biswas15routerattack}{kocher04embeddedsecurity}, but go beyond the scope of
 this thesis and hence will not be considered here.
+\pagebreak
 
 There are a number of possible infection vectors that adversaries may try to exploit in order to covertly introduce a hardware trojan into a \gls{noc}
 implemented in an \gls{mpsoc}\footnote{Theoretically, the aforementioned infection vectors are not specific to \glspl{mpsoc} and \glspl{noc}, but
@@ -29,7 +30,7 @@ semiconductor \gls{oem} companies}
 \cites[1]{ancajas14fortnocs}[2]{bhunia14hardwaretrojans}. These third parties may have an interest in equipping their \gls{ip} with a hardware trojan,
 and their trustworthiness is usually not guaranteed \cite[3]{sethumadhavan15trustworthyhardware}.
 Another practical scenario is a rogue employee \enquote{subvert[ing] the design} \cite[3]{sethumadhavan15trustworthyhardware} of his
-company's product. For example, a hardware designer \enquote{participating in the design process} \cite[3]{sethumadhavan15trustworthyhardware} may
+company's product. For example, a hardware designer \enquote{participating in the design process} \cite[3]{sethumadhavan15trustworthyhardware} might
 secretly introduce a hardware trojan at one point. 
 
 The illustrated scenarios are not an exhaustive list of infection vectors, but they clearly corroborate the need for countermeasures. The ones pursued
@@ -38,7 +39,7 @@ for this thesis will be presented in the following sections.
 \section{Attacker Model}\label{sec:attackermodelover}
 For the experiments in this thesis, the threat of a compromised \gls{noc} is explored. More specifically, the routers may be infected by a hardware
 trojan, while the network interfaces are considered trustworthy. This is the same attacker model as the one used by \citeauthor{moriam18activeattackers}
-\cite{moriam18activeattackers} in the work preceding this thesis. It is based on the assumption that routers and their interconnections are
+\cite{moriam18activeattackers} in the foundational work of this thesis. It is based on the assumption that routers and their interconnections are
 more likely to be obtained from third party vendors than network interfaces, making them more susceptible to concealed hardware trojans. The reasoning
 for this is that \enquote{routers have a deterministic functionality} \cite[2]{moriam18activeattackers} that does not depend on the peculiarities of
 a specific system. In contrast, network interfaces often contain product-specific logic\footnote{For this thesis, product-specific logic is not
@@ -51,7 +52,7 @@ control} \cite[2]{moriam18activeattackers}, eliminating the attack vector of thi
     \includegraphics[width=0.5\textwidth]{noc-trust-boundaries}
     \caption[Trust boundaries in a NoC]{Visualization of the trusted and untrusted hardware components in a NoC. The processing elements and network
     interfaces, which are assumed to be trusted, are marked green. The network itself, which is comprised of the routers and their interconnections,
-    is not trustworthy and thus marked red. The dotted lines at the local connections mark the trust boundaries.}
+    is not trustworthy and thus marked red. The dotted lines at the local connections denote the trust boundaries.}
     \label{fig:noctrustboundaries}
 \end{figure}
 
@@ -133,7 +134,7 @@ first two, both uncoded and network coded variants are implemented. For the latt
 scheme relies on the existance of generations. A comprehensive description of all variants is given in Section \ref{sec:theprotocol}.
 
 \section{Analysis And Evaluation}
-All of the aforementioned protocol variants were implemented to empirically determine their quality and suitability for the task at hand. Many
+All of the aforementioned protocol variants were implemented to empirically determine their quality and suitability for the task at hand. Numerous
 experiments were conducted through software simulation of an \gls{mpsoc} with a \gls{noc} using varying parameters, component layouts, and design
 decisions.
 

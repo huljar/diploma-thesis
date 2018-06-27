@@ -21,6 +21,7 @@ charts, diagrams, and tables.
     \item \textbf{UC} is short for \textit{uncoded}, i.e., the lack of network coding, and
     \item \textbf{G2C3} and \textbf{G2C4} are used for the two network coding variants that were explained in Section \ref{sec:designnc}.
 \end{itemize}
+\pagebreak
 
 These short forms are often combined with a routing strategy when the setup of an experiment is described. For instance, \gls{ida}-UC-\gls{dor} stands for uncoded
 individual authentication using dimension order routing.
@@ -509,6 +510,7 @@ fruition and a considerable improvement is observed.
 In terms of average end-to-end latency, there is no clear best or worst strategy. They all perform similarly, but the discrepancies between the
 protocol variants are less severe for the dynamic strategies. Overall, \gls{dm} and \gls{ramm} seem to enable slightly faster transmissions than
 \gls{dor} and \gls{romm}.
+\pagebreak
 
 As mentioned above, the workload distribution among the routers varies with the different routing strategies. Thus, using the example of
 \gls{iwa}-G2C3, those discrepancies were analyzed and visualized in heatmaps. The simulation setup for this experiment is given in Table
@@ -655,6 +657,7 @@ Finally, the \glspl{rtb} that are necessary for retransmissions also increase th
         as well as the \glspl{arq}. However, such congestions are volatile and hard to estimate, so for the following calculation, they are not taken
         into account.
 \end{itemize}
+\vspace{\baselineskip}
 
 With \gls{noc} dimensions of 8x8, the highest Manhattan distance between two nodes is $d = 14$ hops. For an inter-arrival timeout of $t_1 = 12$ cycles, the
 highest post-\gls{arq} timeout is consequently $t_2 = t_1 + 2 \cdot 14 + 2 = 42$ cycles for network coded protocols (cf. Section
@@ -686,6 +689,7 @@ for an \gls{arq} limit of 2, \glspl{rtb} with a size of 20 flits are necessary.
     \label{tab:areaoverheads}
 \end{table}
 
+\vspace{0.5\baselineskip}
 Table \vref{tab:areaoverheads} gives a summary of the area overhead per network interface. To put these numbers into perspective, a state-of-the-art
 \gls{mpsoc} that implements a software-defined radio platform \cite{haas18sdrmpsoc} is used as a reference. It employs a relatively small hexagonal
 \gls{noc} with 10 network interfaces where the maximum distance between two nodes is 3 hops. Thus, it would only require an \gls{rtb} size of 11 flits
