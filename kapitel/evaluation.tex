@@ -141,7 +141,7 @@ lists all the variable input parameters.
 \begin{table}
     \centering
     \begin{tabulary}{\textwidth}{C|C|C}
-        Parameter name & Value range & Placeholder \\\hline
+        Parameter name & Value set/range & Placeholder \\\hline
         Protocol variant & $\{\text{\gls{ida}}, \text{\gls{iwa}}, \text{\gls{fga}}\}$ & \pProtVar{} \\
         Network coding & $\{\text{UC}, \text{G2C3}, \text{G2C4}\}$ & \pNCMode{} \\
         Routing strategy & $\{\text{\gls{dor}}, \text{\gls{dm}}, \text{\gls{romm}}, \text{\gls{ramm}}\}$ & \pRStrat{} \\
@@ -157,7 +157,6 @@ lists all the variable input parameters.
     that are used in subsequent experiment setups to represent the corresponding parameters.}
     \label{tab:inputparams}
 \end{table}
-% TODO: notation for integer/real intervals
 
 Each network interface contains a number of encryption and authentication modules. On the one hand, there need to be enough modules to process both
 departing and arriving flits quickly without incurring congestions. On the other hand, each additional module entails a higher area requirement for
@@ -188,7 +187,10 @@ for \gls{dor} is described.
 Finally, the properties of the attacking routers may be configured via the set of attackers and their attack probability. The set of attackers refers
 to one of the three sets described in Figure \ref{fig:attackerpositions}. A value of \textit{all} indicates that the experiments were conducted for
 each of the sets independently and the results are averaged across the three settings. If no attackers are present, \textit{none} is used. The attack
-probability parameter defines the likelihood for a malicious router to attack a flit as described above (Section \ref{sec:attackermodeleval}).
+probability parameter defines the likelihood for a malicious router to attack a flit as described above (Section \ref{sec:attackermodeleval}). For all
+experiments employing varying attack probabilities, values of $0.02i\ |\ i \in [0, 10] \cap \mathbb{N}$ and $0.1i\ |\ i \in [3, 5] \cap \mathbb{N}$
+were investigated. This allows for fine-grained analyses with low and medium probabilities up to 0.2 (which is the highest value explored by
+\citeauthor{moriam18activeattackers} \cite{moriam18activeattackers}) while also providing insights into the impact of higher probabilities up to 0.5.
 
 \section{Determining The Hyperparameters}\label{sec:hyperparamseval}
 \subsection{ARQ Timeouts}\label{subsec:arqtimeouts}
@@ -225,7 +227,7 @@ unnecessary \glspl{arq} will be used for the subsequent evaluations.
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida}   & varying    & 5           & 15           & unlimited  & 1            & varying        & \gls{dor}  & none            & 0              \\
     \end{tabulary}
-    \caption[Input parameters for ARQ timeouts experiment]{The input parameters for the simulator in the \gls{arq} timeouts experiment.}
+    \caption[Input parameters for the ARQ timeouts experiment]{The input parameters for the simulator in the \gls{arq} timeouts experiment.}
     \label{tab:setuparqtimeouts}
 \end{table}
 
@@ -239,12 +241,12 @@ the baseline for all experiments before evaluating the effects of other routing 
 \begin{figure}
     \centering
     \input{gnuplot/plots/arqtimeouts}
-    \caption[Results for ARQ timeouts experiment]{Results for the experiment to determine the \gls{arq} inter-arrival timeout. The number of \gls{arq}
+    \caption[Results for the ARQ timeouts experiment]{Results for the experiment to determine the \gls{arq} inter-arrival timeout. The number of \gls{arq}
     issued on average per source flit is shown for various timeout values.}
     \label{fig:resultsarqtimeouts}
 \end{figure}
 
-Figure \vref{fig:resultsarqtimeouts} presents the number of \glspl{arq} issued for $t_1 \in [3, 15]$ clock cycles. The values are shown in relation to
+Figure \vref{fig:resultsarqtimeouts} presents the number of \glspl{arq} issued for $t_1 \in [3, 15] \cap \mathbb{N}$ clock cycles. The values are shown in relation to
 the number of created source flits instead of the number of transmission units as the size of the latter varies significantly depending on the network
 coding scheme. For timeout values of 12 or greater, less than 1 \gls{arq} per 100 source flits is sent, which is considered sufficiently small here.
 Hence, $t_1 = 12$ is chosen and used in all future experiments.
@@ -265,7 +267,7 @@ during such periods, the flits should not suffer unreasonably high delays.
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         varying     & varying    & varying     & varying      & unlimited  & 1            & 12             & \gls{dor}  & 1               & 0.2            \\
     \end{tabulary}
-    \caption[Input parameters for number of crypto modules experiment]{The input parameters for the simulator in the experiment to determine the
+    \caption[Input parameters for the number of crypto modules experiment]{The input parameters for the simulator in the experiment to determine the
     number of required crypto modules.}
     \label{tab:setupnumcrypto}
 \end{table}
@@ -294,7 +296,7 @@ computation). Hence, at most 11 modules are required for this variant.
         \input{gnuplot/plots/encmodules-iwa} & \input{gnuplot/plots/authmodules-iwa.tex} \\
         \input{gnuplot/plots/encmodules-fga} & \input{gnuplot/plots/authmodules-fga.tex}
     \end{tabular}
-    \caption[Results for number of crypto modules experiment]{Results for the experiment to determine the number of required crypto modules. The
+    \caption[Results for the number of crypto modules experiment]{Results for the experiment to determine the number of required crypto modules. The
     number of encryption modules (left column) and authentication modules (right column) is shown in relation to the maximum and average wait times of
     enqueued flits. Each row represents one protocol version with all applicable network coding modes.}
     \label{fig:resultscryptomodules}
@@ -324,7 +326,7 @@ investigated for varying size limits of the former.
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida} & varying & 3 & 9 & varying & 1 & 12 & \gls{dor} & 1 & 0.2 \\
     \end{tabulary}
-    \caption[Input parameters for router queue sizes experiment]{The input parameters for the simulator in the experiment to determine the size of the
+    \caption[Input parameters for the port queue sizes experiment]{The input parameters for the simulator in the experiment to determine the size of the
     routers' port queues.}
     \label{tab:setupqueuesizes}
 \end{table}
@@ -339,7 +341,7 @@ the network load.
     \begin{tabular}{cc}
         \input{gnuplot/plots/queuelengths-ports} & \input{gnuplot/plots/queuelengths-local}
     \end{tabular}
-    \caption[Results for router queue lengths experiment]{Results for the experiment to find an appropriate size for the routers' port queues. The
+    \caption[Results for the port queue sizes experiment]{Results for the experiment to find an appropriate size for the routers' port queues. The
     effect of restricting their size is shown in relation to both the lengths of the port queues themselves (left) and the lengths of the local queues
     (right).}
     \label{fig:resultsqueuelengths}
@@ -362,9 +364,9 @@ the consequences of increasing the \gls{arq} limit to 2 are investigated.
 
 \subsection{Criteria}\label{subsec:criteria}
 To facilitate comparisons of the obtained results with previous research at the Chair of Privacy and Data Security of the TU Dresden, the metrics of
-\citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} are all adopted for the evaluation here. Those are the acceptance rate, the
-information rate, and the residual error probability. As an additional metric, the average end-to-end latency of source flits is employed. The following list elaborates on the
-details of these metrics:
+\citeauthor{moriam18activeattackers} \cites{moriam15manycorenc}{moriam18activeattackers} are all adopted for the evaluation here. Those are the
+acceptance rate, the information rate, the residual error probability, and the average end-to-end latency of source flits. The following list
+elaborates on the details of these metrics:
 \begin{itemize}
     \item \textbf{Acceptance rate.} The base network injection rate specifies the number of flits that are injected into the network per clock cycle
         per node. However, it excludes \glspl{arq} and retransmissions (cf. Section \ref{sec:environmenteval}), whose number rises with increasing
@@ -394,14 +396,15 @@ comparisons once more. The full list of input parameters is given in Table \vref
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         varying & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor} & all & varying \\
     \end{tabulary}
-    \caption[Input parameters for protocol variant experiment]{The input parameters for the simulator in the experiment to compare the five protocol
+    \caption[Input parameters for the protocol variant comparisons]{The input parameters for the simulator in the experiment to compare the five protocol
     variants.}
     \label{tab:setupprotvarexperiment}
 \end{table}
 
 The results are presented in Figure \vref{fig:resultsprotvarexperiment}. The four criteria -- acceptance rate, information rate, residual error
-probability, and average end-to-end latency -- were investigated for various attack probabilities ranging from 0 to 0.5 to illustrate both the impact
-of attackers on the communications and the capability of the different protocol variants to mitigate this impact.
+probability, and average end-to-end latency -- were investigated for various attack probabilities ranging from 0 to 0.5 (cf. Section
+\ref{sec:configurations}) to illustrate both the impact of attackers on the communications and the capability of the different protocol variants to
+mitigate this impact.
 
 \begin{figure}
     \centering
@@ -409,7 +412,7 @@ of attackers on the communications and the capability of the different protocol 
         \input{gnuplot/plots/main-acceptancerate} & \input{gnuplot/plots/main-informationrate} \\
         \input{gnuplot/plots/main-residualerror} & \input{gnuplot/plots/main-endtoendlatency}
     \end{tabular}
-    \caption[Results for protocol variant experiment]{Results of the experiment where the five protocol variants are compared. The defined criteria
+    \caption[Results for the protocol variant comparisons]{Results of the experiment where the five protocol variants are compared. The defined criteria
     are shown in relation to varying attack probabilities. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsprotvarexperiment}
 \end{figure}
@@ -471,7 +474,7 @@ the routing strategy is examined. All variants of \gls{iwa} are tested with each
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & varying & 3 & 9 & 6 & 1 & 12 & varying & 1 & varying \\
     \end{tabulary}
-    \caption[Input parameters for routing strategies experiment]{The input parameters for the simulator in the experiment to compare the four routing
+    \caption[Input parameters for the routing strategies comparisons]{The input parameters for the simulator in the experiment to compare the four routing
     strategies.}
     \label{tab:setuproutingstratexperiment}
 \end{table}
@@ -482,7 +485,7 @@ the routing strategy is examined. All variants of \gls{iwa} are tested with each
         \input{gnuplot/plots/strategies-acceptancerate} & \input{gnuplot/plots/strategies-informationrate} \\
         \input{gnuplot/plots/strategies-residualerror} & \input{gnuplot/plots/strategies-endtoendlatency}
     \end{tabular}
-    \caption[Results for routing strategies experiment]{Results of the experiment where the four routing strategies are compared. The defined criteria
+    \caption[Results for the routing strategies comparisons]{Results of the experiment where the four routing strategies are compared. The defined criteria
     are shown in relation to varying attack probabilities. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsroutingstratsexperiment}
 \end{figure}
@@ -517,7 +520,7 @@ As mentioned above, the workload distribution among the routers varies with the 
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & G2C3 & 3 & 9 & 6 & 1 & 12 & varying & 1 & 0.2 \\
     \end{tabulary}
-    \caption[Input parameters for routing heatmap comparison]{The input parameters for the simulator in the experiment to determine the network load
+    \caption[Input parameters for the router workload comparison]{The input parameters for the simulator in the experiment to determine the network load
     distribution for each routing strategy.}
     \label{tab:setuproutingheatmaps}
 \end{table}
@@ -554,7 +557,7 @@ Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{ida}, \gls{fga} & varying & 3 & 9 & 6 & 1 & 12 & \gls{dor}, \gls{dm} & 1 & varying \\
     \end{tabulary}
-    \caption[Input parameters for comparing DOR and DM]{The input parameters for the simulator in the experiment where the routing strategies
+    \caption[Input parameters for the DOR and DM comparisons]{The input parameters for the simulator in the experiment where the routing strategies
     \gls{dor} and \gls{dm} are juxtaposed.}
     \label{tab:setuproutingdorvsdm}
 \end{table}
@@ -565,7 +568,7 @@ Table \vref{tab:setuproutingdorvsdm}, the input parameters for the simulator are
         \input{gnuplot/plots/dorvsdm-acceptancerate} & \input{gnuplot/plots/dorvsdm-informationrate} \\
         \input{gnuplot/plots/dorvsdm-residualerror} & \input{gnuplot/plots/dorvsdm-endtoendlatency}
     \end{tabular}
-    \caption[Results for the DOR and DM comparison]{Results of the experiment where the routing strategies \gls{dm} and \gls{dor} are juxtaposed. The
+    \caption[Results for the DOR and DM comparisons]{Results of the experiment where the routing strategies \gls{dm} and \gls{dor} are juxtaposed. The
     defined criteria are shown in relation to varying attack probabilities. The charts do not include \gls{iwa} since this variant is already
     presented in Figure \ref{fig:resultsroutingstratsexperiment}. It should be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsroutingdorvsdm}
@@ -590,7 +593,7 @@ visualizes the simulation results.
         \pProtVar{} & \pNCMode{} & \pEncMods{} & \pAuthMods{} & \pRQSize{} & \pARQLimit{} & \pARQTimeout{} & \pRStrat{} & \pAttackerSet{} & \pAttackProb{} \\\hline
         \gls{iwa} & varying & 3 & 9 & 6 & varying & 12 & \gls{dor} & 1 & varying \\
     \end{tabulary}
-    \caption[Input parameters for comparing different ARQ limits]{Input parameters for comparing ARQ limits 1 and 2 for \gls{iwa}.}
+    \caption[Input parameters for the ARQ limit comparisons]{Input parameters for comparing ARQ limits 1 and 2 for \gls{iwa}.}
     \label{tab:setuparqlimits}
 \end{table}
 
@@ -600,7 +603,7 @@ visualizes the simulation results.
         \input{gnuplot/plots/arqlimits-acceptancerate} & \input{gnuplot/plots/arqlimits-informationrate} \\
         \input{gnuplot/plots/arqlimits-residualerror} & \input{gnuplot/plots/arqlimits-endtoendlatency}
     \end{tabular}
-    \caption[Results for the ARQ limit comparison]{Results of the experiment where the \gls{arq} limit was increased. For the protocol
+    \caption[Results for the ARQ limit comparisons]{Results of the experiment where the \gls{arq} limit was increased. For the protocol
     variant \gls{iwa}, the effect of raising the \gls{arq} limit to 2 is shown, while the results for limit 1 are included for comparison. It should
     be noted that the scale of the X axes changes at 0.2.}
     \label{fig:resultsarqlimits}
@@ -657,8 +660,8 @@ With \gls{noc} dimensions of 8x8, the highest Manhattan distance between two nod
 highest post-\gls{arq} timeout is consequently $t_2 = t_1 + 2 \cdot 14 + 2 = 42$ cycles for network coded protocols (cf. Section
 \ref{subsec:arqtimeouts}). Assuming \gls{ida}-G2C4 as the protocol variant (since it has the largest transmission units) and no network congestion,
 the 8 flits that comprise a generation arrive within 8 consecutive clock cycles at the receiver. Since the inter-arrival timeout $t_1$ is longer than
-the time required for verifications, the case of flit losses is the one of interest. Here, the scenario where only the first and last flit arrive is
-considered. An
+the time required for verifications, the case of flit losses is the one of interest. For the following calculations, the scenario where only the first
+and the last flit arrive is considered. An
 \gls{arq} will be issued $d + 8 + t_1$ cycles after the first flit was injected into the network, and it will arrive at the sender after $2d + 8 +
 t_1 = 48$ cycles. Hence, each flit needs to reside for at least 48 cycles within the \gls{rtb} for an \gls{arq} limit of 1. With a base network
 injection rate of 0.2, 9.6 further flits are on average injected into the network during this timespan. Thus, an \gls{rtb} size of 10 flits is
@@ -666,7 +669,7 @@ required to have no requested flit already overwritten once the \gls{arq} arrive
 arrives needs to be taken into account. Assuming that with the first \gls{arq}, six flits were retransmitted, but all except the last one are lost in
 transit, this timespan amounts to $d + 8 + t_1 + d + 2 + d + 6 + t_1 + d = 4d + 2t_1 + 16 = 96$ cycles. This formula includes the time until the first
 \gls{arq} arrives as well as the \gls{rtb} lookup time (2 cycles) and the time until the last of the six retransmitted flits arrives at the receiver
-($d + 6$ cycles). Note that $t_2$ does nor occur in the formula since the arrival of the one successful retransmission increases the \gls{arq} timer
+($d + 6$ cycles). Note that $t_2$ does nor occur in the formula since the arrival of the one successful retransmission sets the \gls{arq} timer
 to $t_1$ again. During the calculated period of 96 cycles, 19.2 more flits are injected into the network on average. Hence,
 for an \gls{arq} limit of 2, \glspl{rtb} with a size of 20 flits are necessary.
 
@@ -684,7 +687,7 @@ for an \gls{arq} limit of 2, \glspl{rtb} with a size of 20 flits are necessary.
 \end{table}
 
 Table \vref{tab:areaoverheads} gives a summary of the area overhead per network interface. To put these numbers into perspective, a state-of-the-art
-\gls{mpsoc} that implements a software-defined radio platform \cite{haas18sdrmpsoc} is used as a reference. They employ a relatively small hexagonal
+\gls{mpsoc} that implements a software-defined radio platform \cite{haas18sdrmpsoc} is used as a reference. It employs a relatively small hexagonal
 \gls{noc} with 10 network interfaces where the maximum distance between two nodes is 3 hops. Thus, it would only require an \gls{rtb} size of 11 flits
 (amounting to approximately 205 bytes of memory) for \gls{arq} limit 2 assuming the same base network injection rate of 0.2. As their \gls{mpsoc} encompasses 24.43
 million \gls{ge} of chip area and 844 kB memory \cite[4]{haas18sdrmpsoc}, the protocol would impose a total area overhead of approximately 4.4\% in

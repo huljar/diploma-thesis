@@ -1,4 +1,4 @@
-The concepts that are explored, implemented, and evaluated in this thesis have been the subject of much research in recent years. This chapter aims to
+Many concepts that are explored and implemented in this thesis have been the subject of intensive research in recent years. This chapter aims to
 summarize the important and relevant works and papers that have been published concerning these topics. Beginning with security in \gls{noc}
 environments, many different attack scenarios and the proposed corresponding defenses are highlighted. Afterwards, advances in network coding with
 respect to its application in \glspl{noc} are presented. Following this, the work preceding this thesis is introduced, which gives an overview of
@@ -11,7 +11,7 @@ general-purpose on-chip networks has been introduced in the early 2000s
 \cite[e.g.][]{ivanov05nocintroduction}. 
 
 However, with rising popularity, the interest of adversaries to compromise such systems also grows. In recent research, many different attack vectors
-on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed to mitigate attacks. The following sections will
+on \gls{noc} architectures have been explored, and a variety of countermeasures have been proposed to mitigate attacks. The following sections
 explore them in detail.
 
 \subsection{Security Zones}\label{subsec:securityzones}
@@ -32,13 +32,13 @@ on power spikes.
 
 \citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc} have pursued a similar approach. They also separate the cores into secure and non-secure
 ones and propose to implement authenticated encryption in the network interfaces. While the secure
-cores employ permanent keys to communicate with each other, the non-secure ones may use plain text messages. Additionally, in order to allow
+cores employ permanent keys to communicate with each other, the non-secure ones may use plaintext messages. Additionally, in order to allow
 communication between the security zones, sessions may be established with individually generated session keys. Furthermore, the authors employ
 traffic limitations in the network interfaces to prevent \gls{dos} attacks by malicious cores, while access rights tables prohibit unauthorized
 memory accesses.
 
 Another work that revolves around security zones in \glspl{noc} was published by \citeauthor{fernandes16nocrouting} \cite{fernandes16nocrouting}.
-However, in contrast to the papers presented above, they deem the underlying hardware to be secure. Assuming that \enquote{software attacks account
+In contrast to the papers presented above, they deem the underlying hardware to be secure. Assuming that \enquote{software attacks account
 for 80\% of security incidents in embedded systems} \cite[1]{fernandes16nocrouting}, their work focuses on the defense against software-based
 \gls{dos} and timing attacks.
 
@@ -57,13 +57,13 @@ integrating malicious components. The methods in both works are not specific to 
 % Fort-NoCs
 \citeauthor{ancajas14fortnocs} \cite{ancajas14fortnocs} have investigated the threat of hardware trojans specifically for \glspl{noc}. They show that the usage of
 third party \gls{noc} \gls{ip} is very popular due to cost efficiency, opening up a practical infection vector for hardware
-trojans. Together with a software accomplice (i.e. an infected processing element) that can send commands to the trojan, this may
-lead to information leaks, data corruption or denial of service attacks.
+trojans. Together with a software accomplice (i.e., an infected processing element) that can send commands to the trojan, this may
+lead to information leaks, data corruption, or denial of service attacks.
 
 The authors focus on mitigating \enquote{covert data theft by a compromised \gls{noc}} \cite[3]{ancajas14fortnocs}. They suggest a three-layer
 approach to mitigate this threat, consisting of data scrambling, packet certification, and node obfuscation. These techniques are
-implemented solely in the network interfaces, which are not provided by a third party and hence assumed to be trustworthy. The goal of these measures
-is to prevent activation of the hardware trojan and render transmitted information unreadable to the attacker.
+implemented solely in the network interfaces, which are not provided by a third party and hence are assumed to be trustworthy. The goal of these measures
+is to prevent the activation of the hardware trojan and render transmitted information unreadable to the attacker.
 
 % Hardened NoC design
 \citeauthor{frey17hardenednoc} \cite{frey17hardenednoc} also worked on mitigating the effect of hardware trojans in a \gls{noc}. Their goal is to
@@ -82,9 +82,9 @@ prevents (or at least detects) small and targeted modifications to the flit head
 \gls{amd} codes for sensitive data and \gls{crc} for \enquote{all other non-critical traffic} \cite[2]{boraten16packetsecurity}. First introduced in 2008
 \cite{cramer08amdcodes}, \gls{amd} codes are capable of \enquote{[detecting] any tampering by an adversary} \cite[1]{cramer08amdcodes}.
 
-Following up on their previous work, the authors published a 2018 paper \cite{boraten18mitigationdos} that refines their methods to faciliate hardware
+Following up on their previous work, the authors published a 2018 paper \cite{boraten18mitigationdos} that refines their methods to facilitate hardware
 trojan detection and mitigation. In contrast to many of the previously presented works \cites(e.g.)(){ancajas14fortnocs}{frey17hardenednoc}, they aim
-to first detect a potential hardware trojan before activating further security measures. The described attacker model employs fault injections to
+to first detect the presence of a potential hardware trojan before activating further security measures. The described attacker model employs fault injections to
 intentionally trigger responses from the error correction codes (like the \gls{amd} code explored earlier \cite{boraten16packetsecurity}), thus
 performing a \gls{dos} attack.
 
@@ -108,7 +108,7 @@ this domain-based routing with very low latency, making this security measure pr
 
 \section{Network Coding For Network-On-Chip}\label{sec:ncfornoc}
 The integration of network coding into \gls{noc} architectures is a relatively new field of research. It was briefly mentioned a decade ago by
-\citeauthor{fragouli08ncapplications} \cite{fragouli08ncapplications}, where emerging network coding applications are discussed. However, it was
+\citeauthor{fragouli08ncapplications} \cite{fragouli08ncapplications}, where emerging network coding applications were discussed. However, it was
 mostly seen as a method to help \enquote{simplify and minimize the length of on-chip wiring} \cite[260]{fragouli08ncapplications}, rather than as a
 robustness measure. In recent years, several works have been published that investigate the applicability and practicality of network coding for
 \glspl{noc}.
@@ -119,8 +119,8 @@ To transfer the advantages of this particular setup to \glspl{noc}, he focuses o
 mapping them onto the underlying architecture by finding appropriate intermediate nodes.
 
 Following up on this idea, \citeauthor{shalaby12nodeselection} \cite{shalaby12nodeselection} have also looked into finding butterfly arrangements in
-\glspl{noc}. Their emphasis lies on enhancing the selection of the intermediate nodes and the way this choice impacts network performance. While
-evaluation showed only modest performance improvements, their results \enquote{confirm the great potential of network coding to improve \gls{noc}
+\glspl{noc}. Their emphasis lies on enhancing the selections of the intermediate nodes and the way these choices impact network performance. While
+evaluation yielded only modest improvements, their results \enquote{confirm the great potential of network coding to improve \gls{noc}
 performance} \cite[5]{shalaby12nodeselection}.
 
 \citeauthor{duongba11ncinmulticore} \cite{duongba11ncinmulticore} have examined network throughput and latency for multi-core processors when applying
@@ -130,7 +130,7 @@ multicast communication in saturated networks, however, the average latency was 
 
 \citeauthor{xue15ncnoc} \cite{xue15ncnoc} have integrated network coding into a \gls{noc} architecture for multicast communications. They propose to
 send both encoded and regular flits of the same packets into the network, creating a redundant transmission. This introduces benefits during the
-routing of the flits, like allowing to drop some flits to potentially prevent network congestion.
+routing of the flits, like allowing to drop some of them in order to potentially prevent network congestion.
 
 The goal of \citeauthor{vonbun13nchopcount} \cite{vonbun13nchopcount} is to improve the evaluation of the impact that network coding has on
 \glspl{noc}. According to the authors, previous works mostly used specific evaluation metrics tailored to the investigated approach, such as only
@@ -143,16 +143,16 @@ In a recent work at the TU Dresden, \citeauthor{moriam15manycorenc} \cite{moriam
 a unicast setting. They argue that many transmission errors may occur \enquote{due to dynamic variations of voltage and temperature}
 \cite[1]{moriam15manycorenc}, leading to a large number of retransmissions and thus a severe degradation of \gls{noc} performance. In their work, they
 have analyzed how different variants of network coding may remedy this situation. Using a \enquote{cycle-accurate \gls{noc} traffic simulator}
-\cite[3]{moriam15manycorenc}, several performance metrics such as average latency and information rate were examined. The results show significant
-improvements for error-prone transmissions, but decreased performance in reliable networks.
+\cite[3]{moriam15manycorenc}, several performance metrics such as average latency and information rate\footnote{The information rate describes the
+amount of transmitted information in relation to the total number of flits.} were examined. The results show significant improvements for error-prone
+transmissions, but decreased performance in reliable networks.
 
 Following up on this research, \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} have constructed an authentication layer on top of
 their network coding system. Seeking to ensure the integrity of messages, they employ \enquote{lightweight message authentication codes (\glspl{mac})
-to guarantee detection of modification} \cite[1]{moriam18activeattackers} like faults injected by compromised routers. In case an integrity breach is
-detected by a receiver, an \gls{arq} is issued back to the sender to request retransmission of the affected flits. The infected routers are assumed to
+to guarantee detection of modification} \cite[1]{moriam18activeattackers}, such as faults injected by compromised routers. In case an integrity breach is
+detected by a receiver, an \gls{arq} is issued back to the sender to request the retransmission of the affected flits. The infected routers are assumed to
 be randomly distributed among the network and to constitute only a small portion of the routers. Their evaluation shows that network coding is able to
-significantly reduce the number of required retransmissions and the residual error probability at the cost of a lower information rate\footnote{The
-information rate describes the amount of transmitted information in relation to the total number of flits.}.
+significantly reduce the number of required retransmissions and the residual error probability at the cost of a lower information rate.
 
 Since this thesis seeks to build upon their work, some concepts of \citeauthor{moriam18activeattackers} can be found here as well. Their network coding
 scheme was reimplemented, which is elaborated in Section \ref{sec:designnc}. Additionally, the authentication methods that they experimented with
@@ -163,18 +163,16 @@ described in Section \ref{subsec:criteria}.
 In order to fulfill the protection goals discussed in Section \ref{sec:protectiongoals}, the addition of encryption and authentication to
 the communication passing through a \gls{noc} suggests itself. However, care needs to be taken to stay within the latency, area, and power constraints
 of this environment (cf. Section \ref{sec:networkonchipfun}). As standard cryptographic algorithms, such as \gls{aes}, are usually not efficient
-enough for this task \cite[1]{bogdanov07present}, novel designs that meet these requirements have become essential for the implementation of
-cryptographic protection measures.
+enough for this task \cite[1]{bogdanov07present}, novel designs have become essential for the implementation of cryptographic protection measures.
 
 In an analysis conducted prior to this thesis, lightweight cryptographic algorithms were thoroughly explored \cite{harttung17lightweightcrypto}. Such
 algorithms are
 specifically designed to enable efficient hardware implementations with low area and power requirements. In addition, they aim to have a small
 computation delay while still providing an adequate level of security. Examples of such algorithms are PRESENT \cite{bogdanov07present},
-mCrypton \cite{lim06mcrypton} (which is used by \citeauthor{moriam18activeattackers} \cite[3]{moriam18activeattackers}), PRINCE \cite{borghoff12prince},
-and Klein \cite{gong12klein}.
+mCrypton \cite{lim06mcrypton}, PRINCE \cite{borghoff12prince}, and Klein \cite{gong12klein}.
 
-The algorithms are evaluated and compared in terms of latency and chip area requirements. A dedicated \gls{fpga} implementation for each algorithm
-was used to allow for a fair comparison. PRESENT required the least chip area, while PRINCE managed to be the fastest to encrypt a block.
+The algorithms were evaluated and compared in terms of latency and chip area requirements. A dedicated \gls{fpga} implementation for each algorithm
+was used to allow for a fair comparison. PRESENT was found to occupy the least chip area, while PRINCE managed to be the fastest.
 Additionally, the large discrepancy of \gls{aes} to the lightweight algorithms was confirmed, cementing its ineptitude for the task at hand.
 
 \section{Assessment And Significance}\label{sec:assandsig}
@@ -182,7 +180,7 @@ Overall, the studies presented in the sections above corroborate the importance 
 communications. Furthermore, the feasibility of network coding and cryptography in \gls{noc} architectures was confirmed.
 
 In Section \ref{sec:nocsecurity}, a variety of attack vectors and proposed countermeasures was explored. While the approaches based on security zones
-look very promosing, they suggest a classification of communications into sensitive and nonsensitive and emphasize the isolation of data between these two
+look very promising, they suggest a classification of communications into sensitive and nonsensitive ones and emphasize the isolation of data between these two
 categories. However, such a separation seems difficult in practice, especially when third party \gls{ip} is used throughout the whole network. Thus, a
 holistic approach appears to be more desirable. Still, the cryptographic protections, such as the authenticated encryption proposed by
 \citeauthor{kapoor13nocauthenc} \cite{kapoor13nocauthenc}, are closely related to the ideas pursued in this thesis\footnote{To implement authenticated
@@ -209,8 +207,9 @@ thesis is inspired by their concept. Furthermore, the combination of network cod
 \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers} proves that such an approach is feasible and able to effectively provide integrity
 in a partially compromised \gls{noc}. However, their implementation requires 18 parallel cryptographic modules per network interface, resulting in a
 noticeable area overhead.
+\pagebreak
 
-Finally, the work preceding this thesis was presented in Section \ref{sec:lightweightcrypto}. It confirmed the applicability of lightweight
+Finally, the work preceding this thesis was presented in Section \ref{sec:lightweightcrypto}. It confirms the applicability of lightweight
 cryptographic algorithms in constrained hardware environments (such as \glspl{noc}). Especially the PRINCE algorithm is of high interest due to its
 low latency, which is a direct requirement for efficient communication\footnote{Since low area is also a requirement, PRESENT is of a similar
 interest. However, latency was deemed more important than area. The reasoning is explained in Section \ref{subsubsec:prince}.} (cf. Section

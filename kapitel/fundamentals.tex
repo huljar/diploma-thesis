@@ -18,22 +18,22 @@ In a 2D mesh, each node is connected to its four neighbors (excluding the ones l
 
 A node consists of a processing element\footnote{As already mentioned, other types of cores are also possible. Since only processing elements are of
 relevance to this thesis, no further distinctions will be made.}, a network interface, and a router \cite{dally01routepacketsnotwires}. The processing
-element executes applications that require it to be able to send and receive messages. The network interface facilitates this by connecting the
+element executes applications that generally require it to be able to send and receive messages. The network interface facilitates this by connecting the
 processing element to the router. Finally, the router manages the interconnections with neighboring nodes and the local processing element. It is also
 responsible for forwarding incoming messages towards their destinations. An example of this architecture is given in Figure \vref{fig:nocexample}.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.6\textwidth]{noc-3x3-colored}
-    \caption[Example of a 3x3 mesh NoC]{Example of a Network-on-Chip in a 2D mesh topology of size 3x3. The processing elements (red) contain a network interface
-    (green) through which they are connected to a router (blue). The routers are interconnected as a 2D mesh.}
+    \caption[Example of a 3x3 mesh NoC]{Example of a Network-on-Chip in a 2D mesh topology of size 3x3. The processing elements (\gls{pe}) contain a network interface
+    (\gls{ni}) through which they are connected to a router (R). The routers are interconnected as a 2D mesh.}
     \label{fig:nocexample}
 \end{figure}
 
-Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are disadvantages entailed by
+Compared to traditional bus-based interconnect systems, \glspl{noc} provide a lot of advantages\footnote{There are also disadvantages entailed by
 the use of \glspl{noc} over bus-based systems, such as incompatibility with bus-oriented \glspl{ip}, but research has shown them to be outweighed
-by the benefits. \citeauthor{tatas16designingnocs} \cite[6]{tatas16designingnocs} give a detailed comparison.}, especially for many-core systems
-\cite[5\psqq]{tatas16designingnocs}. A significant advantage is scalability: since the cores do not share a global bus, \enquote{local performance is not
+by the benefits. \citeauthor{tatas16designingnocs} give a detailed comparison \cite[6]{tatas16designingnocs}.}, especially for many-core systems
+\cite[5\psqq]{tatas16designingnocs}. A significant benefit is scalability: since the cores do not share a global bus, \enquote{local performance is not
 degraded} \cite[6]{tatas16designingnocs} as more components are added, and \enquote{aggregated bandwidth scales with the network size}
 \cite[6]{tatas16designingnocs}.
 
@@ -53,7 +53,7 @@ algorithms and single-cycle routing are pursued to meet these criteria. They are
 \ref{ch:implementation}.
 
 While the term \textit{\gls{noc}} originally refers to the interconnection paradigm, it is also often used in reference to actual on-chip networking
-hardware that follows this paradigm. Throughout this thesis, it will usually be used to denote the networking hardware.
+hardware that follows this paradigm. Throughout this thesis, it will mostly be used to denote the networking hardware.
 
 \section{Protection Goals}\label{sec:protectiongoals}
 % Confidentiality, integrity, availability
@@ -65,8 +65,8 @@ malicious, are detected, for instance through authentication techniques. Finally
 achieved via methods like backup systems and redundant hardware.
 
 Naturally, in \gls{noc} architectures, it is desirable to fulfill these goals\footnote{The necessity for security measures was demonstrated in
-related research, which is elaborated in Section \ref{sec:nocsecurity}.}. In this thesis, confidentiality and integrity through encryption and
-authentication, respectively, are examined.
+related research, which is elaborated in Section \ref{sec:nocsecurity} and reiterated in Section \ref{sec:necessityofsecurity}.}. In this thesis,
+confidentiality and integrity through encryption and authentication, respectively, are examined.
 
 \section{Hardware Trojans}\label{sec:hardwaretrojans}
 % What are HTs, why can they get into other hardware, what are their properties
@@ -74,20 +74,19 @@ Hardware trojans are \enquote{malicious modifications of electronic hardware} \c
 system behavior or to extract sensitive information. The introduction of hardware trojans into larger systems (such as \glspl{mpsoc}) is possible
 through a number of different infection vectors (see Section \ref{sec:necessityofsecurity} for details).
 
-In order to remain undetected, attackers aim to construct hardware trojans that are \enquote{stealthy in nature} \cite[1]{bhunia14hardwaretrojans}
+In order to remain undetected, adversaries aim to construct hardware trojans that are \enquote{stealthy in nature} \cite[1]{bhunia14hardwaretrojans}
 and \enquote{evade […] detection through conventional postmanufacturing test} \cite[1]{bhunia14hardwaretrojans}. Hardware trojans are usually in a
 dormant state until they are activated by a trigger signal to carry out their task \cites{bhunia14hardwaretrojans}{ancajas14fortnocs}. While the
 trojan is inactive, communications through the \gls{noc} are unaffected and the system operates normally.
 
 \section{Flow Control Units}\label{sec:flitsfun}
-\textit{Flow control units (flits)} are small pieces of data that are sent over a network. Employed as an atomic unit of transmission, they are
-usually created by breaking a larger
-packet down into multiple parts to allow for their individual transfer \cite[6]{flitslecturecmu}. Each flit contains a set of header fields (such as source and
+\textit{Flow control units (flits)} are small pieces of data that are sent over a network. They are usually created by breaking a larger
+packet down into multiple parts to allow for their individual transmission \cite[6]{flitslecturecmu}. Each flit contains a set of header fields (such as source and
 destination address, sequence number, or identifier) that are required for routing and handling by the receiver \cite[2]{flitslectureutah}.
-In addition, it contains a payload that carries the actual information to be transmitted.
+In addition, it contains a payload that carries the actual information to be transferred.
 
-In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}. Details on how flits
-are employed in the protocol devised in this thesis can be found in Chapter \ref{ch:protocol}.
+In the context of \glspl{noc}, flits are often used as the standard unit of transmission \cite[51\psqq]{tatas16designingnocs}, which is the case for
+this thesis as well. Details on how flits are employed in the devised communication protocols can be found in Chapter \ref{ch:protocol}.
 
 \section{Automatic Repeat Requests}\label{sec:arqs}
 When reliable data transmissions over an unreliable network are required, the communication protocol needs to ensure that all packets arrive unmodified
@@ -96,14 +95,13 @@ at their intended destinations. A common way to achieve this is the usage of \te
 In traditional implementations, such as \gls{tcp}, the receiver confirms the arrival of packets by answering each one with an acknowledgment.
 If the sender does not receive such a confirmation within a given time span, the corresponding packet is assumed lost and retransmitted.
 
-A \gls{noc} is considered an unreliable network in this thesis. One reason for this is potential network congestion, which can lead to high latencies
-and dropped flits. Another possibility are compromised, malicious routers that drop or modify flits to disrupt the normal network operations, for
-instance as part of a \gls{dos} attack.
+A \gls{noc} is considered an unreliable network in this thesis. The reason for this are compromised, malicious routers that have the potential to drop
+or modify flits, intending to disrupt the normal network operations.
 
-In the protocol devised for this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of missing or corrupted
-flits by issuing an \gls{arq} flit back to the sender. Upon arrival, the sender will retransmit the flits in question. In combination with
-authentication techniques, this aids in fulfilling the protection goal of integrity. This scheme is described in detail in Section
-\ref{sec:reliability}.
+In the protocol devised for this thesis, there are no acknowledgments for successfully transmitted flits. Instead, the receiver informs the sender of
+missing or corrupted flits by issuing an \gls{arq} flit back to the sender. Upon arrival, the sender will retransmit the flits in question. In
+combination with authentication techniques, this aids in fulfilling the protection goal of integrity. This scheme is outlined in Section
+\ref{sec:reliability} and further elaborated in Section \ref{subsec:arqretransmissions}.
 
 \section{Network Coding}\label{sec:networkcodingfun}
 Network coding is a technique for transmitting packets efficiently over a network. First described in 2000 by \citeauthor{ahlswede00networkflow}
@@ -125,5 +123,5 @@ network reliability, it may result in better overall performance and lower trans
 \cite[7]{duongba11ncinmulticore}. Furthermore, it provides \enquote{a natural way to take advantage of multipath diversity for security against
 wiretapping attacks} \cite[8]{fragouli07ncfundamentals}. In the context of \glspl{noc}, it has the potential to hinder eavesdropping attempts inside
 the network, but only for limited passive attackers that merely have access to distinct parts of the network. Therefore, in this thesis, it is not
-viewed as a security measure, but as a complementary technique to increase the network's performance. This approach is elaborated in Sections
+viewed as a security measure, but as a complementary technique to increase the network's performance. This approach is elucidated in Sections
 \ref{sec:networkcodingover} and \ref{sec:designnc}.

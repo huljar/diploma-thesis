@@ -22,7 +22,7 @@ header field is required (the global encoding vector) and the generation ID repl
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{flit-structure-uc}
-    \caption[The structure of a flit without network coding]{The structure and data layout of a flit in an environment without network coding
+    \caption[Structure of a flit without network coding]{The structure and data layout of a flit in an environment without network coding
     (uncoded). The fixed size of the header fields and the payload results in an invariant total size of 141 bit.}
     \label{fig:flitstructureuncoded}
 \end{figure}
@@ -30,7 +30,7 @@ header field is required (the global encoding vector) and the generation ID repl
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{flit-structure-nc}
-    \caption[The structure of a flit with network coding]{The structure and data layout of a flit in a network coded environment. The fixed size of
+    \caption[Structure of a flit with network coding]{The structure and data layout of a flit in a network coded environment. The fixed size of
     the header fields and the payload results in an invariant total size of 149 bit.}
     \label{fig:flitstructurenetworkcoded}
 \end{figure}
@@ -308,8 +308,8 @@ $C \geq G$ combinations are computed with randomly selected coefficients $\beta$
         \end{bmatrix}
     \end{split}
 \]
-Each row of the result matrix represents one combination, with $\beta_i = (\beta_{i,\,0}, …, \beta_{i,\,G-1})\ |\ i \in [0, C-1]$ standing
-for the \glspl{gev} and $q_i = (q_{i,\,0}, …, q_{i,\,P-1})\ |\ i \in [0, C-1]$ corresponding to the encoded payloads. The other header fields
+Each row of the result matrix represents one combination, with $\beta_i = (\beta_{i,\,0}, …, \beta_{i,\,G-1})\ |\ i \in [0, C-1] \cap \mathbb{N}$ standing
+for the \glspl{gev} and $q_i = (q_{i,\,0}, …, q_{i,\,P-1})\ |\ i \in [0, C-1] \cap \mathbb{N}$ corresponding to the encoded payloads. The other header fields
 are adopted unaltered from the original flits\footnote{The header fields of the original flits in the same generation contain the same values by
 design, hence these values can simply be copied to the encoded flits.}. Figure \vref{fig:encodingexample} illustrates the whole process.
 
@@ -351,7 +351,7 @@ solution of the system is obtained by applying Gaussian elimination until the ma
         0 & & 1 & p_{G-1,\,0} & \cdots & p_{G-1,\,P-1}
     \end{bmatrix}
 \]
-Now, the original flits may be recreated. The vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in [0, G-1]$ obtained from the system of linear
+Now, the original flits may be recreated. The vectors $p_i = (p_{i,\,0}, …, p_{i,\,P-1})\ |\ i \in [0, G-1] \cap \mathbb{N}$ obtained from the system of linear
 equations above are their payloads. The flit IDs are reconstructed from the generation ID $j$: with $G = 2$, they are $2j$ and $2j+1$. The other
 header fields are simply copied over from one of the combinations as they have not changed during the encoding phase.
 
@@ -386,13 +386,13 @@ is identical to that of normal flits so that the routers do not need to distingu
 to \textit{\gls{arq}} to differentiate them. However, the following header fields are of no use in \gls{arq} flits and are thus ignored (cf. Section
 \ref{subsec:flitstructure}):
 \begin{itemize}
-    \item \textbf{Burst.} The burst bit is useless for \gls{arq} flits since they are always sent as individual entities and not as part of a stream.
-        For this thesis, this is no different to normal flits as the burst bit is entirely unused anyway; nevertheless, it may be relevant to future
-        experiments.
+    \item \textbf{Burst.} The burst bit is of no use for \gls{arq} flits since they are always sent as individual entities and not as part of a stream.
+        Thus, it is always set to 0 here. For this thesis, this is no different to non-\gls{arq} flits as the burst bit is entirely unused anyway;
+        nevertheless, it may be relevant to future experiments.
     \item \textbf{Global Encoding Vector.} Network coding is never applied to an \gls{arq} flit; it is always uncoded. Hence, there is no \gls{gev}
-        associated with it. For the uncoded protocol variants, this fields does not even exist in the first place.
+        associated with it. For the uncoded protocol variants, this field does not even exist in the first place.
     \item \textbf{Address.} \Glspl{arq} do not contain a memory address since their payload does not need to be written to memory. As with the burst
-        bit, this field remains unused both in \glspl{arq} and in normal flits.
+        bit, this field remains unused both in \glspl{arq} and in non-\gls{arq} flits.
 \end{itemize}
 \vspace{0.5\baselineskip}
 
@@ -406,10 +406,11 @@ payload contains a list of \gls{gev}/mode pairs instead. However, in the network
 since they are randomly selected by the sender of the original flits. For instance, only one flit from a generation might arrive at its destination
 while the others are lost in transit. Then, the receiver would have to issue an \gls{arq} for all other flits while only knowing one \gls{gev}. In
 such cases, the receiver issues an \gls{arq} as usual, but includes a list of \gls{gev}/mode pairs of those flits that have already arrived (i.e.,
-the inverse of the default method). It is then the original sender's responsibility to retrieve and resend all except the specified flits\footnote{To
-distinguish between \glspl{arq} specifying the missing/corrupted flits and \glspl{arq} specifying the received/intact flits, two different values for
-the mode field exist that indicate an \gls{arq}. Depending on the type of \gls{arq}, the appropriate one is used.}. In the protocol descriptions
-below, clarifying examples are included (Section \ref{sec:theprotocol}).
+the inverse of the default method). It is then the original sender's responsibility to retrieve and resend all except the specified flits. To
+distinguish between \glspl{arq} denoting the missing/corrupted flits and \glspl{arq} specifying the received/intact flits, two different mode
+values\footnote{As mentioned in Section \ref{subsec:flitstructure}, up to 16 different values are representable by the mode field, rendering the
+introduction of such auxiliary modes possible.} are employed to indicate an \gls{arq}; depending on the type of \gls{arq}, the appropriate one is
+used. In the protocol descriptions below, clarifying examples are included (Section \ref{sec:theprotocol}).
 
 The payload field is not always large enough to carry all the required information. One \gls{gev}/mode pair is $8+4=12$ bit in size, allowing for up to
 5 pairs to fit into the 64 bit payload. For example, with G2C4 and individual authentication, a transmission unit consists of the four combinations
@@ -440,8 +441,8 @@ the missing flits immediately, but the integrity check for the received flits fa
 the limit, causing the whole unit to fail. On the other hand, postponing the \gls{arq} too long may cause unreasonable increases in latency. As a
 middle ground, the issuance of \glspl{arq} is only postponed if other flits from the same transmission unit are currently being verified\footnote{More
 precisely, a data flit is considered \enquote{currently being verified} if its corresponding \gls{mac} flit has already arrived from the network and
-the verification \gls{mac} is currently being computed, i.e., obtaining the verification result is imminent.} in order to include those flits in the
-\gls{arq} as well, should the integrity check fail.
+the verification \gls{mac} is either being computed or enqueued for computation, i.e., obtaining the verification result is imminent.} in order to
+include those flits in the \gls{arq} as well, should the integrity check fail.
 
 A receiver is able to detect the loss of a complete transmission unit if the stream of flit or generation IDs from the affected sender is not
 continuous. In this case, an \gls{arq} could be issued that requests a retransmission of the entire unit. For this thesis, such cases are not taken into
@@ -923,7 +924,8 @@ characteristics and the distinctions between them.
         adaptive. In contrast, an oblivious one does not take the state into consideration.
     \item \textbf{Static vs. dynamic.} A static strategy implies that exactly one fixed, deterministically chosen path exists for each pair of source
         and destination node. A dynamic one entails a path being selected for each flit individually at runtime. Consequently, static strategies are
-        always oblivious and adaptive ones are always dynamic. Since one objective of this thesis is to investigate the usage of multiple paths, the
+        always oblivious and adaptive ones are always dynamic. While a static strategy guarantees in-order delivery of flits, out-of-order arrivals are
+        possible with dynamic ones. Since one objective of this thesis is to investigate the usage of multiple paths, the
         only static strategy employed is \gls{dor}, serving as a baseline for comparison with the other ones.
 \end{itemize}
 \vspace{0.5\baselineskip}
@@ -939,12 +941,12 @@ The main benefit of dynamic strategies presents itself when used in combination 
 members of the same generation are likely to take diverging paths (as long as source and destination lie on different rows and columns of the
 \gls{noc}). Thus, if malicious routers are situated within the rectangle spanned by source and destination, the variety of paths may enable a portion
 of the flits to circumvent them, allowing for successful decoding even if the others are modified. Figure \vref{fig:circumventattackers} exemplifies
-this scenario with the network coded interwoven authentication protocol.% TODO: mention out of order arrival with dynamic, not possible with static
+this scenario with the network coded interwoven authentication protocol.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{circumvent-attackers}
-    \caption[Example of dynamic routing dodging malicious routers]{Example of a \gls{noc} with two malicious routers and a generation being
+    \caption[Example of dodging malicious routers with dynamic routing]{Example of a \gls{noc} with two malicious routers and a generation being
     transmitted via the network coded interwoven authentication protocol (G2C3) and dynamic routing. While flit 1 is modified by a malicious router,
     the paths of flits 2 and 3 do not include an attacker, enabling the destination node to successfully decode the generation. With \gls{dor}, every
     flit would use path 1, enabling the malicious router to corrupt all of them.}
@@ -979,7 +981,7 @@ generator to be integrated into the routers, increasing their hardware complexit
 \textit{Randomized Oblivious Multi-Phase Minimal Routing (\gls{romm})} is a class of routing algorithms originally designed as a compromise between
 static, minimal and randomized, non-minimal routing \cite[3]{nesson95romm}. The central idea is to have the source select $n$ nodes at random
 through which the flit must be routed, essentially dividing the path into multiple independent segments (hence the name \enquote{multi-phase}). To
-preserve minimality, each node $i\ |\ i \in [1,n]$ must lie within the rectangle spanned by node $i-1$ and the destination\footnote{For uniformity,
+preserve minimality, each node $i\ |\ i \in [1, n] \cap \mathbb{N}$ must lie within the rectangle spanned by node $i-1$ and the destination\footnote{For uniformity,
 node $0$ is defined as the source node.}. \Gls{dor} is employed to route the flit from node $i-1$ to $i$ and from $n$ to the
 destination. Since \gls{dor} is oblivious and the selection of the intermediate nodes is not influenced by the network state, \gls{romm} is oblivious
 as well.
@@ -999,11 +1001,12 @@ source instead of every node along the flit's path.
 With \gls{romm} providing dynamic routing, but in an oblivious manner, the creation of an adaptive version suggested itself. Thus, \textit{Randomized
 Adaptive Multi-Phase Minimal Routing (\gls{ramm})} was designed. It is very similar to \gls{romm} and employs the same approach to select an
 intermediate node. However, during the individual phases, \gls{dm} is used instead of \gls{dor} to introduce a certain degree of adaptiveness to the
-algorithm. Note that the selection of the intermediate node is still oblivious to the network state. Figure \ref{fig:allstrategiespaths}d depicts an
-exemplary path for this strategy.
+algorithm. Note that the selection of the intermediate node is still oblivious to the network state. Figure \ref{fig:allstrategiespaths}d depicts
+exemplary paths for this strategy.
 
-The presumed advantage of this strategy over pure \gls{dm} routing is that the presence of an intermediate node may enable the circumvention of larger
-congested areas.
+The presumed advantage of \gls{ramm} over pure \gls{dm} is a more diverse distribution of paths across the network. The presence of an intermediate
+node may occasionally force flits to travel along or close to the edges of the rectangle spanned by source and destination node, while \gls{dm} is
+likely to favor more jagged paths.
 
 \begin{figure}
     \includegraphics[width=0.22\textwidth]{routing-example-dor}\hfill
@@ -1014,12 +1017,8 @@ congested areas.
     \begin{footnotesize}
         \hspace*{0.08\textwidth}\textbf{(a)}\hfill\textbf{(b)}\hfill\textbf{(c)}\hfill\textbf{(d)}\hspace*{0.08\textwidth}
     \end{footnotesize}
-    \caption[Exemplary paths for the examined routing strategies]{Exemplary paths for each of the examined routing strategies: (a) \gls{dor}, (b)
+    \caption[Exemplary paths for various routing strategies]{Exemplary paths for each of the examined routing strategies: (a) \gls{dor}, (b)
     \gls{dm}, (c) \gls{romm}, (d) \gls{ramm}. The nodes labeled with S and D denote the source and destination, respectively, while the nodes labeled
     with Z represent the randomly selected intermediate nodes for the multi-phase strategies.}
     \label{fig:allstrategiespaths}
 \end{figure}
-% TODO: explain the envisioned advantages of RAMM a bit more (having an intermediate node may enable circumvention of larger congested ares, which DM
-% by itself may be unable to do)
-% TODO: table comparing the routing strategies (adaptive yes/no, static yes/no, out-of-order arrival possible yes/no, ...) (maybe no table but mention
-% out-of-order arrivals

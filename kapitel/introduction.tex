@@ -18,7 +18,7 @@ that implement them as their communication backbone. Particularly due to the tre
 threat of the hardware itself being compromised becomes increasingly relevant \cites{ancajas14fortnocs}{sethumadhavan15trustworthyhardware}.
 
 In order to counteract such threats, it is desirable to embed security considerations directly into the design phase of the circuits. In recent
-research, numerous approaches to integrate such security measures have been pursued\footnote{For an elaborate
+research, numerous approaches to integrate security measures have been pursued\footnote{For an elaborate
 discourse on related research, see Chapter \ref{ch:relatedwork}.}. At the TU Dresden Chair of Privacy and Data Security,
 \citeauthor{moriam18activeattackers} have explored a method to protect the communications between the cores against adversaries residing in the networking
 hardware \cites{moriam15manycorenc}{moriam18activeattackers}. In their approach, network coding was combined with authentication, yielding a
@@ -36,8 +36,8 @@ interconnection system is crucial to ensure flawless operation of the system. A 
 \begin{figure}
     \centering
     \includegraphics[width=0.4\textwidth]{haecbox}
-    \caption[Processor architecture in the HAEC project]{Processor architecture employed in the \gls{haec} project. Numerous chip stacks are organized
-    in compute boards and employ optical and wireless links for their interconnection. Each chip stack is a compute node consisting of of multiple
+    \caption[Processor architecture used in the HAEC project]{Processor architecture employed in the \gls{haec} project. Numerous chip stacks are organized
+    in compute boards and employ optical and wireless links for their interconnection. Each chip stack is a compute node consisting of multiple
     cores arranged as a 3D mesh, which are interconnected by a wired \gls{noc}. The illustration is taken from the \gls{haec} presentation paper
     \cite[1]{matthiesen17haec}.}
     \label{fig:haecbox}
