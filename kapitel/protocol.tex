@@ -342,7 +342,7 @@ form):
         \beta_{G-1,\,0} & \cdots & \beta_{G-1,\,G-1} & q_{G-1,\,0} & \cdots & q_{G-1,\,P-1}
     \end{bmatrix}
 \]
-It is important to note that in the above matrix, any $G$ of the $C$ combination may be used, and in any order; the given indices are examplary. The
+It is important to note that in the above matrix, any $G$ of the $C$ combination may be used, and in any order; the given row indices are exemplary. The
 solution of the system is obtained by applying Gaussian elimination until the matrix is in reduced row echelon form with the following structure:
 \[
     \begin{bmatrix}
@@ -369,8 +369,8 @@ For each sender-receiver pair, the IDs of flits and generations should be unique
 attacks. Hence, for each such pair, IDs start at zero and are incremented with every newly created flit or generation, respectively. However, as only a finite amount of
 distinct values can be represented by the carrying header field, long-running systems are bound to cause an arithmetic overflow at some point. Prior
 to this thesis, a size of 24 bit was determined as sufficient for the given scenario \cite[5]{franz18authdraft}. With this, $2^{24} = \num{16777216}$
-distinct IDs are at disposal. Should an overflow occur, the IDs simply restart at zero. At this point, is is advisable to negotiate a new shared
-secret key with the affected receiver to further impede replay attacks. For the remainder of this thesis, IDs are assumed to be unique for a given
+distinct IDs are at disposal. Should an overflow occur, the IDs simply restart at zero. At this point, is is advisable to negotiate new shared
+secret keys with the affected receiver to further impede replay attacks. For the remainder of this thesis, IDs are assumed to be unique for a given
 sender-receiver pair.
 
 \subsection{Transmission Units}
@@ -383,8 +383,8 @@ the set of combinations created from one generation together with any \glspl{mac
 As introduced in Section \ref{sec:reliability}, \glspl{arq} are used to request the retransmission of specific flits in the event of a loss or
 corruption in transit. \Glspl{arq} are special flits that receivers can send back to the originator of the affected transmission unit. Their structure
 is identical to that of normal flits so that the routers do not need to distinguish between \glspl{arq} and other flits. The mode field is always set
-to \textit{\gls{arq}} to differentiate them. However, the following header fields are of no use in \gls{arq} flits and are thus ignored (cf. Section
-\ref{subsec:flitstructure}):
+to a value indicating an \gls{arq} to differentiate them. However, the following header fields are of no use in \gls{arq} flits and are thus ignored
+(cf. Section \ref{subsec:flitstructure}):
 \begin{itemize}
     \item \textbf{Burst.} The burst bit is of no use for \gls{arq} flits since they are always sent as individual entities and not as part of a stream.
         Thus, it is always set to 0 here. For this thesis, this is no different to non-\gls{arq} flits as the burst bit is entirely unused anyway;
@@ -505,8 +505,8 @@ The sequence of actions for sending flits to the network (upper part of Figure \
         i.e., each other node in the network,
         there is a separate buffer because the required storage time is proportional to the distance to the receiver. Thus, buffers for nodes far away are
         larger. Once a buffer is full, old flits are replaced in a \gls{fifo} manner\footnote{Naturally, the buffers should be large enough to be
-        able to serve flits for \glspl{arq} arriving within an acceptable time frame after the original flit was dispatched. For simplicity, the
-        buffers are assumed to be sufficiently large to handle all \glspl{arq}.}.
+        able to serve flits for \glspl{arq} arriving within an acceptable time frame after the original flit was dispatched. For simplicity, a
+        single buffer is assumed that is sufficiently large to handle all \glspl{arq}.}.
 \end{enumerate}
 \vspace{0.5\baselineskip}
 
@@ -555,7 +555,7 @@ vice versa). Examplary sequences of events involving \glspl{arq} are depicted in
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{verification-fail-indauth-uc}
+    \includegraphics[width=0.9\textwidth]{verification-fail-indauth-uc}
     \caption[Example flow chart for uncoded ind. auth. with integrity breach]{Example flow chart for uncoded individual authentication depicting a
     sender and a receiver communicating a single transmission unit. The \gls{mac} flit is modified in transit, triggering an \gls{arq} to request the
     retransmission of both data and \gls{mac} flit. With the unhindered retransmissions, verification succeeds.}
@@ -600,7 +600,7 @@ This amounts to the following procedure for sending flits to the network (upper 
     \item \textbf{Authenticate combinations.} The authentication procedure is virtually the same as for uncoded individual authentication. The only
         difference is that the \glspl{mac} are computed over combinations rather than uncoded flits (see Figure \vref{fig:computecombinationmac}
         for a visualization of the algorithm)\footnote{Combinations and their \gls{mac} flits are linked by containing the same \gls{gev} value in
-        addition to having the same generation ID.}. Apart from that, each outgoing combination flit is individually authenticated with a dedicated \gls{mac}
+        addition to having the same generation ID.}. Apart from that, each outgoing combination is individually authenticated with a dedicated \gls{mac}
         flit.
     \item \textbf{Store copies in retransmission buffer.} Unchanged from the uncoded protocol variant, a copy of each flit (combinations and
         \glspl{mac} alike) is stored in the retransmission buffer to facilitate \gls{arq} answers.
@@ -637,7 +637,7 @@ transmission unit. This scenario is illustrated in Figure \vref{fig:timeoutindau
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{timeout-indauth-nc}
+    \includegraphics[width=0.9\textwidth]{timeout-indauth-nc}
     \caption[Example flow chart for network coded ind. auth. with many losses]{Example flow chart for network coded individual authentication showing
     a sender and a receiver attempting to communicate a single transmission unit. After half the flits are lost in transit, a timeout occurs. Since
     the receiver does not know the \gls{gev} of the third data/\gls{mac} pair, the subsequent \gls{arq} specifies which flits have already arrived.
@@ -712,7 +712,7 @@ same flit is the eponymous characteristic of this protocol variant.
 Sending a flit from the processing element to the network is achieved by the following course of action (upper part of Figure \ref{fig:protchartintauthuc}):
 \begin{enumerate}
     \item \textbf{Encrypt payload.} The encryption process does not differ from uncoded individual authentication.
-    \item \textbf{Split flit.} This step is unique to interwoven authentication. As described above, a new flit with the same header values is created
+    \item \textbf{Split flit.} This step is unique to interwoven authentication. As described above, a new flit with matching header values is created
         and the payload is divided among the two flits. Afterwards, one contains the first 32 bit of the payload, while the other holds the last 32
         bit.
     \item \textbf{Authenticate flits.} Each flit is authenticated by computing its authcode, which is then appended to the encrypted data. The 32 data
@@ -732,7 +732,7 @@ Flits incoming from the network are processed as follows (lower portion of Figur
         decryption. Thus, the flit is buffered as mentioned above until its counterpart arrives. Then, the payload is merged back into a single flit,
         which is subsequently decrypted.
     \item \textbf{Verification.} Once the receiver has computed its own authcode, it is compared with the one contained within the flit. Naturally,
-        the integrity check fails should they diverge. If the flit was already decrypted (i.e., the other part of the split has already arrived), the
+        the integrity check fails should they diverge. If the flit was already decrypted (i.e., the other part of the split had already arrived), the
         result has to be discarded. Once the integrity of both parts is guaranteed, the merged and decrypted flit is sent to the processing element.
 \end{enumerate}
 \vspace{0.5\baselineskip}
@@ -774,7 +774,7 @@ The following steps are implemented on the sender side (upper part of Figure \re
     \item \textbf{Encrypt payload.} As per usual, this is the first piece of the sending process and does not differ from the other protocol variants.
     \item \textbf{Split flit.} The same procedure as in uncoded interwoven authentication is applied here.
     \item \textbf{Encode generation.} As described above, the flits resulting from the split form a generation for network coding. The encoding
-        algorithm is the virtually the same as in network coded individual authentication, the only difference being that is is applied to a shorter
+        algorithm is the virtually the same as in network coded individual authentication, the only difference being that it is applied to a shorter
         payload\footnote{Recalling the operation breakdown from Section \ref{sec:designnc}, the shorter payload is expressed by setting $P=8$ instead
         of $P=16$.}.
     \item \textbf{Authenticate combinations.} For each combination, an authcode is computed in the same manner as in uncoded interwoven
@@ -806,7 +806,7 @@ other variants apply. An example is given in Figure \vref{fig:verificationfailin
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{verification-fail-intauth-nc}
+    \includegraphics[width=0.9\textwidth]{verification-fail-intauth-nc}
     \caption[Example flow chart for network coded int. auth. with integrity breach]{Example flow chart for network coded interwoven authentication
     with a sender and a receiver attempting to communicate a single transmission unit. The second flit is modified in transit, triggering an \gls{arq}
     to request its retransmission. Furthermore, the already decoded, merged, and decrypted flit has to be discarded and the process is retried with
@@ -875,7 +875,7 @@ The receiver uses the following course of action (lower portion of Figure \ref{f
 \begin{enumerate}
     \item \textbf{\Gls{arq} handling.} The treatment of incoming \glspl{arq} is the same as in the other protocol variants described above.
     \item \textbf{Storing \gls{mac} flits.} If a generation's \gls{mac} flit arrives, it is stored for the integrity check as usual.
-    \item \textbf{Decoding.} In contrast to all other protocol variants, the combinations need to be decoded before the verification \glspl{mac} can
+    \item \textbf{Decoding.} In contrast to all other protocol variants, the combinations need to be decoded before the verification \gls{mac} can
         be computed. Flits are thus buffered here until two combinations from the same generation are available. Then, the normal decoding process is
         performed.
     \item \textbf{Processing decoded flits.} After decoding, the flits are duplicated. One copy of each is used to compute the \gls{mac} of the
@@ -961,7 +961,7 @@ saturated networks and produce a more uniform distribution of the traffic over t
 \textit{Dimension Order Routing (\gls{dor})}, sometimes referred to as \textit{XY Routing}, is an oblivious, static routing strategy. Flits are first
 forwarded along the rows of the mesh (the X dimension) until they arrive at the column that their destination is situated in. Then, they are routed
 along this column (the Y dimension) until reaching their target. This is the simplest of the examined strategies and used as a baseline for the
-evaluation of the other ones. Exemplary paths are depicted in Figure \ref{fig:allstrategiespaths}a.
+evaluation of the other ones. An exemplary path is depicted in Figure \ref{fig:allstrategiespaths}a.
 
 Due to its simplicity, this strategy can be implemented in routers without increasing their complexity, and thus their occupied chip area, by a lot.
 However, its performance deteriorates considerably under heavy network loads \cite[3]{nesson95romm}. Furthermore, it does not offer the advantages of
@@ -971,7 +971,7 @@ multipath routing described above.
 The second strategy of interest is \textit{Dynamic Minimal Routing (\gls{dm})}. When a router has multiple options for the next hop of a flit, it checks
 the congestion status of the viable output ports. In a 2D mesh, at most two directions are allowed in order for the path to remain minimal. If both
 are free or both are congested, one of them is chosen at random. However, if exactly one of them is uncongested, it is always selected.
-These steps are performed by every router along the flit's path. Figure \ref{fig:allstrategiespaths}b shows a few of the possible paths.
+These steps are performed by every router along the flit's path. Figure \ref{fig:allstrategiespaths}b shows a few of the possible routes.
 
 The adaptiveness of this scheme allows for the possibility to dodge saturated areas of the network. Together with the random selections in the
 intermediate routers, it facilitates the use of multiple paths for each pair of source and destination node. However, it requires a random number
@@ -991,7 +991,7 @@ specific algorithm rather than the whole class. In other words, the source choos
 the destination; then \gls{dor} is used for the path from source to intermediate and from intermediate to destination\footnote{As the intermediate
 node is selected by the source, this information needs to be transmitted along with the flit to render this strategy possible. This increases the flit
 size by 8 bit (4 bit X and 4 bit Y coordinate, see Section \ref{subsec:flitstructure}). To maintain uniformity, the increase is ignored here. The
-number of input blocks for the authentication ciphers is not affected; the padding is simply 8 bit shorter.}. An example is given in Figure
+number of input blocks for the authentication procedures is not affected; the padding is simply 8 bit shorter.}. An example is given in Figure
 \ref{fig:allstrategiespaths}c.
 
 \Gls{romm} provides a middle ground between \gls{dor} and \gls{dm}. Random number generation is still required, but only needs to be performed by the

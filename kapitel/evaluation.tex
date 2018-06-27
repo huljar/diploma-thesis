@@ -358,7 +358,7 @@ average and maximum local queue lengths and is thus not considered worth the add
 
 \section{Performance Comparisons}\label{sec:perfcompeval}
 After the preliminary experiments to determine the hyperparameters for the simulations were finished, the main performance evaluations of the protocol
-variants and routing strategies are tackled. In the next section, various criteria are established and explained that indicate the performance aspects
+variants and routing strategies were tackled. In the next section, various criteria are established and explained that indicate the performance aspects
 of a given configuration. Then, the protocol variants are compared under these criteria for varying attack probabilities of the malicious routers.
 Afterwards, the most promising variant is evaluated for each of the presented routing strategies to examine their effects on the performance. Finally,
 the consequences of increasing the \gls{arq} limit to 2 are investigated.
@@ -670,7 +670,7 @@ t_1 = 48$ cycles. Hence, each flit needs to reside for at least 48 cycles within
 injection rate of 0.2, 9.6 further flits are on average injected into the network during this timespan. Thus, an \gls{rtb} size of 10 flits is
 required to have no requested flit already overwritten once the \gls{arq} arrives. For a limit of 2, the duration until the second \gls{arq}
 arrives needs to be taken into account. Assuming that with the first \gls{arq}, six flits were retransmitted, but all except the last one are lost in
-transit, this timespan amounts to $d + 8 + t_1 + d + 2 + d + 6 + t_1 + d = 4d + 2t_1 + 16 = 96$ cycles. This formula includes the time until the first
+transit, this timespan amounts to $(d + 8 + t_1 + d) + (2 + d + 6) + (t_1 + d) = 4d + 2t_1 + 16 = 96$ cycles. This formula includes the time until the first
 \gls{arq} arrives as well as the \gls{rtb} lookup time (2 cycles) and the time until the last of the six retransmitted flits arrives at the receiver
 ($d + 6$ cycles). Note that $t_2$ does nor occur in the formula since the arrival of the one successful retransmission sets the \gls{arq} timer
 to $t_1$ again. During the calculated period of 96 cycles, 19.2 more flits are injected into the network on average. Hence,

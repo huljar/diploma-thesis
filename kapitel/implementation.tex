@@ -14,7 +14,7 @@ module through which it sends and receives messages. The connections link the ga
 message flows and the network's topology.
 
 The simulator makes extensive use of the hierarchical and modular approach of \omnet{}. The processing elements, network interfaces, and routers are
-defined as modules and instanced as many times as required, depending on the \gls{noc} dimensions. They are interconnected through their gates and
+defined as modules and are instanced as many times as required, depending on the \gls{noc} dimensions. They are interconnected through their gates and
 arranged in a way mirroring the structure of the \gls{noc}. To create a simulation as realistic as possible, they are made up of a number of
 submodules, such as queues, buffers, and crypto modules, resembling the actual hardware layout.
 
@@ -110,7 +110,7 @@ consumer with an input queue. Figure \vref{fig:omnetpe} depicts its appearance i
 The traffic generator randomly produces flits and sends them to the network interface\footnote{This traffic generation scheme was adopted from
 \citeauthor{moriam18activeattackers} \cite{moriam18activeattackers}.}. On each clock tick, one flit is created with a configurable
 \textit{generation probability}. The destination is chosen at random from the set of network nodes (excluding the own node) with a uniform
-distribution. The produced flits are always data flits (not \glspl{mac} or \glspl{arq}) without any meaningful information contained in their
+distribution. The produced flits are always data flits (i.e., not \glspl{mac} or \glspl{arq}) without any meaningful information contained in their
 payloads\footnote{For the simulation, only the transmission parameters are of interest, not the actual data being transferred.}. Furthermore, the
 generator may be configured to always produce a pair of two flits: in the event of a flit creation as described above, another flit will always be
 produced on the next clock tick with the same destination. The purpose of this generation pattern is to allow for a fair comparison of uncoded and
@@ -163,7 +163,7 @@ With the interwoven authentication protocol variant, the next step is to create 
 flits are encoded as a generation by the \textit{encoder}. The resulting three or four flits are subsequently sent back to the \textit{cryptoExit}
 auxiliary module which merely forwards them to the \textit{authenticateQueue}\footnote{The flits could also bypass the \textit{cryptoExit} and head
 straight for the \textit{authenticateQueue}, but this would have been more tedious to implement. The forwarding by \textit{cryptoExit} imposes no
-temporal overhead.}. As the computation of a combination takes one clock cycle, the encoder
+overhead.}. As the computation of a combination takes one clock cycle, the encoder
 consequently sends out precisely one combination per cycle.
 
 Now, each combination needs to be authenticated. The \textit{authenticateQueue} is one of the four queues connected to the \textit{cryptoEntry}. In
@@ -210,7 +210,7 @@ In case an \gls{arq} must be issued, either caused by non-equal authcodes or tim
 \subsection{Router}\label{subsec:routerimpl}
 Like the processing elements, the routers' internal structure is straightforward. Presented in Figure \vref{fig:omnetrouter}, it consists of a switch
 and five input buffers (one for the local network interface and four for the neighboring routers). These buffers are referred to as the \textit{local
-queue} and the \textit{port queues}, respectively.
+queue} and the \textit{port queues} (or \textit{node queues}), respectively.
 
 \begin{figure}
     \centering
@@ -278,6 +278,7 @@ needs to be processed. For authentication, the number of input blocks (and conse
 blocks are processed, corresponding to six clock cycles. Interwoven authentication only has two input blocks, but entails an additional cycle for the
 authcode calculation. With full-generation authentication, the two input flits are divided into five blocks and thus require ten cycles of
 processing.
+\pagebreak
 
 The lookup procedure for the retransmission buffer works as follows: when an \gls{arq} arrives, the first action is to find the correct buffer
 depending on the \gls{arq}'s source. As the location of each buffer is static, this does not require a dedicated clock cycle. Afterwards, the position
@@ -288,6 +289,6 @@ of the individual flits is determined by fixed offsets from this location depend
 Thus, for uncoded protocol variants, an \gls{rtb} lookup takes one clock cycle. However, if multiple flits need to be retransmitted, only one can be
 sent out per cycle since the link to the router cannot be occupied by more than one flit at the same time.
 
-In network coded environments, the mode header field does not suffice to uniquely identify a flit within a transmission unit; the \glspl{gev}
+In network coded environments, the mode does not suffice to uniquely identify a flit within a transmission unit; the \glspl{gev}
 specified in the \gls{arq} need to be compared as well. Hence, a flit's position is determined by first finding the ID, then the affected \glspl{gev},
 and finally the required modes for each \gls{gev}. This extended procedure adds one clock cycle to the lookup time for a total of two cycles.
